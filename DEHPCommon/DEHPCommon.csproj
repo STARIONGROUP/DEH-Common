@@ -80,10 +80,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="CommonUserInterface\" />
-    <Folder Include="HubController\" />
-    <Folder Include="MappingEngine\" />
-    <Folder Include="UserPreferenceHandler\" />
+    <Folder Include="CommonUserInterface\ViewModels\" />
+    <Folder Include="CommonUserInterface\View\" />
+    <Folder Include="HubController\MessageHub\" />
+    <Folder Include="MappingEngine\MappingEngine\" />
+    <Folder Include="UserPreferenceHandler\UserPreferenceService\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
