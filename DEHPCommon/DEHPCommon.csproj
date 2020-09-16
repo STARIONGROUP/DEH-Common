@@ -82,8 +82,9 @@
   <ItemGroup>
     <Folder Include="CommonUserInterface\ViewModels\" />
     <Folder Include="CommonUserInterface\View\" />
-    <Folder Include="HubController\MessageHub\" />
-    <Folder Include="MappingEngine\MappingEngine\" />
+    <Folder Include="HubController\" />
+    <Folder Include="MappingEngine\" />
+    <Folder Include="MessageHub\" />
     <Folder Include="UserPreferenceHandler\UserPreferenceService\" />
   </ItemGroup>
   <ItemGroup>

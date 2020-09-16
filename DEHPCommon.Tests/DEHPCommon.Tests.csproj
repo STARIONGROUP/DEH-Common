@@ -16,6 +16,7 @@
     <Folder Include="CommonUserInterface\" />
     <Folder Include="HubController\" />
     <Folder Include="MappingEngine\" />
+    <Folder Include="MessageHub\" />
     <Folder Include="UserPreferenceHandler\" />
   </ItemGroup>
 
