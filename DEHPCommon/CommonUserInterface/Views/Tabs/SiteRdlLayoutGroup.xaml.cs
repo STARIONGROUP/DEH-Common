@@ -5,20 +5,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.CommonUserInterface.ViewModels
+namespace DEHPCommon.CommonUserInterface.Views.Tabs
 {
-    using DevExpress.Mvvm;
+    using DevExpress.Xpf.LayoutControl;
 
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for SiteRdlLayoutGroup.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class SiteRdlLayoutGroup : LayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="SiteRdlLayoutGroup"/> class.
         /// </summary>
-        public MainViewModel()
+        public SiteRdlLayoutGroup()
         {
+            InitializeComponent();
         }
     }
 }

@@ -5,20 +5,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.CommonUserInterface.ViewModels
+namespace DEHPCommon.CommonUserInterface.Views
 {
-    using DevExpress.Mvvm;
+    using System.Windows.Controls;
 
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for LoginView.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class LoginView : UserControl
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
-        /// </summary>
-        public MainViewModel()
+        public LoginView()
         {
+            InitializeComponent();
         }
     }
 }
