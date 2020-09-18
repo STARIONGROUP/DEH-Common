@@ -5,19 +5,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.CommonUserInterface.Views.Tabs
+namespace DEHPCommon.CommonUserInterface.Views.Common
 {
-    using DevExpress.Xpf.LayoutControl;
+    using System.Windows.Controls;
 
     /// <summary>
-    /// Interaction logic for SiteRdlLayoutGroup.xaml
+    /// Interaction logic for LoginView.xaml
     /// </summary>
-    public partial class SiteRdlLayoutGroup : LayoutGroup
+    public partial class LoginView : UserControl
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SiteRdlLayoutGroup"/> class.
-        /// </summary>
-        public SiteRdlLayoutGroup()
+        public LoginView()
         {
             InitializeComponent();
         }

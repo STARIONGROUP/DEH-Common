@@ -5,14 +5,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.CommonUserInterface.ViewModels
+namespace DEHPCommon.CommonUserInterface.ViewModels.Common
 {
     using System;
-    using System.Diagnostics;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
-    using System.Reactive;
+    using System.Diagnostics;
     using System.Linq;
+    using System.Reactive;
+    using System.Threading.Tasks;
+
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -21,13 +23,11 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
 
     using CDP4WspDal;
 
-    using ReactiveUI;
+    using DEHPCommon.CommonUserInterface.ViewModels.Rows;
 
     using Microsoft.Win32;
 
-    using DEHPCommon.CommonUserInterface.ViewModels.Rows;
-
-    using CDP4Common.SiteDirectoryData;
+    using ReactiveUI;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different datasources
@@ -259,7 +259,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
                 {
                     return;
                 }
-                LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
+                this.LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
@@ -268,7 +268,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
                 {
                     return;
                 }
-                LogMessage($"Succesfully logged to {this.Uri}({this.ServerType.Value}) data-source");
+                this.LogMessage($"Succesfully logged to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.ServerType).Subscribe(_ =>
@@ -303,7 +303,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
             {
                 if (this.IsSessionOpen(this.Uri, this.UserName, this.Password))
                 {
-                    LogMessage("The user is already logged on this server. Closing the session.");
+                    this.LogMessage("The user is already logged on this server. Closing the session.");
                     await this.ServerSession.Close();
                 }
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
@@ -330,7 +330,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
             }
             catch (Exception ex)
             {
-                LogMessage(ex.Message);
+                this.LogMessage(ex.Message);
 
                 this.LoginFailed = true;
             }

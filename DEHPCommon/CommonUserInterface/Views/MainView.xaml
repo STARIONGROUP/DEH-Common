@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:ViewModels="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels"
+             xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.Views.Tabs"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.DataContext>
         <ViewModels:MainViewModel />
@@ -13,7 +14,11 @@
         <dxlc:LayoutControl Margin="5"
                             Orientation="Vertical"
                             ScrollBars="None" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-
+            <dxlc:LayoutGroup Orientation="Vertical"
+                              View="Tabs"
+                              dxlc:LayoutControl.AllowHorizontalSizing="True">
+                <tabs:LoginLayoutGroup/>
+            </dxlc:LayoutGroup>
         </dxlc:LayoutControl>
     </Grid>
 </UserControl>

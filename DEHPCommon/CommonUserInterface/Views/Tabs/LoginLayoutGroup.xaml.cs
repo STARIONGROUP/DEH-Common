@@ -5,18 +5,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.CommonUserInterface.Views
+namespace DEHPCommon.CommonUserInterface.Views.Tabs
 {
-    using System.Windows.Controls;
+    using DevExpress.Xpf.LayoutControl;
 
     /// <summary>
-    /// Interaction logic for LoginView.xaml
+    /// Interaction logic for LoginLayoutGroup.xaml
     /// </summary>
-    public partial class LoginView : UserControl
+    public partial class LoginLayoutGroup : LayoutGroup
     {
-        public LoginView()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoginLayoutGroup"/> class.
+        /// </summary>
+        public LoginLayoutGroup()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

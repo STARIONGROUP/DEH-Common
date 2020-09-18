@@ -58,22 +58,20 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="CommonUserInterface\Utils\InverseBooleanConverter.cs" />
-    <Compile Include="CommonUserInterface\ViewModels\LoginViewModel.cs" />
+    <Compile Include="CommonUserInterface\ViewModels\Tabs\LoginLayoutGroupViewModel.cs" />
+    <Compile Include="CommonUserInterface\ViewModels\Common\LoginViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\MainViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Rows\DefinedThingRowViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Rows\EngineeringModelRowViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Rows\SiteReferenceDataLibraryRowViewModel.cs" />
-    <Compile Include="CommonUserInterface\Views\LoginView.xaml.cs">
+    <Compile Include="CommonUserInterface\Views\Common\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="CommonUserInterface\Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CommonUserInterface\Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
-      <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="CommonUserInterface\Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
-      <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>
+    <Compile Include="CommonUserInterface\Views\Tabs\LoginLayoutGroup.xaml.cs">
+      <DependentUpon>LoginLayoutGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -136,7 +134,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CommonUserInterface\Views\LoginView.xaml">
+    <Page Include="CommonUserInterface\Views\Common\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -144,11 +142,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CommonUserInterface\Views\Tabs\EngineeringModelLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonUserInterface\Views\Tabs\SiteRdlLayoutGroup.xaml">
+    <Page Include="CommonUserInterface\Views\Tabs\LoginLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

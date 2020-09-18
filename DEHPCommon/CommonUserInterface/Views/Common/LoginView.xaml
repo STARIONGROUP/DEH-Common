@@ -1,5 +1,5 @@
 ﻿<UserControl
-             x:Class="DEHPCommon.CommonUserInterface.Views.LoginView"
+             x:Class="DEHPCommon.CommonUserInterface.Views.Common.LoginView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,6 +11,7 @@
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:utils="clr-namespace:DEHPCommon.CommonUserInterface.Utils"
              xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.Views.Tabs"
+             xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels.Common"
              mc:Ignorable="d"
              d:DesignHeight="240">
     <UserControl.Resources>
@@ -19,7 +20,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.DataContext>
-        <ViewModels:LoginViewModel />
+        <common:LoginViewModel />
     </UserControl.DataContext>
     <Grid>
         <Grid.RowDefinitions>
@@ -150,8 +151,6 @@
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1">
             <dxlc:LayoutGroup Orientation="Vertical" View="Tabs" Margin="0 5 0 0" Visibility="{Binding Path=LoginSuccessfully, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
-                <tabs:EngineeringModelLayoutGroup GridSelectionIsAvailable="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=JsonIsAvailable}" />
-                <tabs:SiteRdlLayoutGroup />
             </dxlc:LayoutGroup>
         </StackPanel>
     </Grid>
