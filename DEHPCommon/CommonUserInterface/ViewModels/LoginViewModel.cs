@@ -40,7 +40,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
         public static KeyValuePair<string, string>[] DataSourceList { get; } = {
             new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
             new KeyValuePair<string, string>("OCDT", "OCDT WSP Server"),
-            new KeyValuePair<string, string>("JSON", "JSON")
         };
 
         /// <summary>
@@ -317,9 +316,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels
                     case "OCDT":
                         this.dal = new WspDal();
                         break;
-                        //case "JSON":
-                        //    this.dal = new JsonFileDal(new Version("1.0.0"));
-                        //    break;
                 }
 
                 this.ServerSession = new Session(this.dal, credentials);

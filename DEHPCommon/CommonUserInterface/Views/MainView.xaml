@@ -5,8 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:ViewModels="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels"
-             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-             xmlns:local="clr-namespace:DEHPCommon.CommonUserInterface.Views"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.DataContext>
         <ViewModels:MainViewModel />
