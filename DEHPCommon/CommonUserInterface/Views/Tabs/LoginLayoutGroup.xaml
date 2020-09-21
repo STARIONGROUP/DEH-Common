@@ -9,7 +9,7 @@
                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                   xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.Views"
                   xmlns:ViewModels="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels"
-                  xmlns:com="clr-namespace:DEHPCommon.CommonUserInterface.Views.Com"
+                  xmlns:com="clr-namespace:DEHPCommon.CommonUserInterface.Views.Tabs"
                   xmlns:common1="clr-namespace:DEHPCommon.CommonUserInterface.Views.Common"
                   xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels.Tabs"
                   Header="Migration"

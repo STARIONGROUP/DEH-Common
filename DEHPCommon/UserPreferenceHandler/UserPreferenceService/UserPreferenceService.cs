@@ -32,7 +32,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public static string ConfigurationDirectoryFolder = "";
+        public static string ConfigurationDirectoryFolder = "UserPreferenceService";
 
         /// <summary>
         /// The setting file extension
