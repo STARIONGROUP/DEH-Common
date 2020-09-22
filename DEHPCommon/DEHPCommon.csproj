@@ -51,12 +51,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonUserInterface\App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="CommonUserInterface\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="CommonUserInterface\Utils\InverseBooleanConverter.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Tabs\LoginLayoutGroupViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Common\LoginViewModel.cs" />
@@ -82,9 +76,6 @@
     <Folder Include="HubController\" />
     <Folder Include="MappingEngine\" />
     <Folder Include="MessageHub\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="CommonUserInterface\Resources\cdplogo3d_48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE">
@@ -128,14 +119,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CommonUserInterface\App.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonUserInterface\MainWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="CommonUserInterface\Views\Common\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
