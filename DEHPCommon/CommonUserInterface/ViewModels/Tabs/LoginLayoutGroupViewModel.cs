@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs"company="RHEA System S.A.">
+// <copyright file="LoginLayoutGroupViewModel.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
@@ -82,7 +82,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
                 this.UpdateOutput(message);
             });
 
-            this.WhenAnyValue(vm => vm.LoginViewModel.LoginSuccessfully, vm => vm.LoginViewModel.ServerSession, (loginSuccessfully, dataSourceSession) =>
+            this.WhenAnyValue(vm => vm.LoginViewModel.LoginSuccessfully, (loginSuccessfully, dataSourceSession) =>
             {
                 return loginSuccessfully && dataSourceSession != null;
             });
@@ -95,7 +95,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
         {
             this.WhenAnyValue(
                 vm => vm.LoginViewModel.LoginSuccessfully,
-                vm => vm.LoginViewModel.ServerSession,
                 (sourceLoginSuccessfully, sourceSession) =>
                 {
                     return sourceLoginSuccessfully && sourceSession != null;

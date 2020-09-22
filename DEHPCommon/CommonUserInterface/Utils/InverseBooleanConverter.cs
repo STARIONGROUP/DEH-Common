@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs"company="RHEA System S.A.">
+// <copyright file="InverseBooleanConverter.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
@@ -23,7 +23,9 @@ namespace DEHPCommon.CommonUserInterface.Utils
         /// <param name="targetType">Target type (bool)</param>
         /// <param name="parameter">The parameter is not used.</param>
         /// <param name="culture">The parameter is not used.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// The boolean value that is inversed
+        /// </returns>
         public object Convert(object value, Type targetType, object parameter,
             System.Globalization.CultureInfo culture)
         {
@@ -40,7 +42,9 @@ namespace DEHPCommon.CommonUserInterface.Utils
         /// <param name="targetType">The parameter is not used</param>
         /// <param name="parameter">The parameter is not used</param>
         /// <param name="culture">The parameter is not used</param>
-        /// <returns></returns>
+        /// <returns>
+        /// Not supported
+        /// </returns>
         public object ConvertBack(object value, Type targetType, object parameter,
             System.Globalization.CultureInfo culture)
         {

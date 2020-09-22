@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs"company="RHEA System S.A.">
+// <copyright file="LoginViewModel.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
@@ -9,7 +9,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
@@ -24,8 +23,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
     using CDP4WspDal;
 
     using DEHPCommon.CommonUserInterface.ViewModels.Rows;
-
-    using Microsoft.Win32;
 
     using ReactiveUI;
 
@@ -58,7 +55,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         }
 
         /// <summary>
-        /// Backing field for the <see cref="Username"/> property
+        /// Backing field for the <see cref="UserName"/> property
         /// </summary>
         private string username;
 
@@ -108,21 +105,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         private IDal dal;
 
         /// <summary>
-        /// Backing field for the <see cref="ISession"/> property
-        /// </summary>
-        private ISession session;
-
-        /// <summary>
-        /// Gets or sets login succesfully flag
-        /// </summary>
-        public ISession ServerSession
-        {
-            get => this.session;
-
-            private set => this.RaiseAndSetIfChanged(ref this.session, value);
-        }
-
-        /// <summary>
         /// Backing field for the <see cref="LoginSuccessfully"/> property
         /// </summary>
         private bool loginSuccessfully;
@@ -153,21 +135,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         }
 
         /// <summary>
-        /// Backing field for the <see cref="JsonIsSelected"/> property
-        /// </summary>
-        private bool jsonIsSelected;
-
-        /// <summary>
-        /// Gets or sets json selected flag
-        /// </summary>
-        public bool JsonIsSelected
-        {
-            get => this.jsonIsSelected;
-
-            private set => this.RaiseAndSetIfChanged(ref this.jsonIsSelected, value);
-        }
-
-        /// <summary>
         /// Backing field for the <see cref="Output"/> property
         /// </summary>
         private string output;
@@ -180,20 +147,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
             get => this.output;
 
             set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
-        /// Out property for the <see cref="SelectAllModels"/> property
-        /// </summary>
-        private bool selectAllModels;
-
-        /// <summary>
-        /// Gets a value indicating whether all models are selected
-        /// </summary>
-        public bool SelectAllModels
-        {
-            get { return this.selectAllModels; }
-            set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
         }
 
         /// <summary>
@@ -211,33 +164,9 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         }
 
         /// <summary>
-        /// Backing field for the <see cref="SiteReferenceDataLibraries"/> property
-        /// </summary>
-        private ReactiveList<SiteReferenceDataLibraryRowViewModel> siteReferenceDataLibraries;
-
-        /// <summary>
-        /// Gets or sets site reference data libraries
-        /// </summary>
-        public ReactiveList<SiteReferenceDataLibraryRowViewModel> SiteReferenceDataLibraries
-        {
-            get => this.siteReferenceDataLibraries;
-            private set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraries, value);
-        }
-
-        /// <summary>
         /// Gets the server login command
         /// </summary>
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
-
-        /// <summary>
-        /// Gets the AnnexC-3 zip file command whcih loads json file as datasource<see cref="IReactiveCommand"/>
-        /// </summary>
-        public ReactiveCommand<object> LoadSourceFile { get; private set; }
-
-        /// <summary>
-        /// Gets the command to select/unselect all models for import
-        /// </summary>
-        public ReactiveCommand<object> CheckUncheckModel { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -259,7 +188,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                 {
                     return;
                 }
-                this.LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
@@ -268,26 +196,14 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                 {
                     return;
                 }
-                this.LogMessage($"Succesfully logged to {this.Uri}({this.ServerType.Value}) data-source");
-            });
-
-            this.WhenAnyValue(vm => vm.ServerType).Subscribe(_ =>
-            {
-                this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
             });
 
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
-            this.LoadSourceFile = ReactiveCommand.Create();
-            this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
-            this.CheckUncheckModel = ReactiveCommand.Create();
-            this.CheckUncheckModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
             this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>();
             this.EngineeringModels.ChangeTrackingEnabled = true;
-            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>();
-            this.SiteReferenceDataLibraries.ChangeTrackingEnabled = true;
         }
 
         /// <summary>
@@ -301,11 +217,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
 
             try
             {
-                if (this.IsSessionOpen(this.Uri, this.UserName, this.Password))
-                {
-                    this.LogMessage("The user is already logged on this server. Closing the session.");
-                    await this.ServerSession.Close();
-                }
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
                 switch (this.ServerType.Key)
@@ -326,12 +237,9 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
 
                 var siteDirectory = this.ServerSession.RetrieveSiteDirectory();
                 this.BindEngineeringModels(siteDirectory);
-                this.BindSiteReferenceDataLibraries(siteDirectory);
             }
             catch (Exception ex)
             {
-                this.LogMessage(ex.Message);
-
                 this.LoginFailed = true;
             }
         }
@@ -348,85 +256,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
             {
                 this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
             }
-
-            this.SelectAllModels = true;
-        }
-
-        /// <summary>
-        /// Bind site reference data libraries to the reactive list
-        /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindSiteReferenceDataLibraries(SiteDirectory siteDirectory)
-        {
-            this.SiteReferenceDataLibraries.Clear();
-
-            foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
-            {
-                this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
-            }
-        }
-
-        /// <summary>
-        /// Executes loading of Annex-C-3 file
-        /// </summary>
-        private void ExecuteLoadSourceFile()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
-            {
-                InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
-                Filter = "Zip files (*.zip)|*.zip"
-            };
-
-            var dialogResult = openFileDialog.ShowDialog();
-
-            if (dialogResult.HasValue && dialogResult.Value && openFileDialog.FileNames.Length == 1)
-            {
-                this.Uri = openFileDialog.FileNames[0];
-            }
-        }
-
-        /// <summary>
-        /// Select model for the migration procedure
-        /// </summary>
-        private void ExecuteCheckUncheckModel()
-        {
-            this.SelectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
-        }
-
-        /// <summary>
-        /// Log message to console/output panel
-        /// </summary>
-        /// <param name="message"></param>
-        private void LogMessage(string message)
-        {
-            Debug.WriteLine(message);
-            this.Output = message;
-        }
-
-        /// <summary>
-        /// Checki if a session is already open on the passed data source
-        /// </summary>
-        /// <param name="dataSourceUri">Data source</param>
-        /// <param name="username">Logged username</param>
-        /// <returns>true/false</returns>
-        private bool IsSessionOpen(string dataSourceUri, string username, string password)
-        {
-            if (this.ServerSession is null)
-            {
-                return false;
-            }
-
-            return this.TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(this.TrimUri(dataSourceUri)) && this.ServerSession.Credentials.UserName.Equals(username) && this.ServerSession.Credentials.Password.Equals(password);
-        }
-
-        /// <summary>
-        /// Trims the final trailing forward slash of the URI
-        /// </summary>
-        /// <param name="input">The original Uri</param>
-        /// <returns>The trimmed uri or the original if there is no slash.</returns>
-        private string TrimUri(string input)
-        {
-            return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
         }
     }
 }

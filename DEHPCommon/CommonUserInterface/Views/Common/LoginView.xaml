@@ -6,7 +6,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-             xmlns:ViewModels="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:utils="clr-namespace:DEHPCommon.CommonUserInterface.Utils"
@@ -47,30 +46,18 @@
                 <!-- Data source type -->
                 <dxlc:LayoutItemLabel Grid.Row="0"
                               Grid.Column="0"
+                              Height="Auto"
                               Margin="5"
                               Content="Data Source" />
                 <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                     <ComboBox FontSize="12"
                       Name="ServerType"
                       Margin="5"
-                      Width="200"
+                      Width="250"
                       SelectedItem="{Binding Path=ServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       ItemsSource="{Binding DataSourceList, Mode=OneTime}"
                       SelectedValuePath="Key"
                       DisplayMemberPath="Value" />
-                    <Button MinWidth="40"
-                    Name="BrowseJson"
-                    Height="Auto"
-                    MaxWidth="40"
-                    Margin="5"
-                    FontSize="12"
-                    HorizontalAlignment="Right"
-                    Command="{Binding LoadSourceFile}"
-                    IsEnabled="{Binding Path=JsonIsSelected}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{dx:DXImage Image=Open_16x16.png}" Stretch="Uniform" />
-                        </StackPanel>
-                    </Button>
                 </StackPanel>
 
                 <!-- Server Address -->
@@ -87,7 +74,6 @@
                       Margin="5"
                       FontSize="12"
                       Width="250"
-                      IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
                       Text="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!-- Username -->

@@ -7,9 +7,7 @@
                   xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                   xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                  xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.Views"
-                  xmlns:ViewModels="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels"
-                  xmlns:common1="clr-namespace:DEHPCommon.CommonUserInterface.Views.Common"
+                  xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.Views.Common"
                   xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels.Tabs"
                   Header="Migration"
                   Orientation="Vertical"
@@ -28,7 +26,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <common1:LoginView Grid.Row="0"/>
+                <common:LoginView Grid.Row="0"/>
             </Grid>
         </StackPanel>
     </GroupBox>
