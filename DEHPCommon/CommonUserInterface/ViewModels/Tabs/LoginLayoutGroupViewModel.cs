@@ -46,18 +46,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
         }
 
         /// <summary>
-        /// Out property for the <see cref="CanLogIn"/> property
-        /// </summary>
-        private readonly ObservableAsPropertyHelper<bool> canLogIn;
-
-        /// <summary>
-        /// Gets a value indicating whether a migration operation can start
-        /// </summary>
-        public bool CanLogIn
-        {
-            get { return this.canLogIn.Value; }
-        }
-        /// <summary>
         /// Backing field for the the output messages <see cref="Output"/>
         /// </summary>
         private string output;
@@ -81,11 +69,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
             {
                 this.UpdateOutput(message);
             });
-
-            this.WhenAnyValue(vm => vm.LoginViewModel.LoginSuccessfully, (loginSuccessfully, dataSourceSession) =>
-            {
-                return loginSuccessfully && dataSourceSession != null;
-            });
         }
 
         /// <summary>
@@ -93,14 +76,12 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
         /// </summary>
         public LoginLayoutGroupViewModel()
         {
-            this.WhenAnyValue(
-                vm => vm.LoginViewModel.LoginSuccessfully,
-                (sourceLoginSuccessfully, sourceSession) =>
-                {
-                    return sourceLoginSuccessfully && sourceSession != null;
-                }).ToProperty(this, vm => vm.CanLogIn, out this.canLogIn);
-
-            this.ServerIsChecked = true;
+            this.WhenAnyValue(vm => vm.LoginViewModel.LoginSuccessfully).Subscribe(value =>
+            {
+                this.ServerIsChecked = value;
+            });
+            
+            this.AddSubscriptions();
         }
 
         /// <summary>
