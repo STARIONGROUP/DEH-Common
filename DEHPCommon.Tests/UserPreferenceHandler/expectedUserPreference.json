@@ -1,0 +1,6 @@
+﻿{
+  "serverType": "CDP4 WebServices",
+  "uri": "http://localhost:5000",
+  "userName": "DEHP-User",
+  "password": "1234"
+}

@@ -10,7 +10,26 @@ namespace DEHPCommon.UserPreferenceHandler
     /// <summary>
     /// Base class from which all <see cref="UserPreference"/> shall derive
     /// </summary>
-    public abstract class UserPreference
+    public class UserPreference
     {
+        /// <summary>
+        /// Gets or sets server serverType value
+        /// </summary>
+        public string ServerType { get; set; }
+
+        /// <summary>
+        /// Gets or sets server uri
+        /// </summary>
+        public string Uri { get; set; }
+
+        /// <summary>
+        /// Gets or sets server username value
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// Gets or sets server password value
+        /// </summary>
+        public string Password { get; set; }
     }
 }

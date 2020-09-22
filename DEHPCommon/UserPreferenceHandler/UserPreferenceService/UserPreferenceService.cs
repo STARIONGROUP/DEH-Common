@@ -52,7 +52,6 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
             this.userPreferenceSettings = new Dictionary<string, UserPreference>();
         }
 
-
         /// <summary>
         /// Reads the <see cref="T"/> user preference in settings
         /// </summary>
@@ -106,7 +105,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         {
             if (userPreference == null)
             {
-                throw new ArgumentNullException(nameof(userPreference), "The pluginSettings may not be null");
+                throw new ArgumentNullException(nameof(userPreference), "This may not be null");
             }
 
             var assemblyName = this.QueryAssemblyTitle(userPreference.GetType());
@@ -115,7 +114,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
 
-            logger.Debug("write user preference to for {0} to {1}", assemblyName, path);
+            logger.Debug("Write user preference to for {0} to {1}", assemblyName, path);
 
             using (var streamWriter = File.CreateText(path))
             {

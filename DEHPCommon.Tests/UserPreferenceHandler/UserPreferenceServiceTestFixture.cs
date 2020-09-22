@@ -10,9 +10,8 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     using System;
     using System.IO;
 
+    using DEHPCommon.UserPreferenceHandler;
     using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
-
-    using Newtonsoft.Json;
 
     using NUnit.Framework;
 
@@ -24,7 +23,12 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     {
         private UserPreferenceService userPreferenceService;
         private string expectedUserPreferencePath;
-        private TestUserPreference userPreference;
+        private UserPreference userPreference;
+
+        private string serverType;
+        private string uri;
+        private string userName;
+        private string password;
 
         [SetUp]
         public void SetUp()
@@ -33,15 +37,22 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
                 Path.Combine(
                     UserPreferenceService.AppDataFolder,
                     UserPreferenceService.ConfigurationDirectoryFolder,
-                    "DEHPCommon.Tests.settings.json");
+                    "DEHPCommon.settings.json");
             
             this.userPreferenceService = new UserPreferenceService();
 
-            this.userPreference = new TestUserPreference()
+            this.userPreference = new UserPreference()
             {
-                Identifier = Guid.Parse("78d90eda-bc57-45fe-8bfa-b9ca23130a00"),
-                Description = "This is a description"
+                ServerType = "CDP4 WebServices",
+                Uri = "http://localhost:5000",
+                UserName = "DEHP-User",
+                Password = "1234"
             };
+
+            this.serverType = "CDP4 WebServicesNew";
+            this.uri = "http://localhost:4000";
+            this.userName = "DEHP-UserNew";
+            this.password = "4321";
         }
 
         [TearDown]
@@ -56,17 +67,14 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         [Test]
         public void Verify_that_on_write_ArgumentNullException_is_thrown()
         {
-            Assert.Throws<ArgumentNullException>(() => this.userPreferenceService.Write<TestUserPreference>(null));
+            Assert.Throws<ArgumentNullException>(() => this.userPreferenceService.Write<UserPreference>(null));
         }
 
         [Test]
         public void Verify_that_the_settings_can_be_written_to_disk()
         {
             Assert.DoesNotThrow(() => this.userPreferenceService.Write(this.userPreference));
-            var test = Path.Combine(TestContext.CurrentContext.TestDirectory);
-            File.Copy(this.expectedUserPreferencePath, test);
-            
-            var expectedUserPreferenceContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceService", "DEHPCommon.Tests.settings.json"));
+            var expectedUserPreferenceContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"));
             var writtenContent = File.ReadAllText(this.expectedUserPreferencePath);
             Assert.AreEqual(expectedUserPreferenceContent, writtenContent);
         }
@@ -76,12 +84,14 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         {
             this.userPreferenceService.CheckConfigurationDirectory();
 
-            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedUserPreferencePath);
+            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"), this.expectedUserPreferencePath);
             Assert.IsTrue(File.Exists(this.expectedUserPreferencePath));
 
-            var readSettings = this.userPreferenceService.Read<TestUserPreference>();
-            Assert.AreEqual(this.userPreference.Identifier, readSettings.Identifier);
-            Assert.AreEqual(this.userPreference.Description, readSettings.Description);
+            var readUserPreference = this.userPreferenceService.Read<UserPreference>();
+            Assert.AreEqual(this.userPreference.ServerType, readUserPreference.ServerType);
+            Assert.AreEqual(this.userPreference.Uri, readUserPreference.Uri);
+            Assert.AreEqual(this.userPreference.UserName, readUserPreference.UserName);
+            Assert.AreEqual(this.userPreference.Password, readUserPreference.Password);
         }
 
         [Test]
@@ -89,25 +99,26 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         {
             this.userPreferenceService.CheckConfigurationDirectory();
 
-            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "PluginSettingService", "expectedSettings.settings.json"), this.expectedUserPreferencePath);
+            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"), this.expectedUserPreferencePath);
             Assert.IsTrue(File.Exists(this.expectedUserPreferencePath));
 
-            var readSettings = this.userPreferenceService.Read<TestUserPreference>();
-            Assert.AreEqual(this.userPreference.Identifier, readSettings.Identifier);
-            Assert.AreEqual(this.userPreference.Description, readSettings.Description);
+            var readUserPreference = this.userPreferenceService.Read<UserPreference>();
+            Assert.AreEqual(this.userPreference.ServerType, readUserPreference.ServerType);
+            Assert.AreEqual(this.userPreference.Uri, readUserPreference.Uri);
+            Assert.AreEqual(this.userPreference.UserName, readUserPreference.UserName);
+            Assert.AreEqual(this.userPreference.Password, readUserPreference.Password);
 
-            var id = Guid.NewGuid();
-            var description = "this is a new description";
+            readUserPreference.ServerType = this.serverType;
+            readUserPreference.Uri = this.uri;
+            readUserPreference.UserName = this.userName;
+            readUserPreference.Password = this.password;
 
-            readSettings.Identifier = id;
-            readSettings.Description = description;
-
-            this.userPreferenceService.Write(readSettings);
-
-            var newSettings = this.userPreferenceService.Read<TestUserPreference>();
-
-            Assert.AreEqual(id, newSettings.Identifier);
-            Assert.AreEqual(description, newSettings.Description);
+            this.userPreferenceService.Write(readUserPreference);
+            var newUserPreference = this.userPreferenceService.Read<UserPreference>();
+            Assert.AreEqual(this.serverType, newUserPreference.ServerType);
+            Assert.AreEqual(this.uri, newUserPreference.Uri);
+            Assert.AreEqual(this.userName, newUserPreference.UserName);
+            Assert.AreEqual(this.password, newUserPreference.Password);
         }
     }
 }
