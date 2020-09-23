@@ -105,6 +105,11 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         private IDal dal;
 
         /// <summary>
+        /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="LoginViewModel"/>.
+        /// </summary>
+        public ISession Session { get; private set; }
+
+        /// <summary>
         /// Backing field for the <see cref="LoginSuccessfully"/> property
         /// </summary>
         private bool loginSuccessfully;
@@ -171,7 +176,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
         /// </summary>
-        public LoginViewModel()
+        public LoginViewModel(ISession session)
         {
             var canLogin = this.WhenAnyValue(
                 vm => vm.ServerType,
@@ -198,7 +203,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                 }
             });
 
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
+            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(session), RxApp.MainThreadScheduler);
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -210,7 +215,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// Executes login command
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        private async Task ExecuteLogin()
+        private async Task ExecuteLogin(ISession session)
         {
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -229,13 +234,12 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                         break;
                 }
 
-                this.ServerSession = new Session(this.dal, credentials);
-
-                await this.ServerSession.Open();
+                this.Session = new Session(this.dal, credentials);
+                await this.Session.Open();
 
                 this.LoginSuccessfully = true;
 
-                var siteDirectory = this.ServerSession.RetrieveSiteDirectory();
+                var siteDirectory = session.RetrieveSiteDirectory();
                 this.BindEngineeringModels(siteDirectory);
             }
             catch (Exception ex)
