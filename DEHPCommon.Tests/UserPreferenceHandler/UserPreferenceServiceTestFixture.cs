@@ -28,14 +28,13 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         private string serverType;
         private string uri;
         private string userName;
-        private string password;
 
         [SetUp]
         public void SetUp()
         {
             this.expectedUserPreferencePath = 
                 Path.Combine(
-                    UserPreferenceService.AppDataFolder,
+                    UserPreferenceService.UserPreferenceDataFolder,
                     UserPreferenceService.ConfigurationDirectoryFolder,
                     "DEHPCommon.settings.json");
             
@@ -45,14 +44,12 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             {
                 ServerType = "CDP4 WebServices",
                 Uri = "http://localhost:5000",
-                UserName = "DEHP-User",
-                Password = "1234"
+                UserName = "DEHP-User"
             };
 
             this.serverType = "CDP4 WebServicesNew";
             this.uri = "http://localhost:4000";
             this.userName = "DEHP-UserNew";
-            this.password = "4321";
         }
 
         [TearDown]
@@ -91,7 +88,6 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             Assert.AreEqual(this.userPreference.ServerType, readUserPreference.ServerType);
             Assert.AreEqual(this.userPreference.Uri, readUserPreference.Uri);
             Assert.AreEqual(this.userPreference.UserName, readUserPreference.UserName);
-            Assert.AreEqual(this.userPreference.Password, readUserPreference.Password);
         }
 
         [Test]
@@ -106,19 +102,16 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             Assert.AreEqual(this.userPreference.ServerType, readUserPreference.ServerType);
             Assert.AreEqual(this.userPreference.Uri, readUserPreference.Uri);
             Assert.AreEqual(this.userPreference.UserName, readUserPreference.UserName);
-            Assert.AreEqual(this.userPreference.Password, readUserPreference.Password);
 
             readUserPreference.ServerType = this.serverType;
             readUserPreference.Uri = this.uri;
             readUserPreference.UserName = this.userName;
-            readUserPreference.Password = this.password;
 
             this.userPreferenceService.Write(readUserPreference);
             var newUserPreference = this.userPreferenceService.Read<UserPreference>();
             Assert.AreEqual(this.serverType, newUserPreference.ServerType);
             Assert.AreEqual(this.uri, newUserPreference.Uri);
             Assert.AreEqual(this.userName, newUserPreference.UserName);
-            Assert.AreEqual(this.password, newUserPreference.Password);
         }
     }
 }

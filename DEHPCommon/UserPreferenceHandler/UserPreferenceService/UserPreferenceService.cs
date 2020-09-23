@@ -27,7 +27,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// Path to special windows "AppData" folder 
         /// </summary>
-        public static string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public static string UserPreferenceDataFolder = Environment.CurrentDirectory;
 
         /// <summary>
         /// Application configuration folder path.
@@ -157,7 +157,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// </summary>
         public string ApplicationConfigurationDirectory
         {
-            get { return Path.Combine(AppDataFolder, ConfigurationDirectoryFolder); }
+            get { return Path.Combine(UserPreferenceDataFolder, ConfigurationDirectoryFolder); }
         }
 
         /// <summary>

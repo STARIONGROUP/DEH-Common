@@ -27,9 +27,5 @@ namespace DEHPCommon.UserPreferenceHandler
         /// </summary>
         public string UserName { get; set; }
 
-        /// <summary>
-        /// Gets or sets server password value
-        /// </summary>
-        public string Password { get; set; }
     }
 }
