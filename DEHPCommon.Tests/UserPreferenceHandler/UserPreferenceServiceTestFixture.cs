@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginSettingsServiceTestFixture.cs"company="RHEA System S.A.">
+// <copyright file="UserPreferenceServiceTestFixture.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
@@ -19,7 +19,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     /// Suite of tests for the <see cref="UserPreferenceService"/> class.
     /// </summary>
     [TestFixture]
-    public class PluginSettingsServiceTestFixture
+    public class UserPreferenceServiceTestFixture
     {
         private UserPreferenceService userPreferenceService;
         private string expectedUserPreferencePath;
