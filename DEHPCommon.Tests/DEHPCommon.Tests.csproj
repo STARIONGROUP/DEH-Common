@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CommonUserInterface\" />
     <Folder Include="HubController\" />
     <Folder Include="MappingEngine\" />
     <Folder Include="MessageHub\" />
