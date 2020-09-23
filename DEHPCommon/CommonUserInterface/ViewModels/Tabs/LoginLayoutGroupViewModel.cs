@@ -49,32 +49,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
         }
 
         /// <summary>
-        /// Backing field for the the output messages <see cref="Output"/>
-        /// </summary>
-        private string output;
-
-        /// <summary>
-        /// Gets or sets operation output messages
-        /// </summary>
-        public string Output
-        {
-            get => this.output;
-
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
-        /// Add subscription to the login viewmodels
-        /// </summary>
-        public void AddSubscriptions()
-        {
-            this.WhenAnyValue(vm => vm.LoginViewModel.Output).Subscribe(message =>
-            {
-                this.UpdateOutput(message);
-            });
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="LoginLayoutGroupViewModel"/> class
         /// </summary>
         public LoginLayoutGroupViewModel()
@@ -84,21 +58,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
                 this.ServerIsChecked = value;
             });
             
-            this.AddSubscriptions();
-        }
-
-        /// <summary>
-        /// Add text message to the output panel
-        /// </summary>
-        /// <param name="message">The text message</param>
-        private void UpdateOutput(string message)
-        {
-            if (string.IsNullOrEmpty(message))
-            {
-                return;
-            }
-
-            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
         }
     }
 }

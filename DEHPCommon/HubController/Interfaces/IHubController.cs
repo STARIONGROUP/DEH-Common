@@ -1,25 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LoginLayoutGroup.cs"company="RHEA System S.A.">
+// <copyright file="IHubController.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.CommonUserInterface.Views.Tabs
+namespace DEHPCommon.HubController.Interfaces
 {
-    using DevExpress.Xpf.LayoutControl;
+    using CDP4Dal;
 
     /// <summary>
-    /// Interaction logic for LoginLayoutGroup.xaml
+    /// Definition of the interface for the <see cref="HubController"/>
     /// </summary>
-    public partial class LoginLayoutGroup : LayoutGroup
+    public interface IHubController
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoginLayoutGroup"/> class.
+        /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="HubController"/>.
         /// </summary>
-        public LoginLayoutGroup()
-        {
-            this.InitializeComponent();
-        }
+        ISession Session { get; set; }
     }
 }

@@ -23,7 +23,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
     using CDP4WspDal;
 
     using DEHPCommon.CommonUserInterface.ViewModels.Rows;
-    using DEHPCommon.HubController;
     using DEHPCommon.HubController.Interfaces;
 
     using ReactiveUI;
@@ -137,21 +136,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         }
 
         /// <summary>
-        /// Backing field for the <see cref="Output"/> property
-        /// </summary>
-        private string output;
-
-        /// <summary>
-        /// Gets or sets output panel log messages
-        /// </summary>
-        public string Output
-        {
-            get => this.output;
-
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
         /// Backing field for the <see cref="EngineeringModels"/> property
         /// </summary>
         private ReactiveList<EngineeringModelRowViewModel> engineeringModels;
@@ -173,7 +157,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
         /// </summary>
-        public LoginViewModel(HubController controller)
+        public LoginViewModel(IHubController controller)
         {
             var canLogin = this.WhenAnyValue(
                 vm => vm.ServerType,
@@ -212,7 +196,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// Executes login command
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        private async Task ExecuteLogin(HubController controller)
+        private async Task ExecuteLogin(IHubController controller)
         {
             this.LoginSuccessfully = false;
             this.LoginFailed = false;

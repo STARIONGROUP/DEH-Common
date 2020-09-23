@@ -51,7 +51,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonUserInterface\Utils\InverseBooleanConverter.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Tabs\LoginLayoutGroupViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Common\LoginViewModel.cs" />
     <Compile Include="CommonUserInterface\ViewModels\Rows\DefinedThingRowViewModel.cs" />
@@ -63,6 +62,7 @@
       <DependentUpon>LoginLayoutGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="HubController\HubController.cs" />
+    <Compile Include="HubController\Interfaces\IHubController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

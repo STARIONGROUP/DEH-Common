@@ -8,16 +8,10 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-             xmlns:utils="clr-namespace:DEHPCommon.CommonUserInterface.Utils"
              xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.Views.Tabs"
              xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels.Common"
              mc:Ignorable="d"
              d:DesignHeight="240">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <utils:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        </ResourceDictionary>
-    </UserControl.Resources>
     <UserControl.DataContext>
         <common:LoginViewModel />
     </UserControl.DataContext>

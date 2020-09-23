@@ -9,14 +9,17 @@ namespace DEHPCommon.HubController
 {
     using CDP4Dal;
 
+    using DEHPCommon.HubController.Interfaces;
+
     /// <summary>
     /// Definition of the <see cref="HubController"/>
     /// </summary>
-    public abstract class HubController
+    public class HubController : IHubController
     {
         /// <summary>
         /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="HubController"/>.
         /// </summary>
-        public ISession Session;
+        public ISession Session { get; set; }
+
     }
 }

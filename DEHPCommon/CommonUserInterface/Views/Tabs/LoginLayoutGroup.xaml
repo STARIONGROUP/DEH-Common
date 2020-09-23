@@ -9,7 +9,7 @@
                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                   xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.Views.Common"
                   xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels.Tabs"
-                  Header="Migration"
+                  Header="DEHP"
                   Orientation="Vertical"
                   mc:Ignorable="d"
                   VerticalAlignment="Stretch"
@@ -29,16 +29,5 @@
                 <common:LoginView Grid.Row="0"/>
             </Grid>
         </StackPanel>
-    </GroupBox>
-    <GroupBox Header="Output" HorizontalAlignment="Stretch">
-        <dxe:TextEdit
-            Height="Auto"
-            FontSize="12"
-            TextWrapping="Wrap"
-            AcceptsReturn="True"
-            VerticalContentAlignment="Top"
-            VerticalScrollBarVisibility="Visible"
-            IsReadOnly="True"
-            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </GroupBox>
 </dxlc:LayoutGroup>
