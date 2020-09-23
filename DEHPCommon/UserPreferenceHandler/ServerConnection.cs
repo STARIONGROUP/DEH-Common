@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UserPreference.cs"company="RHEA System S.A.">
+// <copyright file="ServerConnection.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
@@ -7,16 +7,19 @@
 
 namespace DEHPCommon.UserPreferenceHandler
 {
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Base class from which all <see cref="UserPreference"/> shall derive
+    /// Definition of the <see cref="ServerConnection"/> used to handle specific settings
     /// </summary>
-    public class UserPreference
+    public class ServerConnection
     {
         /// <summary>
-        /// A list used to store the server connection settings,
+        /// Gets or sets server serverType value
         /// </summary>
-        public List<ServerConnection> SavedServerConections { get; set; }
+        public string ServerType { get; set; }
+
+        /// <summary>
+        /// Gets or sets server uri
+        /// </summary>
+        public string Uri { get; set; }
     }
 }

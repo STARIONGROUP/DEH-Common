@@ -35,7 +35,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             this.expectedUserPreferencePath = 
                 Path.Combine(
                     UserPreferenceService.UserPreferenceDataFolder,
-                    UserPreferenceService.ConfigurationDirectoryFolder,
+                    UserPreferenceService.DirectoryFolder,
                     "DEHPCommon.settings.json");
             
             this.userPreferenceService = new UserPreferenceService();
@@ -44,7 +44,6 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             {
                 ServerType = "CDP4 WebServices",
                 Uri = "http://localhost:5000",
-                UserName = "DEHP-User"
             };
 
             this.serverType = "CDP4 WebServicesNew";

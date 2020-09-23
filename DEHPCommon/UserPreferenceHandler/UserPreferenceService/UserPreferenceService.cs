@@ -8,7 +8,6 @@
 namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
 
@@ -17,6 +16,9 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
     using NLog;
 
+    /// <summary>
+    /// Definition of the <see cref="UserPreferenceService"/> used to load specific settings
+    /// </summary>
     public class UserPreferenceService : IUserPreferenceService
     {
         /// <summary>
@@ -25,14 +27,14 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// Path to special windows "AppData" folder 
+        /// The path of the User Preference directory storage
         /// </summary>
         public static string UserPreferenceDataFolder = Environment.CurrentDirectory;
 
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public static string ConfigurationDirectoryFolder = "UserPreferenceService";
+        public static string DirectoryFolder = "UserPreferenceService";
 
         /// <summary>
         /// The setting file extension
@@ -40,16 +42,16 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         public const string SETTING_FILE_EXTENSION = ".settings.json";
 
         /// <summary>
-        /// A dictionary used to store the user preference setting,
+        /// Gets or sets  user preference setting,
         /// </summary>
-        private readonly Dictionary<string, UserPreference> userPreferenceSettings;
+        private UserPreference userPreferenceSettings { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="UserPreferenceService"/>
         /// </summary>
         public UserPreferenceService()
         {
-            this.userPreferenceSettings = new Dictionary<string, UserPreference>();
+            this.userPreferenceSettings = new UserPreference();
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             this.CheckConfigurationDirectory();
 
-            var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
+            var path = Path.Combine(this.ApplicationDirectory, assemblyName);
 
             logger.Debug("Read user preference for {0} from {1}", assemblyName, path);
 
@@ -82,7 +84,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                     result = (T)serializer.Deserialize(file, typeof(T));
 
                     // once the settings have been read from disk, add them to the cache for fast access
-                    this.userPreferenceSettings.Add(assemblyName, result);
+                    this.userPreferenceSettings Add(assemblyName, result);
 
                     return (T)result;
                 }
@@ -112,7 +114,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             this.CheckConfigurationDirectory();
 
-            var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
+            var path = Path.Combine(this.ApplicationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
 
             logger.Debug("Write user preference to for {0} to {1}", assemblyName, path);
 
@@ -155,21 +157,21 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// Configuration file Directory
         /// </summary>
-        public string ApplicationConfigurationDirectory
+        public string ApplicationDirectory
         {
-            get { return Path.Combine(UserPreferenceDataFolder, ConfigurationDirectoryFolder); }
+            get { return Path.Combine(UserPreferenceDataFolder, DirectoryFolder); }
         }
 
         /// <summary>
-        /// Checks for the existence of the <see cref="UserPreferenceService.ApplicationConfigurationDirectory"/>
+        /// Checks for the existence of the <see cref="ApplicationDirectory"/>
         /// </summary>
         public void CheckConfigurationDirectory()
         {
-            if (!Directory.Exists(this.ApplicationConfigurationDirectory))
+            if (!Directory.Exists(this.ApplicationDirectory))
             {
-                logger.Debug("The user preference folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
-                Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                logger.Debug("The user preference folder {0} has been created", this.ApplicationConfigurationDirectory);
+                logger.Debug("The user preference folder {0} does not yet exist", this.ApplicationDirectory);
+                Directory.CreateDirectory(this.ApplicationDirectory);
+                logger.Debug("The user preference folder {0} has been created", this.ApplicationDirectory);
             }
         }
     }

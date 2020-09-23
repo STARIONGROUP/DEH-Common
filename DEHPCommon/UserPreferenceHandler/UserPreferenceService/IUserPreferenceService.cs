@@ -12,6 +12,8 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     /// </summary>
     public interface IUserPreferenceService
     {
+        //expose user preference
+
         /// <summary>
         /// Reads the <see cref="T"/>
         /// </summary>

@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserPreferenceHandler\ServerConnection.cs" />
     <Compile Include="UserPreferenceHandler\UserPreference.cs" />
     <Compile Include="UserPreferenceHandler\UserPreferenceService\IUserPreferenceService.cs" />
     <Compile Include="UserPreferenceHandler\UserPreferenceService\UserPreferenceService.cs" />
