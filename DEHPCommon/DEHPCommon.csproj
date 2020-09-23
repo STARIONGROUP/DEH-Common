@@ -62,10 +62,10 @@
     <Compile Include="CommonUserInterface\Views\Tabs\LoginLayoutGroup.xaml.cs">
       <DependentUpon>LoginLayoutGroup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="HubController\HubController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="HubController\" />
     <Folder Include="MappingEngine\" />
     <Folder Include="MessageHub\" />
     <Folder Include="UserPreferenceHandler\UserPreferenceService\" />

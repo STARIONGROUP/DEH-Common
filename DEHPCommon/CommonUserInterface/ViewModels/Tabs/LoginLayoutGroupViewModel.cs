@@ -13,6 +13,9 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Tabs
 
     using ReactiveUI;
 
+    /// <summary>
+    /// The view-model for the LoginLayoutGroup that allows to manage displayed resources.
+    /// </summary>
     public class LoginLayoutGroupViewModel : ReactiveObject
     {
         /// <summary>

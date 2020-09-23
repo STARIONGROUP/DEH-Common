@@ -23,6 +23,8 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
     using CDP4WspDal;
 
     using DEHPCommon.CommonUserInterface.ViewModels.Rows;
+    using DEHPCommon.HubController;
+    using DEHPCommon.HubController.Interfaces;
 
     using ReactiveUI;
 
@@ -105,11 +107,6 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         private IDal dal;
 
         /// <summary>
-        /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="LoginViewModel"/>.
-        /// </summary>
-        public ISession Session { get; private set; }
-
-        /// <summary>
         /// Backing field for the <see cref="LoginSuccessfully"/> property
         /// </summary>
         private bool loginSuccessfully;
@@ -176,7 +173,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
         /// </summary>
-        public LoginViewModel(ISession session)
+        public LoginViewModel(HubController controller)
         {
             var canLogin = this.WhenAnyValue(
                 vm => vm.ServerType,
@@ -203,7 +200,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                 }
             });
 
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(session), RxApp.MainThreadScheduler);
+            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(controller), RxApp.MainThreadScheduler);
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -215,7 +212,7 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// Executes login command
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        private async Task ExecuteLogin(ISession session)
+        private async Task ExecuteLogin(HubController controller)
         {
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -234,12 +231,12 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                         break;
                 }
 
-                this.Session = new Session(this.dal, credentials);
-                await this.Session.Open();
+                controller.Session = new Session(this.dal, credentials);
+                await controller.Session.Open();
 
                 this.LoginSuccessfully = true;
 
-                var siteDirectory = session.RetrieveSiteDirectory();
+                var siteDirectory = controller.Session.RetrieveSiteDirectory();
                 this.BindEngineeringModels(siteDirectory);
             }
             catch (Exception ex)
