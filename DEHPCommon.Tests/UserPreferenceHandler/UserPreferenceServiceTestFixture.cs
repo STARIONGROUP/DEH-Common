@@ -9,7 +9,6 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
 {
     using System;
     using System.IO;
-    using System.Linq;
 
     using DEHPCommon.UserPreferenceHandler;
     using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
