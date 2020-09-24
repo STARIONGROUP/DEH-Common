@@ -18,5 +18,13 @@ namespace DEHPCommon.UserPreferenceHandler
         /// A list used to store the server connection settings,
         /// </summary>
         public List<ServerConnection> SavedServerConections { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="UserPreference"/>
+        /// </summary>
+        public UserPreference()
+        {
+            this.SavedServerConections = new List<ServerConnection>();
+        }
     }
 }

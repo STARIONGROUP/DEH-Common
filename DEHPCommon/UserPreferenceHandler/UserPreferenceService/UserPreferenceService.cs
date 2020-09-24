@@ -8,7 +8,9 @@
 namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using Newtonsoft.Json;
@@ -65,11 +67,6 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         {
             var assemblyName = this.QueryAssemblyTitle(typeof(T));
 
-            if (this.userPreferenceSettings.TryGetValue(assemblyName, out var result))
-            {
-                return result as T;
-            }
-
             this.CheckConfigurationDirectory();
 
             var path = Path.Combine(this.ApplicationDirectory, assemblyName);
@@ -81,12 +78,14 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                 using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
                 {
                     var serializer = new JsonSerializer();
-                    result = (T)serializer.Deserialize(file, typeof(T));
+                    var result = (List<ServerConnection>)serializer.Deserialize(file, typeof(List<ServerConnection>));
 
-                    // once the settings have been read from disk, add them to the cache for fast access
-                    this.userPreferenceSettings Add(assemblyName, result);
+                    if (result!=null)
+                    {
+                        this.userPreferenceSettings.SavedServerConections.AddRange(result);
+                    }
 
-                    return (T)result;
+                    return (T)this.userPreferenceSettings;
                 }
             }
             catch (Exception ex)
@@ -126,17 +125,10 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                     Formatting = Formatting.Indented
                 };
 
-                serializer.Serialize(streamWriter, userPreference);
+                serializer.Serialize(streamWriter, userPreference.SavedServerConections);
             }
 
-            if (this.userPreferenceSettings.ContainsKey(assemblyName))
-            {
-                this.userPreferenceSettings[assemblyName] = userPreference;
-            }
-            else
-            {
-                this.userPreferenceSettings.Add(assemblyName, userPreference);
-            }
+            this.userPreferenceSettings = userPreference;
         }
 
         /// <summary>
