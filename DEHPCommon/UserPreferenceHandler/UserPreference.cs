@@ -9,6 +9,8 @@ namespace DEHPCommon.UserPreferenceHandler
 {
     using System.Collections.Generic;
 
+    using DevExpress.CodeParser;
+
     /// <summary>
     /// Base class from which all <see cref="UserPreference"/> shall derive
     /// </summary>

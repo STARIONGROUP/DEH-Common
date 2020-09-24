@@ -10,6 +10,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using Newtonsoft.Json;
@@ -63,15 +64,11 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         }
 
         /// <summary>
-        /// Reads the <see cref="T"/> user preference in settings
+        /// Reads the <see cref="UserPreference"/> settings
         /// </summary>
-        /// <typeparam name="T">A type of <see cref="UserPreference"/></typeparam>
-        /// <returns>
-        /// An instance of <see cref="UserPreference"/>
-        /// </returns>
-        public T Read<T>() where T : UserPreference
+        public void Read()
         {
-            var assemblyName = this.QueryAssemblyTitle(typeof(T));
+            var assemblyName = this.QueryAssemblyTitle(typeof(UserPreference));
 
             this.CheckConfigurationDirectory();
 
@@ -88,13 +85,8 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                     this.Write(this.UserPreferenceSettings);
                 }
 
-                using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
-                {
-                    var serializer = new JsonSerializer();
-                    var result = (List<ServerConnection>)serializer.Deserialize(file, typeof(List<ServerConnection>));
-                    this.UserPreferenceSettings.SavedServerConections.AddRange(result);
-                    return (T)this.UserPreferenceSettings;
-                }
+                var file = File.ReadAllText($"{path}{SETTING_FILE_EXTENSION}");
+                this.UserPreferenceSettings = JsonConvert.DeserializeObject<UserPreference>(file);
             }
             catch (Exception ex)
             {
@@ -110,7 +102,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <param name="userPreference">
         /// The <see cref="UserPreference"/> that will be persisted
         /// </param>
-        public void Write<T>(T userPreference) where T : UserPreference
+        public void Write(UserPreference userPreference)
         {
             if (userPreference == null)
             {
@@ -133,7 +125,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                     Formatting = Formatting.Indented
                 };
 
-                serializer.Serialize(streamWriter, userPreference.SavedServerConections);
+                serializer.Serialize(streamWriter, userPreference);
             }
 
             this.UserPreferenceSettings = userPreference;
