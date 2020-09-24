@@ -28,14 +28,14 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// The path of the User Preference directory storage
+        /// The path of the user preference directory storage
         /// </summary>
-        public static string UserPreferenceDataFolder = Environment.CurrentDirectory;
+        public static string ApplicationExecutePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly()?.Location);
 
         /// <summary>
-        /// Application configuration folder path.
+        /// The name of folder where user preference is storage.
         /// </summary>
-        public static string DirectoryFolder = "UserPreferenceService";
+        public static string UserPreferenceDirectoryName = "UserPreferenceService";
 
         /// <summary>
         /// The setting file extension
@@ -43,16 +43,23 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         public const string SETTING_FILE_EXTENSION = ".settings.json";
 
         /// <summary>
-        /// Gets or sets  user preference setting,
+        /// Gets or sets  user preference settings,
         /// </summary>
-        private UserPreference userPreferenceSettings { get; set; }
+        public UserPreference UserPreferenceSettings { get; set; }
 
+        /// <summary>
+        /// Configuration user preference file path
+        /// </summary>
+        public string UserPreferenceDirectoryPath
+        {
+            get { return Path.Combine(ApplicationExecutePath, UserPreferenceDirectoryName); }
+        }
         /// <summary>
         /// Initializes a new instance of <see cref="UserPreferenceService"/>
         /// </summary>
         public UserPreferenceService()
         {
-            this.userPreferenceSettings = new UserPreference();
+            this.UserPreferenceSettings = new UserPreference();
         }
 
         /// <summary>
@@ -68,7 +75,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             this.CheckConfigurationDirectory();
 
-            var path = Path.Combine(this.ApplicationDirectory, assemblyName);
+            var path = Path.Combine(this.UserPreferenceDirectoryPath, assemblyName);
 
             logger.Debug("Read user preference for {0} from {1}", assemblyName, path);
 
@@ -78,28 +85,22 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
                 if (!fileExist)
                 {
-                    this.Write(this.userPreferenceSettings);
+                    this.Write(this.UserPreferenceSettings);
                 }
 
                 using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
                 {
                     var serializer = new JsonSerializer();
                     var result = (List<ServerConnection>)serializer.Deserialize(file, typeof(List<ServerConnection>));
-                    this.userPreferenceSettings.SavedServerConections.AddRange(result);
-                    return (T)this.userPreferenceSettings;
+                    this.UserPreferenceSettings.SavedServerConections.AddRange(result);
+                    return (T)this.UserPreferenceSettings;
                 }
-            }
-            catch (IOException ex)
-            {
-                logger.Error(ex, "IOException- The user preference could not be found");
-
-                throw new Exception("The user preference could not be found", ex);
             }
             catch (Exception ex)
             {
                 logger.Error(ex, "The user preference could not be read");
 
-                throw new Exception("The user preference could not be read", ex);
+                throw new IOException("The user preference could not be read", ex);
             }
         }
 
@@ -120,7 +121,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             this.CheckConfigurationDirectory();
 
-            var path = Path.Combine(this.ApplicationDirectory, $"{assemblyName}{SETTING_FILE_EXTENSION}");
+            var path = Path.Combine(this.UserPreferenceDirectoryPath, $"{assemblyName}{SETTING_FILE_EXTENSION}");
 
             logger.Debug("Write user preference to for {0} to {1}", assemblyName, path);
 
@@ -135,7 +136,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                 serializer.Serialize(streamWriter, userPreference.SavedServerConections);
             }
 
-            this.userPreferenceSettings = userPreference;
+            this.UserPreferenceSettings = userPreference;
         }
 
         /// <summary>
@@ -154,23 +155,15 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         }
 
         /// <summary>
-        /// Configuration file Directory
-        /// </summary>
-        public string ApplicationDirectory
-        {
-            get { return Path.Combine(UserPreferenceDataFolder, DirectoryFolder); }
-        }
-
-        /// <summary>
-        /// Checks for the existence of the <see cref="ApplicationDirectory"/>
+        /// Checks for the existence of the <see cref="UserPreferenceDirectoryPath"/>
         /// </summary>
         public void CheckConfigurationDirectory()
         {
-            if (!Directory.Exists(this.ApplicationDirectory))
+            if (!Directory.Exists(this.UserPreferenceDirectoryPath))
             {
-                logger.Debug("The user preference folder {0} does not yet exist", this.ApplicationDirectory);
-                Directory.CreateDirectory(this.ApplicationDirectory);
-                logger.Debug("The user preference folder {0} has been created", this.ApplicationDirectory);
+                logger.Debug("The user preference folder {0} does not yet exist", this.UserPreferenceDirectoryPath);
+                Directory.CreateDirectory(this.UserPreferenceDirectoryPath);
+                logger.Debug("The user preference folder {0} has been created", this.UserPreferenceDirectoryPath);
             }
         }
     }

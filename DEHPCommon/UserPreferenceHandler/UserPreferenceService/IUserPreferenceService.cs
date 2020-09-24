@@ -12,7 +12,10 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     /// </summary>
     public interface IUserPreferenceService
     {
-        //expose user preference
+        /// <summary>
+        /// Gets or sets  user preference settings,
+        /// </summary>
+        UserPreference UserPreferenceSettings { get; set; }
 
         /// <summary>
         /// Reads the <see cref="T"/>

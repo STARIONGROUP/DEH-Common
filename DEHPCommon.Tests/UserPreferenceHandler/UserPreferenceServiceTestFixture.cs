@@ -11,6 +11,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     using System.IO;
 
     using DEHPCommon.UserPreferenceHandler;
+    using DEHPCommon.UserPreferenceHandler.Enums;
     using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
     using NUnit.Framework;
@@ -28,29 +29,26 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         private ServerConnection serverConnection2;
         private ServerConnection serverConnection3;
 
-        private string serverType;
-        private string uri;
-
         [SetUp]
         public void SetUp()
         {
             this.expectedUserPreferencePath =
                 Path.Combine(
-                    UserPreferenceService.UserPreferenceDataFolder,
-                    UserPreferenceService.DirectoryFolder,
+                    UserPreferenceService.ApplicationExecutePath,
+                    UserPreferenceService.UserPreferenceDirectoryName,
                     "DEHPCommon.settings.json");
 
             this.userPreferenceService = new UserPreferenceService();
 
             this.serverConnection1 = new ServerConnection()
             {
-                ServerType = "CDP4 WebServices",
+                ServerType = ServerType.Cdp4WebServices,
                 Uri = "http://localhost:5000",
             };
 
             this.serverConnection2 = new ServerConnection()
             {
-                ServerType = "OCDT WebServices",
+                ServerType = ServerType.OcdtWSPServer,
                 Uri = "http://localhost:4000",
             };
 
@@ -60,8 +58,8 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
 
             this.serverConnection3 = new ServerConnection()
             {
-                ServerType = this.serverType,
-                Uri = this.uri,
+                ServerType = ServerType.Cdp4WebServices,
+                Uri = "http://localhost:3000",
             };
         }
 
@@ -131,8 +129,8 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             this.userPreferenceService.Write(readUserPreference);
 
             var newUserPreference = this.userPreferenceService.Read<UserPreference>();
-            Assert.AreEqual(this.serverType, newUserPreference.SavedServerConections[2].ServerType);
-            Assert.AreEqual(this.uri, newUserPreference.SavedServerConections[2].Uri);
+            Assert.AreEqual(this.serverConnection3.ServerType, newUserPreference.SavedServerConections[2].ServerType);
+            Assert.AreEqual(this.serverConnection3.Uri, newUserPreference.SavedServerConections[2].Uri);
         }
     }
 }

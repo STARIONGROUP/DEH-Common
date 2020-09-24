@@ -7,6 +7,8 @@
 
 namespace DEHPCommon.UserPreferenceHandler
 {
+    using DEHPCommon.UserPreferenceHandler.Enums;
+
     /// <summary>
     /// Definition of the <see cref="ServerConnection"/> used to handle specific settings
     /// </summary>
@@ -15,7 +17,7 @@ namespace DEHPCommon.UserPreferenceHandler
         /// <summary>
         /// Gets or sets server serverType value
         /// </summary>
-        public string ServerType { get; set; }
+        public ServerType ServerType { get; set; }
 
         /// <summary>
         /// Gets or sets server uri
