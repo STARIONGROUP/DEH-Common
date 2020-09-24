@@ -82,7 +82,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         }
 
         [Test]
-        public void Verify_that_the_settings_can_be_written_to_disk()
+        public void Verify_that_the_UserPreference_settings_can_be_written_to_disk()
         {
             Assert.DoesNotThrow(() => this.userPreferenceService.Write(this.userPreference));
             var expectedUserPreferenceContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"));
@@ -91,7 +91,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         }
 
         [Test]
-        public void Verify_that_the_settings_can_be_read_from_disk()
+        public void Verify_that_the_UserPreference_settings_can_be_read_from_disk()
         {
             this.userPreferenceService.CheckConfigurationDirectory();
 
@@ -104,6 +104,14 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             Assert.AreEqual(this.userPreference.SavedServerConections[1].ServerType, readUserPreference.SavedServerConections[1].ServerType);
             Assert.AreEqual(this.userPreference.SavedServerConections[1].Uri, readUserPreference.SavedServerConections[1].Uri);
 
+        }
+
+        [Test]
+        public void Verify_that_the_UserPreference_settings_file_will_be_created_if_not_exist_on_the_first_bootup()
+        {
+            var readUserPreference = this.userPreferenceService.Read<UserPreference>();
+            Assert.AreEqual(readUserPreference.SavedServerConections.Count, 0);
+            Assert.AreEqual(readUserPreference.SavedServerConections.Count, 0);
         }
 
         [Test]

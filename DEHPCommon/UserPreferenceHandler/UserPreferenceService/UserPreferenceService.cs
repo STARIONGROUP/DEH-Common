@@ -10,7 +10,6 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
 
     using Newtonsoft.Json;
@@ -75,18 +74,26 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             try
             {
+                var fileExist = File.Exists($"{path}{SETTING_FILE_EXTENSION}");
+
+                if (!fileExist)
+                {
+                    this.Write(this.userPreferenceSettings);
+                }
+
                 using (var file = File.OpenText($"{path}{SETTING_FILE_EXTENSION}"))
                 {
                     var serializer = new JsonSerializer();
                     var result = (List<ServerConnection>)serializer.Deserialize(file, typeof(List<ServerConnection>));
-
-                    if (result!=null)
-                    {
-                        this.userPreferenceSettings.SavedServerConections.AddRange(result);
-                    }
-
+                    this.userPreferenceSettings.SavedServerConections.AddRange(result);
                     return (T)this.userPreferenceSettings;
                 }
+            }
+            catch (IOException ex)
+            {
+                logger.Error(ex, "IOException- The user preference could not be found");
+
+                throw new Exception("The user preference could not be found", ex);
             }
             catch (Exception ex)
             {
