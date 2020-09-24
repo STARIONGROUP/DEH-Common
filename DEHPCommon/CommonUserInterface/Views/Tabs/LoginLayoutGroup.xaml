@@ -1,0 +1,33 @@
+﻿<dxlc:LayoutGroup x:Class="DEHPCommon.CommonUserInterface.Views.Tabs.LoginLayoutGroup"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                  xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                  xmlns:common="clr-namespace:DEHPCommon.CommonUserInterface.Views.Common"
+                  xmlns:tabs="clr-namespace:DEHPCommon.CommonUserInterface.ViewModels.Tabs"
+                  Header="DEHP"
+                  Orientation="Vertical"
+                  mc:Ignorable="d"
+                  VerticalAlignment="Stretch"
+                  HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup.DataContext>
+        <tabs:LoginLayoutGroupViewModel />
+    </dxlc:LayoutGroup.DataContext>
+    <GroupBox Header="Login" Height="250">
+        <StackPanel Margin="0">
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <common:LoginView Grid.Row="0"/>
+            </Grid>
+        </StackPanel>
+    </GroupBox>
+</dxlc:LayoutGroup>
