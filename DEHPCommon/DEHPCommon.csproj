@@ -66,6 +66,8 @@
     <Compile Include="MessageHub\Events\IsBusyEvent.cs" />
     <Compile Include="MessageHub\MessageHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserPreferenceHandler\Enums\ServerType.cs" />
+    <Compile Include="UserPreferenceHandler\Interfaces\IUserPreference.cs" />
     <Compile Include="UserPreferenceHandler\ServerConnection.cs" />
     <Compile Include="UserPreferenceHandler\UserPreference.cs" />
     <Compile Include="UserPreferenceHandler\UserPreferenceService\IUserPreferenceService.cs" />
@@ -73,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MappingEngine\" />
+    <Folder Include="MessageHub\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE">

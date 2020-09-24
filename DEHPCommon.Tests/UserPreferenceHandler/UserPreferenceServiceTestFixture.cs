@@ -11,6 +11,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     using System.IO;
 
     using DEHPCommon.UserPreferenceHandler;
+    using DEHPCommon.UserPreferenceHandler.Enums;
     using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
     using NUnit.Framework;
@@ -21,36 +22,33 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     [TestFixture]
     public class UserPreferenceServiceTestFixture
     {
-        private UserPreferenceService userPreferenceService;
+        private UserPreferenceService<UserPreference> userPreferenceService;
         private string expectedUserPreferencePath;
         private UserPreference userPreference;
         private ServerConnection serverConnection1;
         private ServerConnection serverConnection2;
         private ServerConnection serverConnection3;
 
-        private string serverType;
-        private string uri;
-
         [SetUp]
         public void SetUp()
         {
             this.expectedUserPreferencePath =
                 Path.Combine(
-                    UserPreferenceService.UserPreferenceDataFolder,
-                    UserPreferenceService.DirectoryFolder,
+                    UserPreferenceService<UserPreference>.ApplicationExecutePath,
+                    UserPreferenceService<UserPreference>.UserPreferenceDirectoryName,
                     "DEHPCommon.settings.json");
 
-            this.userPreferenceService = new UserPreferenceService();
+            this.userPreferenceService = new UserPreferenceService<UserPreference>();
 
             this.serverConnection1 = new ServerConnection()
             {
-                ServerType = "CDP4 WebServices",
+                ServerType = ServerType.Cdp4WebServices,
                 Uri = "http://localhost:5000",
             };
 
             this.serverConnection2 = new ServerConnection()
             {
-                ServerType = "OCDT WebServices",
+                ServerType = ServerType.OcdtWSPServer,
                 Uri = "http://localhost:4000",
             };
 
@@ -60,8 +58,8 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
 
             this.serverConnection3 = new ServerConnection()
             {
-                ServerType = this.serverType,
-                Uri = this.uri,
+                ServerType = ServerType.Cdp4WebServices,
+                Uri = "http://localhost:3000",
             };
         }
 
@@ -75,17 +73,24 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         }
 
         [Test]
-        public void Verify_that_on_write_ArgumentNullException_is_thrown()
-        {
-            Assert.Throws<ArgumentNullException>(() => this.userPreferenceService.Write<UserPreference>(null));
-        }
-
-        [Test]
         public void Verify_that_the_UserPreference_settings_can_be_written_to_disk()
         {
-            Assert.DoesNotThrow(() => this.userPreferenceService.Write(this.userPreference));
+            Assert.DoesNotThrow(() => this.userPreferenceService.Save());
+
+            this.userPreferenceService.Read();
+
+            Assert.AreEqual(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count, 0);
+
+            this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(this.serverConnection1);
+            this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(this.serverConnection2);
+
+            Assert.DoesNotThrow(() => this.userPreferenceService.Save());
+            Assert.AreEqual(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count, 2);
+
+            this.userPreferenceService.Read();
             var expectedUserPreferenceContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"));
             var writtenContent = File.ReadAllText(this.expectedUserPreferencePath);
+
             Assert.AreEqual(expectedUserPreferenceContent, writtenContent);
         }
 
@@ -93,24 +98,23 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         public void Verify_that_the_UserPreference_settings_can_be_read_from_disk()
         {
             this.userPreferenceService.CheckConfigurationDirectory();
-
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"), this.expectedUserPreferencePath);
             Assert.IsTrue(File.Exists(this.expectedUserPreferencePath));
 
-            var readUserPreference = this.userPreferenceService.Read<UserPreference>();
-            Assert.AreEqual(this.userPreference.SavedServerConections[0].ServerType, readUserPreference.SavedServerConections[0].ServerType);
-            Assert.AreEqual(this.userPreference.SavedServerConections[0].Uri, readUserPreference.SavedServerConections[0].Uri);
-            Assert.AreEqual(this.userPreference.SavedServerConections[1].ServerType, readUserPreference.SavedServerConections[1].ServerType);
-            Assert.AreEqual(this.userPreference.SavedServerConections[1].Uri, readUserPreference.SavedServerConections[1].Uri);
+            this.userPreferenceService.Read();
+            Assert.AreEqual(this.userPreference.SavedServerConections[0].ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[0].ServerType);
+            Assert.AreEqual(this.userPreference.SavedServerConections[0].Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[0].Uri);
+            Assert.AreEqual(this.userPreference.SavedServerConections[1].ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[1].ServerType);
+            Assert.AreEqual(this.userPreference.SavedServerConections[1].Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[1].Uri);
 
         }
 
         [Test]
         public void Verify_that_the_UserPreference_settings_file_will_be_created_if_not_exist_on_the_first_bootup()
         {
-            var readUserPreference = this.userPreferenceService.Read<UserPreference>();
-            Assert.AreEqual(readUserPreference.SavedServerConections.Count, 0);
-            Assert.AreEqual(readUserPreference.SavedServerConections.Count, 0);
+            this.userPreferenceService.Read();
+            Assert.AreEqual(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count, 0);
+            Assert.AreEqual(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count, 0);
         }
 
         [Test]
@@ -121,18 +125,18 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"), this.expectedUserPreferencePath);
             Assert.IsTrue(File.Exists(this.expectedUserPreferencePath));
 
-            var readUserPreference = this.userPreferenceService.Read<UserPreference>();
-            Assert.AreEqual(this.userPreference.SavedServerConections[0].ServerType, readUserPreference.SavedServerConections[0].ServerType);
-            Assert.AreEqual(this.userPreference.SavedServerConections[0].Uri, readUserPreference.SavedServerConections[0].Uri);
-            Assert.AreEqual(this.userPreference.SavedServerConections[1].ServerType, readUserPreference.SavedServerConections[1].ServerType);
-            Assert.AreEqual(this.userPreference.SavedServerConections[1].Uri, readUserPreference.SavedServerConections[1].Uri);
+            this.userPreferenceService.Read();
+            Assert.AreEqual(this.userPreference.SavedServerConections[0].ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[0].ServerType);
+            Assert.AreEqual(this.userPreference.SavedServerConections[0].Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[0].Uri);
+            Assert.AreEqual(this.userPreference.SavedServerConections[1].ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[1].ServerType);
+            Assert.AreEqual(this.userPreference.SavedServerConections[1].Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[1].Uri);
 
-            readUserPreference.SavedServerConections.Add(this.serverConnection3);
-            this.userPreferenceService.Write(readUserPreference);
+            this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(this.serverConnection3);
+            this.userPreferenceService.Save();
 
-            var newUserPreference = this.userPreferenceService.Read<UserPreference>();
-            Assert.AreEqual(this.serverType, newUserPreference.SavedServerConections[2].ServerType);
-            Assert.AreEqual(this.uri, newUserPreference.SavedServerConections[2].Uri);
+            this.userPreferenceService.Read();
+            Assert.AreEqual(this.serverConnection3.ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[2].ServerType);
+            Assert.AreEqual(this.serverConnection3.Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[2].Uri);
         }
     }
 }
