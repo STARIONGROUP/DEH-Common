@@ -56,14 +56,6 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
             get { return Path.Combine(ApplicationExecutePath, UserPreferenceDirectoryName); }
         }
 
-        ///// <summary>
-        ///// Initializes a new instance of <see cref="UserPreferenceService"/>
-        ///// </summary>
-        //public UserPreferenceService()
-        //{
-        //    this.UserPreferenceSettings = new UserPreference();
-        //}
-
         /// <summary>
         /// Reads the <see cref="T"/> user preference in settings
         /// </summary>
@@ -83,7 +75,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
                 if (!fileExist)
                 {
-                    this.Write((T)(new UserPreference() as IUserPreference));
+                    this.Save();
                 }
 
                 var file = File.ReadAllText($"{path}{SETTING_FILE_EXTENSION}");
@@ -98,19 +90,16 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         }
 
         /// <summary>
-        /// Writes the <see cref="UserPreference"/> to disk
+        /// Save the <see cref="UserPreference"/> to disk
         /// </summary>
-        /// <param name="userPreference">
-        /// The <see cref="UserPreference"/> that will be persisted
-        /// </param>
-        public void Write(T userPreference)
+        public void Save()
         {
-            if (userPreference == null)
+            if (this.UserPreferenceSettings == null)
             {
-                throw new ArgumentNullException(nameof(userPreference), "This may not be null");
+                this.UserPreferenceSettings = (T)(new UserPreference() as IUserPreference);
             }
 
-            var assemblyName = this.QueryAssemblyTitle(userPreference.GetType());
+            var assemblyName = this.QueryAssemblyTitle(this.UserPreferenceSettings.GetType());
 
             this.CheckConfigurationDirectory();
 
@@ -127,10 +116,8 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                     Formatting = Formatting.Indented
                 };
 
-                serializer.Serialize(streamWriter, userPreference);
+                serializer.Serialize(streamWriter, this.UserPreferenceSettings);
             }
-
-            this.UserPreferenceSettings = userPreference;
         }
 
         /// <summary>

@@ -22,15 +22,11 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// Reads the <see cref="T"/> user preference in settings
         /// </summary>
-        /// <typeparam name="T">A type of <see cref="UserPreference"/></typeparam>
         void Read();
 
         /// <summary>
-        /// Writes the <see cref="UserPreference"/> to disk
+        /// Save the <see cref="UserPreference"/> to disk
         /// </summary>
-        /// <param name="userPreference">
-        /// The <see cref="UserPreference"/> that will be persisted
-        /// </param>
-        void Write(T userPreference);
+        void Save();
     }
 }
