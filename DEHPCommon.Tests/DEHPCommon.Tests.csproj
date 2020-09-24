@@ -17,7 +17,16 @@
     <Folder Include="HubController\" />
     <Folder Include="MappingEngine\" />
     <Folder Include="MessageHub\" />
-    <Folder Include="UserPreferenceHandler\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DEHPCommon\DEHPCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="UserPreferenceHandler\expectedUserPreference.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

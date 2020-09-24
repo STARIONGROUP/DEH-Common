@@ -1,0 +1,12 @@
+﻿{
+  "savedServerConections": [
+    {
+      "serverType": "Cdp4WebServices",
+      "uri": "http://localhost:5000"
+    },
+    {
+      "serverType": "OcdtWSPServer",
+      "uri": "http://localhost:4000"
+    }
+  ]
+}
