@@ -22,7 +22,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
     [TestFixture]
     public class UserPreferenceServiceTestFixture
     {
-        private UserPreferenceService userPreferenceService;
+        private UserPreferenceService<UserPreference> userPreferenceService;
         private string expectedUserPreferencePath;
         private UserPreference userPreference;
         private ServerConnection serverConnection1;
@@ -34,11 +34,11 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         {
             this.expectedUserPreferencePath =
                 Path.Combine(
-                    UserPreferenceService.ApplicationExecutePath,
-                    UserPreferenceService.UserPreferenceDirectoryName,
+                    UserPreferenceService<UserPreference>.ApplicationExecutePath,
+                    UserPreferenceService<UserPreference>.UserPreferenceDirectoryName,
                     "DEHPCommon.settings.json");
 
-            this.userPreferenceService = new UserPreferenceService();
+            this.userPreferenceService = new UserPreferenceService<UserPreference>();
 
             this.serverConnection1 = new ServerConnection()
             {

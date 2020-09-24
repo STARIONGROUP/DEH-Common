@@ -1,32 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UserPreference.cs"company="RHEA System S.A.">
+// <copyright file="IUserPreference.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserPreferenceHandler
+namespace DEHPCommon.UserPreferenceHandler.Interfaces
 {
     using System.Collections.Generic;
 
-    using DEHPCommon.UserPreferenceHandler.Interfaces;
-
     /// <summary>
-    /// Base class from which all <see cref="UserPreference"/> shall derive
+    /// Base interface from which all <see cref="UserPreference"/> shall derive
     /// </summary>
-    public class UserPreference : IUserPreference
+    public interface IUserPreference
     {
         /// <summary>
         /// A list used to store the server connection settings,
         /// </summary>
-        public List<ServerConnection> SavedServerConections { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="UserPreference"/>
-        /// </summary>
-        public UserPreference()
-        {
-            this.SavedServerConections = new List<ServerConnection>();
-        }
+        List<ServerConnection> SavedServerConections { get; set; }
     }
 }

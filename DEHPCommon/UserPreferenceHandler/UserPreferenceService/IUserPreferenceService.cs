@@ -7,19 +7,22 @@
 
 namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 {
+    using DEHPCommon.UserPreferenceHandler.Interfaces;
+
     /// <summary>
     /// Definition of the <see cref="IUserPreferenceService"/> used to load specific settings
     /// </summary>
-    public interface IUserPreferenceService
+    public interface IUserPreferenceService<T> where T : IUserPreference
     {
         /// <summary>
         /// Gets or sets  user preference settings,
         /// </summary>
-        UserPreference UserPreferenceSettings { get; set; }
+        T UserPreferenceSettings { get; set; }
 
         /// <summary>
-        /// Reads the <see cref="UserPreference"/> settings
+        /// Reads the <see cref="T"/> user preference in settings
         /// </summary>
+        /// <typeparam name="T">A type of <see cref="UserPreference"/></typeparam>
         void Read();
 
         /// <summary>
@@ -28,6 +31,6 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <param name="userPreference">
         /// The <see cref="UserPreference"/> that will be persisted
         /// </param>
-        void Write(UserPreference userPreference);
+        void Write(T userPreference);
     }
 }

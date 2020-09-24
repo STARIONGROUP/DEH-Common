@@ -8,10 +8,10 @@
 namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
+
+    using DEHPCommon.UserPreferenceHandler.Interfaces;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
@@ -21,7 +21,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     /// <summary>
     /// Definition of the <see cref="UserPreferenceService"/> used to load specific settings
     /// </summary>
-    public class UserPreferenceService : IUserPreferenceService
+    public class UserPreferenceService<T> : IUserPreferenceService<T> where T : IUserPreference
     {
         /// <summary>
         /// The logger for the current class
@@ -46,7 +46,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// Gets or sets  user preference settings,
         /// </summary>
-        public UserPreference UserPreferenceSettings { get; set; }
+        public T UserPreferenceSettings { get; set; }
 
         /// <summary>
         /// Configuration user preference file path
@@ -55,20 +55,21 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         {
             get { return Path.Combine(ApplicationExecutePath, UserPreferenceDirectoryName); }
         }
-        /// <summary>
-        /// Initializes a new instance of <see cref="UserPreferenceService"/>
-        /// </summary>
-        public UserPreferenceService()
-        {
-            this.UserPreferenceSettings = new UserPreference();
-        }
+
+        ///// <summary>
+        ///// Initializes a new instance of <see cref="UserPreferenceService"/>
+        ///// </summary>
+        //public UserPreferenceService()
+        //{
+        //    this.UserPreferenceSettings = new UserPreference();
+        //}
 
         /// <summary>
-        /// Reads the <see cref="UserPreference"/> settings
+        /// Reads the <see cref="T"/> user preference in settings
         /// </summary>
         public void Read()
         {
-            var assemblyName = this.QueryAssemblyTitle(typeof(UserPreference));
+            var assemblyName = this.QueryAssemblyTitle(typeof(T));
 
             this.CheckConfigurationDirectory();
 
@@ -82,11 +83,11 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
                 if (!fileExist)
                 {
-                    this.Write(this.UserPreferenceSettings);
+                    this.Write((T)(new UserPreference() as IUserPreference));
                 }
 
                 var file = File.ReadAllText($"{path}{SETTING_FILE_EXTENSION}");
-                this.UserPreferenceSettings = JsonConvert.DeserializeObject<UserPreference>(file);
+                this.UserPreferenceSettings = JsonConvert.DeserializeObject<T>(file);
             }
             catch (Exception ex)
             {
@@ -102,7 +103,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <param name="userPreference">
         /// The <see cref="UserPreference"/> that will be persisted
         /// </param>
-        public void Write(UserPreference userPreference)
+        public void Write(T userPreference)
         {
             if (userPreference == null)
             {
@@ -122,6 +123,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
                 var serializer = new JsonSerializer
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    Converters = {new Newtonsoft.Json.Converters.StringEnumConverter()},
                     Formatting = Formatting.Indented
                 };
 
