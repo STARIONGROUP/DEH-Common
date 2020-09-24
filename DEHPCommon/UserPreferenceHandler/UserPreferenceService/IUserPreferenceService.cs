@@ -12,7 +12,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     /// <summary>
     /// Definition of the <see cref="IUserPreferenceService"/> used to load specific settings
     /// </summary>
-    public interface IUserPreferenceService<T> where T : IUserPreference
+    public interface IUserPreferenceService<T> where T : new()
     {
         /// <summary>
         /// Gets or sets  user preference settings,

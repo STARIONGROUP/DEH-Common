@@ -11,8 +11,6 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     using System.IO;
     using System.Reflection;
 
-    using DEHPCommon.UserPreferenceHandler.Interfaces;
-
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
 
@@ -21,7 +19,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
     /// <summary>
     /// Definition of the <see cref="UserPreferenceService"/> used to load specific settings
     /// </summary>
-    public class UserPreferenceService<T> : IUserPreferenceService<T> where T : IUserPreference
+    public class UserPreferenceService<T> : IUserPreferenceService<T> where T : new()
     {
         /// <summary>
         /// The logger for the current class
@@ -96,7 +94,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         {
             if (this.UserPreferenceSettings == null)
             {
-                this.UserPreferenceSettings = (T)(new UserPreference() as IUserPreference);
+                this.UserPreferenceSettings = new T();
             }
 
             var assemblyName = this.QueryAssemblyTitle(this.UserPreferenceSettings.GetType());
