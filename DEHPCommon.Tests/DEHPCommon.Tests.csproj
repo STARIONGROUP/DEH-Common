@@ -16,7 +16,6 @@
   <ItemGroup>
     <Folder Include="HubController\" />
     <Folder Include="MappingEngine\" />
-    <Folder Include="MessageHub\" />
   </ItemGroup>
 
   <ItemGroup>

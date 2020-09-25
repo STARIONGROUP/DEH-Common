@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="HubController\HubController.cs" />
     <Compile Include="HubController\Interfaces\IHubController.cs" />
+    <Compile Include="MessageHub\Events\IsBusyEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserPreferenceHandler\Enums\ServerType.cs" />
     <Compile Include="UserPreferenceHandler\Interfaces\IUserPreference.cs" />
@@ -73,7 +74,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MappingEngine\" />
-    <Folder Include="MessageHub\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE">
