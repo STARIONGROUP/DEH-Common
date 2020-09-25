@@ -29,12 +29,12 @@ namespace DEHPCommon.MessageHub.Events
         }
 
         /// <summary>
-        /// Gets or sets the IsBusy status
+        /// Gets or sets a value indicating whether application has busy status
         /// </summary>
         public bool IsBusy { get; set; }
 
         /// <summary>
-        /// Gets or sets the message
+        /// Gets or sets a message indicating whether application has busy status
         /// </summary>
         public string Message { get; set; }
     }
