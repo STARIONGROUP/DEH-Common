@@ -28,24 +28,13 @@ namespace DEHPCommon.HubController.Interfaces
         /// <summary>
         /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="HubController"/>.
         /// </summary>
-        ISession Session { get; }
+        ISession Session { get; set; }
 
         /// <summary>
         /// Checks whether the session is open by checking if
         /// the <see cref="CDP4Common.SiteDirectoryData.SiteDirectory" /> is available
         /// </summary>
         bool IsSessionOpen { get; }
-
-        /// <summary>
-        /// Gets the <see cref="EngineeringModelSetup"/> contained in the site directory
-        /// </summary>
-        IEnumerable<EngineeringModelSetup> GetEngineeringModels();
-
-        /// <summary>
-        /// Retrieves the <see cref="SiteDirectory"/> that is loaded in the <see cref="ISession"/>
-        /// </summary>
-        /// <returns>The <see cref="SiteDirectory"/></returns>
-        SiteDirectory GetSiteDirectory();
 
         /// <summary>
         /// Gets the <see cref="Thing"/> by its <see cref="iid"/> from the cache
@@ -78,6 +67,17 @@ namespace DEHPCommon.HubController.Interfaces
         /// Closes connection to the data-source and end the execution of this app
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Gets the <see cref="EngineeringModelSetup"/> contained in the site directory
+        /// </summary>
+        IEnumerable<EngineeringModelSetup> GetEngineeringModels();
+
+        /// <summary>
+        /// Retrieves the <see cref="SiteDirectory"/> that is loaded in the <see cref="ISession"/>
+        /// </summary>
+        /// <returns>The <see cref="SiteDirectory"/></returns>
+        SiteDirectory GetSiteDirectory();
 
         /// <summary>
         /// Reads an <see cref="Iteration"/> and set the active <see cref="DomainOfExpertise"/> for the Iteration
@@ -131,5 +131,36 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="updateOption">An assert whether the <see cref="Option"/> shall be updated with the created <see cref="NestedElement"/></param>
         /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="NestedElement"/></returns>
         IEnumerable<NestedElement> GetNestedElementTree(Option option, DomainOfExpertise domainOfExpertise, bool updateOption);
+
+        /// <summary>
+        /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="iteration"></param>
+        /// <param name="domain"></param>
+        Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
+
+        /// <summary>
+        /// Computes all the <see cref="FileType"/> of the file that is to be uploaded
+        /// </summary>
+        /// <param name="extensions">The file extensions</param>
+        /// <param name="allowedFileTypes">The Allowed <see cref="FileType"/></param>
+        /// <param name="fileName">The name of the file that is to be uploaded</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="FileType"/></returns>
+        IEnumerable<FileType> ComputeFileTypes(string[] extensions, IEnumerable<FileType> allowedFileTypes, ref string fileName);
+
+        /// <summary>
+        /// Downloads a <see cref="File.CurrentFileRevision"/>
+        /// </summary>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        Task Download(File file);
+
+        /// <summary>
+        /// Downloads a specific <see cref="FileRevision"/>
+        /// </summary>
+        /// <param name="fileRevision">The <see cref="FileRevision"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        Task Download(FileRevision fileRevision);
     }
 }

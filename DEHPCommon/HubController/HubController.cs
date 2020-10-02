@@ -9,6 +9,7 @@ namespace DEHPCommon.HubController
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -27,12 +28,15 @@ namespace DEHPCommon.HubController
     using CDP4WspDal;
 
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.FileDialogService;
     using DEHPCommon.UserPreferenceHandler.Enums;
 
     using NLog;
 
+    using File = CDP4Common.EngineeringModelData.File;
+
     /// <summary>
-    /// Definition of the <see cref="HubController"/>
+    /// Definition of the <see cref="HubController"/>, which is responsible to provides <see cref="ISession"/> related functionnalities
     /// </summary>
     public class HubController : IHubController
     {
@@ -42,9 +46,23 @@ namespace DEHPCommon.HubController
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// The <see cref="IOpenSaveFileDialogService"/>
+        /// </summary>
+        private readonly IOpenSaveFileDialogService fileDialogService;
+        
+        /// <summary>
         /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="HubController"/>.
         /// </summary>
         public ISession Session { get; set; }
+        
+        /// <summary>
+        /// Initializes a new <see cref="HubController"/>
+        /// </summary>
+        /// <param name="fileDialogService">The <see cref="IOpenSaveFileDialogService"/></param>
+        public HubController(IOpenSaveFileDialogService fileDialogService)
+        {
+            this.fileDialogService = fileDialogService;
+        }
 
         /// <summary>
         /// Gets the <see cref="Thing"/> by its <see cref="iid"/> from the cache
@@ -271,6 +289,185 @@ namespace DEHPCommon.HubController
         public IEnumerable<NestedElement> GetNestedElementTree(Option option, DomainOfExpertise domainOfExpertise, bool updateOption)
         {
             return new NestedElementTreeGenerator().Generate(option, domainOfExpertise, updateOption);
+        }
+
+        /// <summary>
+        /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="iteration"></param>
+        /// <param name="domain"></param>
+        public async Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
+        {
+            iteration ??= this.GetIteration().Keys.First();
+            domain ??= this.Session.QueryCurrentDomainOfExpertise();
+            var iDalUri = new Uri(this.Session.DataSourceUri);
+
+            var fileStore = iteration.DomainFileStore.FirstOrDefault(x => x.Owner.Iid == domain.Iid);
+
+            if (fileStore is null || !this.GetFile(out var filePath, out var fileName, out var extensions))
+            {
+                return;
+            }
+            
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
+            {
+                CreatedOn = DateTime.UtcNow, Name = fileName, ContentHash = this.CalculateContentHash(filePath), LocalPath = filePath
+            };
+
+            fileRevision.FileType.AddRange(this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fileName));
+            
+            if (file is null)
+            {
+                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri);
+                fileStore.File.Add(file);
+            }
+
+            file.FileRevision.Add(fileRevision);
+            
+            var clone = fileStore.Clone(true);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), clone);
+            transaction.CreateOrUpdate(fileRevision);
+            transaction.CreateOrUpdate(file);
+
+            await this.Session.Write(transaction.FinalizeTransaction(), new[] { fileName });
+        }
+
+        /// <summary>
+        /// Computes all the <see cref="FileType"/> of the file that is to be uploaded
+        /// </summary>
+        /// <param name="extensions">The file extensions</param>
+        /// <param name="allowedFileTypes">The Allowed <see cref="FileType"/></param>
+        /// <param name="fileName">The name of the file that is to be uploaded</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="FileType"/></returns>
+        public IEnumerable<FileType> ComputeFileTypes(string[] extensions, IEnumerable<FileType> allowedFileTypes, ref string fileName)
+        {
+            var fileTypes = new List<FileType>();
+            allowedFileTypes = allowedFileTypes.ToList();
+
+            for (var i = extensions.Length - 1; i >= 0; i--)
+            {
+                var fileType = allowedFileTypes.FirstOrDefault(x => x.Extension.ToLower().Equals(extensions[i].ToLower()));
+
+                if (fileType == null)
+                {
+                    break;
+                }
+
+                fileTypes.Insert(0, fileType);
+                fileName = string.Join(".", extensions.Take(i));
+            }
+
+            return fileTypes;
+        }
+
+        /// <summary>
+        /// Opens the Open File Dialog and let the user select one file and returns the file Path the file Name and its extensions
+        /// </summary>
+        /// <param name="filePath">The File Path</param>
+        /// <param name="fileName">The File Name</param>
+        /// <param name="extensions">The Extensions</param>
+        /// <returns>An assert whether any informations this method returns are compliant</returns>
+        private bool GetFile(out string filePath, out string fileName, out string[] extensions)
+        {
+            filePath = null;
+            fileName = null;
+            extensions = null;
+
+            var result = this.fileDialogService.GetOpenFileDialog(false, false, false, string.Empty, string.Empty, string.Empty, 1);
+
+            if (result.Count() != 1)
+            {
+                return false;
+            }
+
+            filePath = result.First();
+            fileName = System.IO.Path.GetFileName(filePath);
+
+            if (fileName is null)
+            {
+                return false;
+            }
+            
+            extensions = fileName.Split(new[] { "." }, StringSplitOptions.None);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Calculate the Hash of the contents of some filecontent
+        /// </summary>
+        /// <param name="filePath">The complete path of the file</param>
+        /// <returns>The Hash as <see cref="string"/></returns>
+        private string CalculateContentHash(string filePath)
+        {
+            if (filePath == null)
+            {
+                return null;
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                return StreamToHashComputer.CalculateSha1HashFromStream(fileStream);
+            }
+        }
+
+        /// <summary>
+        /// Gets the allowed file type
+        /// </summary>
+        /// <param name="iteration">The iteration</param>
+        /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="FileType"/></returns>
+        private IEnumerable<FileType> GetAllowedFileType(Thing iteration)
+        {
+            var modelReferenceDataLibrary = iteration.GetContainerOfType<EngineeringModel>().EngineeringModelSetup.RequiredRdl.Single();
+
+            var allowedFileTypes = new List<FileType>(modelReferenceDataLibrary.FileType);
+            allowedFileTypes.AddRange(modelReferenceDataLibrary.GetRequiredRdls().SelectMany(rdl => rdl.FileType));
+            return allowedFileTypes;
+        }
+
+        /// <summary>
+        /// Downloads a <see cref="File.CurrentFileRevision"/>
+        /// </summary>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(File file)
+        {
+            if (file is null)
+            {
+                return;
+            }
+
+            await this.Download(file.CurrentFileRevision);
+        }
+
+        /// <summary>
+        /// Downloads a specific <see cref="FileRevision"/>
+        /// </summary>
+        /// <param name="fileRevision">The <see cref="FileRevision"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(FileRevision fileRevision)
+        {
+            if (fileRevision is null)
+            {
+                return;
+            }
+
+            var fileName = Path.GetFileNameWithoutExtension(fileRevision.Path);
+            var extension = Path.GetExtension(fileRevision.Path);
+            var filter = string.IsNullOrWhiteSpace(extension) ? "All files (*.*)|*.*" : $"{extension.Replace(".", "")} files|*{extension}";
+
+            var destinationPath = this.fileDialogService.GetSaveFileDialog(fileName, extension, filter, string.Empty, 1);
+
+            if (!string.IsNullOrWhiteSpace(destinationPath))
+            {
+                var fileContent = await this.Session.ReadFile(fileRevision);
+
+                if (fileContent != null)
+                {
+                    System.IO.File.WriteAllBytes(destinationPath, fileContent);
+                }
+            }
         }
     }
 }

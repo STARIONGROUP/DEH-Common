@@ -23,6 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="HubController\file.tar.gz">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="UserPreferenceHandler\expectedUserPreference.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -67,6 +67,8 @@
     <Compile Include="HubController\Interfaces\IHubController.cs" />
     <Compile Include="MessageHub\Events\IsBusyEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FileDialogService\IOpenSaveFileDialogService.cs" />
+    <Compile Include="Services\FileDialogService\OpenSaveFileDialogService.cs" />
     <Compile Include="UserPreferenceHandler\Enums\ServerType.cs" />
     <Compile Include="UserPreferenceHandler\Interfaces\IUserPreference.cs" />
     <Compile Include="UserPreferenceHandler\ServerConnection.cs" />
