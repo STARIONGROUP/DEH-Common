@@ -14,11 +14,13 @@ namespace DEHPCommon.Tests.CommonUserInterface
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
+    using CDP4Dal.DAL;
 
     using DEHPCommon.CommonUserInterface.ViewModels.Common;
     using DEHPCommon.CommonUserInterface.ViewModels.Tabs;
-    using DEHPCommon.HubController;
+
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.UserPreferenceHandler.Enums;
 
     using NUnit.Framework;
 
@@ -36,9 +38,8 @@ namespace DEHPCommon.Tests.CommonUserInterface
         private Mock<IHubController> controller;
         private LoginViewModel loginViewModel;
         public LoginLayoutGroupViewModel loginLayoutGroupViewModel;
-
-
-        private KeyValuePair<string, string> serverType;
+        
+        private KeyValuePair<ServerType, string> serverType;
         private string uri;
         private string userName;
         private string password;
@@ -52,11 +53,12 @@ namespace DEHPCommon.Tests.CommonUserInterface
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
             this.controller = new Mock<IHubController>();
             this.controller.Setup(x => x.Session).Returns(this.session.Object);
+            this.controller.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(Task.FromResult(true));
             this.loginViewModel = new LoginViewModel(this.controller.Object);
             this.loginLayoutGroupViewModel = new LoginLayoutGroupViewModel();
             this.loginLayoutGroupViewModel.LoginViewModel = this.loginViewModel;
 
-            this.serverType = new KeyValuePair<string, string>("CDP", "CDP4 WebServices");
+            this.serverType = new KeyValuePair<ServerType, string>(ServerType.Cdp4WebServices, "CDP4 WebServices");
             this.uri = "http://localhost:4000";
             this.userName = "DEHP-UserNew";
             this.password = "1234";
@@ -73,7 +75,7 @@ namespace DEHPCommon.Tests.CommonUserInterface
         {
             Assert.IsFalse(this.loginViewModel.LoginCommand.CanExecute(null));
 
-            this.loginViewModel.ServerType = this.serverType;
+            this.loginViewModel.SelectedServerType = this.serverType;
             this.loginViewModel.Uri = this.uri;
             this.loginViewModel.UserName = this.userName;
             this.loginViewModel.Password = this.password;
@@ -92,7 +94,7 @@ namespace DEHPCommon.Tests.CommonUserInterface
             Assert.That(this.loginViewModel.LoginFailed, Is.True);
             Assert.That(this.loginViewModel.LoginSuccessfully, Is.False);
 
-            this.loginViewModel.ServerType = this.serverType;
+            this.loginViewModel.SelectedServerType = this.serverType;
             this.loginViewModel.Uri = this.uri;
             this.loginViewModel.UserName = this.userName;
             this.loginViewModel.Password = this.password;
@@ -108,7 +110,7 @@ namespace DEHPCommon.Tests.CommonUserInterface
         {
             Assert.That(this.loginLayoutGroupViewModel.ServerIsChecked, Is.False);
 
-            this.loginViewModel.ServerType = this.serverType;
+            this.loginViewModel.SelectedServerType = this.serverType;
             this.loginViewModel.Uri = this.uri;
             this.loginViewModel.UserName = this.userName;
             this.loginViewModel.Password = this.password;

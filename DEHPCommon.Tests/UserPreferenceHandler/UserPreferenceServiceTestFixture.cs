@@ -48,7 +48,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
 
             this.serverConnection2 = new ServerConnection()
             {
-                ServerType = ServerType.OcdtWSPServer,
+                ServerType = ServerType.OcdtWspServer,
                 Uri = "http://localhost:4000",
             };
 
