@@ -69,7 +69,7 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
         /// <param name="iid">The id of the <see cref="Thing"/></param>
-        /// <param name="iteration"></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <returns>An assert whether the <see cref="thing"/> has been found</returns>
         public bool GetThingById<TThing>(Guid iid, Iteration iteration, out TThing thing) where TThing : Thing
