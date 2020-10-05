@@ -24,6 +24,9 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
 
     using DEHPCommon.CommonUserInterface.ViewModels.Rows;
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.UserPreferenceHandler.Enums;
+
+    using NLog;
 
     using ReactiveUI;
 
@@ -33,26 +36,36 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
     public class LoginViewModel : ReactiveObject
     {
         /// <summary>
+        /// The <see cref="NLog"/> logger
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger(typeof(LoginViewModel));
+
+        /// <summary>
+        /// The <see cref="IHubController"/> instance
+        /// </summary>
+        private readonly IHubController hubController;
+
+        /// <summary>
         /// Gets or sets datasource server type
         /// </summary>
-        public static KeyValuePair<string, string>[] DataSourceList { get; } = {
-            new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
-            new KeyValuePair<string, string>("OCDT", "OCDT WSP Server"),
+        public Dictionary<ServerType, string> DataSourceList { get; } = new Dictionary<ServerType, string>()
+        {
+            { ServerType.Cdp4WebServices, "CDP4 WebServices"},
+            { ServerType.OcdtWspServer, "OCDT WSP Server"}
         };
 
         /// <summary>
-        /// Backing field for the <see cref="ServerType"/> property
+        /// Backing field for the <see cref="SelectedServerType"/> property
         /// </summary>
-        private KeyValuePair<string, string> serverType;
+        private KeyValuePair<ServerType, string> selectedServerType;
 
         /// <summary>
         /// Gets or sets server serverType value
         /// </summary>
-        public KeyValuePair<string, string> ServerType
+        public KeyValuePair<ServerType, string> SelectedServerType
         {
-            get => this.serverType;
-
-            set => this.RaiseAndSetIfChanged(ref this.serverType, value);
+            get => this.selectedServerType;
+            set => this.RaiseAndSetIfChanged(ref this.selectedServerType, value);
         }
 
         /// <summary>
@@ -157,10 +170,13 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
         /// </summary>
-        public LoginViewModel(IHubController controller)
+        /// <param name="hubController">The <see cref="IHubController"/></param>
+        public LoginViewModel(IHubController hubController)
         {
+            this.hubController = hubController;
+
             var canLogin = this.WhenAnyValue(
-                vm => vm.ServerType,
+                vm => vm.SelectedServerType,
                 vm => vm.UserName,
                 vm => vm.Password,
                 vm => vm.Uri,
@@ -184,19 +200,18 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
                 }
             });
 
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(controller), RxApp.MainThreadScheduler);
+            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
-            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>();
-            this.EngineeringModels.ChangeTrackingEnabled = true;
+            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel> { ChangeTrackingEnabled = true };
         }
 
         /// <summary>
         /// Executes login command
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        private async Task ExecuteLogin(IHubController controller)
+        private async Task ExecuteLogin()
         {
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -204,43 +219,27 @@ namespace DEHPCommon.CommonUserInterface.ViewModels.Common
             try
             {
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
-
-                switch (this.ServerType.Key)
-                {
-                    case "CDP":
-                        this.dal = new CdpServicesDal();
-                        break;
-                    case "OCDT":
-                        this.dal = new WspDal();
-                        break;
-                }
-
-                controller.Session = new Session(this.dal, credentials);
-                await controller.Session.Open();
-
-                this.LoginSuccessfully = true;
-
-                var siteDirectory = controller.Session.RetrieveSiteDirectory();
-                this.BindEngineeringModels(siteDirectory);
+                this.LoginSuccessfully = await this.hubController.Open(credentials, this.SelectedServerType.Key);
+                this.BindEngineeringModels();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 this.LoginFailed = true;
+                this.logger.Error($"Loggin failed: {exception}");
             }
         }
-
+        
         /// <summary>
         /// Bind engineering models to the reactive list
         /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindEngineeringModels(SiteDirectory siteDirectory)
+        private void BindEngineeringModels()
         {
             this.EngineeringModels.Clear();
-
-            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
-            {
-                this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
-            }
+            
+            this.EngineeringModels.AddRange(
+                this.hubController.GetEngineeringModels()
+                    .OrderBy(m => m.Name)
+                    .Select(x => new EngineeringModelRowViewModel(x)));
         }
     }
 }

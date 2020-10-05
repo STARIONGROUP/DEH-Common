@@ -12,7 +12,14 @@ namespace DEHPCommon.UserPreferenceHandler.Enums
     /// </summary>
     public enum ServerType
     {
+        /// <summary>
+        /// Reprensents a CDP4 Webservice
+        /// </summary>
         Cdp4WebServices,
-        OcdtWSPServer
+
+        /// <summary>
+        /// Represents a OCDT WSP server
+        /// </summary>
+        OcdtWspServer
     }
 }
