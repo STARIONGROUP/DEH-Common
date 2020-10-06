@@ -12,50 +12,79 @@ namespace DEHPCommon.MappingEngine
     using System.Linq;
     using System.Reflection;
 
-    using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
-    using DEHPCommon.MappingRules;
     using DEHPCommon.MappingRules.Core;
+
+    using NLog;
 
     /// <summary>
     /// The <see cref="MappingEngine"/> allows to map dst tool models to ECSS-E-TM-10-25A model
     /// </summary>
     public class MappingEngine
     {
-        /// <summary>
-        /// Maps an existing non ECSS-E-TM-10-25A Model to a new ECSS-E-TM-10-25A model
-        /// </summary>
-        /// <param name="model">The external model</param>
-        /// <param name="mappingRules">The rules that allows the <see cref="MappingEngine"/> to map</param>
-        /// <returns></returns>
-        public EngineeringModel MapForward(object obj, params IMappingRule[] mappingRules)
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger(typeof(MappingEngine));
+
+        private readonly Assembly assembly = Assembly.GetExecutingAssembly();
+
+        public IEnumerable<(Type InputType, Type MappingRuleType)> Rules { get; private set; } = new List<(Type InputType, Type MappingRuleType)>();
+
+        public MappingEngine()
         {
-            var model = new ObjectType(obj, mappingRules);
-
-            var EngineeringModel = new EngineeringModel();
-
-            foreach (var nameTypeInstance in model.Properties)
-            {
-                var propertyRule = (model.MappingRules as IMappingRule[])?.FirstOrDefault(x => x.DstPropertyName == nameTypeInstance.Key);
-                var propertyInstance = nameTypeInstance.Value.Instance;
-                EngineeringModel.GetType().GetProperty(propertyRule.ExternalProperty).SetValue(EngineeringModel, propertyInstance);
-            }
-
-            return EngineeringModel;
+            this.PopulateRules();
         }
 
-        private bool TryGetPropertyValue<TPropertyType>(object undefinedObject, string name, out TPropertyType value)
+        /// <summary>
+        /// Maps the provided <see cref="object"/> to another type if a rule is found
+        /// </summary>
+        /// <param name="obj">The external object to map</param>
+        /// <returns>The new object</returns>
+        public object Map(object obj)
         {
-            value = default;
+            if (!this.Rules.Any())
+            {
+                return null;
+            }
 
-            var type = undefinedObject.GetType();
+            foreach (var (inputType, mappingRuleType) in this.Rules)
+            {
+                if (this.TryCast(inputType, obj, out var newObject ))
+                {
+                    var ruleInstance = Activator.CreateInstance(mappingRuleType, newObject);
+                    ruleInstance.Transform();
+                    return ruleInstance.Output;
+                }
+            }
 
-            value = (TPropertyType)(type.GetProperty(name)?.GetValue(undefinedObject, null) ??
-                        type.GetProperties().FirstOrDefault(x => x.Name == name));
+            logger.Error($"Could not map {obj}, no corresponding mapping rule has been found");
+            return null;
+        }
 
-            return value != default(TPropertyType);
+        private bool TryCast(Type type, object obj, out dynamic result)
+        {
+            result = default;
+
+            if (type.IsInstanceOfType(obj))
+            {
+                result = Convert.ChangeType(obj, type);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void PopulateRules()
+        {
+            var assignableType = new List<(Type InputType, Type MappingRuleType)>();
+
+            foreach (var type in this.assembly.GetTypes())
+            {
+                if (type.GetInterface(nameof(IMappingRule)) != null && type.BaseType?.IsAbstract == true && !type.IsAbstract)
+                {
+                    var typeArguments = type.BaseType?.GetGenericArguments();
+                    assignableType.Add((typeArguments[0], type));
+                }
+            }
+
+            this.Rules = assignableType;
         }
     }
 }

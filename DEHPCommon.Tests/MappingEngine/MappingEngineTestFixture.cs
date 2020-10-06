@@ -7,41 +7,37 @@
 
 namespace DEHPCommon.Tests.MappingEngine
 {
-    using CDP4Common.SiteDirectoryData;
-
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    
     using DEHPCommon.MappingEngine;
-    using DEHPCommon.MappingRules.Core;
+    using DEHPCommon.Tests.MappingEngine.Dst;
 
     using NUnit.Framework;
 
     [TestFixture]
     public class MappingEngineTestFixture
     {
-        private const string Name = "TheName";
-
-        public class RandomDstObject
-        {
-            public RandomNestedDstObject RandomProperty { get; set; }
-        }
-
-        public class RandomNestedDstObject
-        {
-            public string RandomName { get; set; }
-        }
-            
         [Test]
         public void VerifyMap()
         {
+            var assembly = typeof(MappingEngine).GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance);
+
             var mappinEngine = new MappingEngine();
-            var baseObject = new RandomDstObject() { RandomProperty = new RandomNestedDstObject() { RandomName = Name } };
 
-            var result = mappinEngine.MapForward(baseObject, new ObjectProperty("RandomProperty", typeof(EngineeringModelSetup), new IMappingRule[]
-            {
-                new ObjectProperty("RandomName", typeof(string), nameof(EngineeringModelSetup.Name))
-            }));
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            assembly.SetValue(mappinEngine, executingAssembly);
 
+            mappinEngine.PopulateRules();
+
+            var baseObject = new Cube() { Id = Guid.NewGuid(), Sides = new List<double>() {.1, .2, 2}};
+
+            var result = mappinEngine.Map(baseObject);
             Assert.IsNotNull(result);
-            Assert.AreEqual(Name, result.EngineeringModelSetup.Name);
+            Assert.IsInstanceOf<Sphere>(result);
+            Assert.AreEqual(.1, ((Sphere)result).Points.First().X);
         }
     }
 }

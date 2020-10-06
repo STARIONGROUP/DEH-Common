@@ -67,9 +67,7 @@
     <Compile Include="HubController\HubController.cs" />
     <Compile Include="HubController\Interfaces\IHubController.cs" />
     <Compile Include="MappingEngine\MappingEngine.cs" />
-    <Compile Include="MappingEngine\Utilities\MappingUtility.cs" />
-    <Compile Include="MappingRules\Core\ObjectProperty.cs" />
-    <Compile Include="MappingRules\Core\ObjectType.cs" />
+    <Compile Include="MappingRules\Core\MappingRule.cs" />
     <Compile Include="MappingRules\Core\IMappingRule.cs" />
     <Compile Include="MessageHub\Events\IsBusyEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,9 +80,7 @@
     <Compile Include="UserPreferenceHandler\UserPreferenceService\IUserPreferenceService.cs" />
     <Compile Include="UserPreferenceHandler\UserPreferenceService\UserPreferenceService.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MappingRules\Dst\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE">
       <Version>6.1.1</Version>
