@@ -14,37 +14,11 @@ namespace DEHPCommon.MappingRules.Core
     /// </summary>
     /// <typeparam name="TInput">The input <see cref="Type"/></typeparam>
     /// <typeparam name="TOutput">The output <see cref="Type"/></typeparam>
-    public abstract class MappingRule<TInput, TOutput> : IMappingRule
+    public abstract class MappingRule<TInput, TOutput> : IMappingRule<TInput, TOutput>
     { 
-        /// <summary>
-        /// Gets the output type
-        /// </summary>
-        public TOutput Output { get; protected set; }
-
-        /// <summary>
-        /// Gets or Sets the input
-        /// </summary>
-        public TInput Input { get; set; }
-        
-        /// <summary>
-        /// Initializes a new <see cref="MappingRule{T,T}"/>
-        /// </summary>
-        protected MappingRule()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new <see cref="MappingRule{T,T}"/>
-        /// </summary>
-        /// <param name="input">The input <see cref="TInput"/></param>
-        protected MappingRule(TInput input)
-        {
-            this.Input = input;
-        }
-
         /// <summary>
         /// Transforms <see cref="TInput"/> to a <see cref="TOutput"/>
         /// </summary>
-        public abstract void Transform();
+        public abstract TOutput Transform(TInput input);
     }
 }

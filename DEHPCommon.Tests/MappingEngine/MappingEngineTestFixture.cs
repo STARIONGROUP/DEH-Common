@@ -23,15 +23,8 @@ namespace DEHPCommon.Tests.MappingEngine
         [Test]
         public void VerifyMap()
         {
-            var assembly = typeof(MappingEngine).GetField("assembly", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            var mappinEngine = new MappingEngine();
-
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            assembly.SetValue(mappinEngine, executingAssembly);
-
-            mappinEngine.PopulateRules();
-
+            var mappinEngine = new MappingEngine(this.GetType().Assembly);
+            
             var baseObject = new Cube() { Id = Guid.NewGuid(), Sides = new List<double>() {.1, .2, 2}};
 
             var result = mappinEngine.Map(baseObject);

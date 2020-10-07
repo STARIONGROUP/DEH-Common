@@ -10,11 +10,17 @@ namespace DEHPCommon.MappingRules.Core
     /// <summary>
     /// Defines a mapping rule for <see cref="MappingRule{T,T}"/>
     /// </summary>
-    public interface IMappingRule
+    /// <typeparam name="TInput">The input <see cref="Type"/></typeparam>
+    /// <typeparam name="TOutput">The output <see cref="Type"/></typeparam>
+    public interface IMappingRule<TInput, TOutput> : IMappingRule
     {
         /// <summary>
         /// Transforms a object of type <see cref="TInput"/> to another one of type <see cref="TOutput"/>
         /// </summary>
-        void Transform();
+        TOutput Transform(TInput input);
+    }
+
+    public interface IMappingRule
+    {
     }
 }

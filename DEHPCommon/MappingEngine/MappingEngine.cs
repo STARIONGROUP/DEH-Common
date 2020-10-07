@@ -21,67 +21,50 @@ namespace DEHPCommon.MappingEngine
     /// </summary>
     public class MappingEngine
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger(typeof(MappingEngine));
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(MappingEngine));
 
-        private readonly Assembly assembly = Assembly.GetExecutingAssembly();
+        public Dictionary<Type, IMappingRule> Rules { get; private set; } = new Dictionary<Type, IMappingRule>();
 
-        public IEnumerable<(Type InputType, Type MappingRuleType)> Rules { get; private set; } = new List<(Type InputType, Type MappingRuleType)>();
-
-        public MappingEngine()
+        public MappingEngine(Assembly ruleAssembly)
         {
-            this.PopulateRules();
+            this.PopulateRules(ruleAssembly);
         }
 
         /// <summary>
         /// Maps the provided <see cref="object"/> to another type if a rule is found
         /// </summary>
-        /// <param name="obj">The external object to map</param>
+        /// <param name="input">The external object to map</param>
         /// <returns>The new object</returns>
-        public object Map(object obj)
+        public object Map(object input)
         {
             if (!this.Rules.Any())
             {
                 return null;
             }
 
-            foreach (var (inputType, mappingRuleType) in this.Rules)
-            {
-                if (this.TryCast(inputType, obj, out var newObject ))
-                {
-                    var ruleInstance = Activator.CreateInstance(mappingRuleType, newObject);
-                    ruleInstance.Transform();
-                    return ruleInstance.Output;
-                }
-            }
+            var ruleExist = this.Rules.TryGetValue(input.GetType(), out var foundRule);
 
-            logger.Error($"Could not map {obj}, no corresponding mapping rule has been found");
+            if (ruleExist)
+            {
+                return foundRule.GetType().GetMethod("Transform")?.Invoke(foundRule, new[] { input });
+            }
+                
+            Logger.Error($"Could not map {input}, no corresponding mapping rule has been found");
             return null;
         }
 
-        private bool TryCast(Type type, object obj, out dynamic result)
+        /// <summary>
+        /// Populates the rules that have been found. A rule shall implement <see cref="MappingRule{TInput,TOutput}"/>
+        /// </summary>
+        /// <param name="ruleAssembly"></param>
+        private void PopulateRules(Assembly ruleAssembly)
         {
-            result = default;
+            var assignableType =  new Dictionary<Type, IMappingRule>();
 
-            if (type.IsInstanceOfType(obj))
+            foreach (var type in ruleAssembly.GetTypes().Where(x => x.GetInterface(nameof(IMappingRule)) != null && x.BaseType != null && x.BaseType.IsAbstract && !x.IsAbstract))
             {
-                result = Convert.ChangeType(obj, type);
-                return true;
-            }
-
-            return false;
-        }
-
-        public void PopulateRules()
-        {
-            var assignableType = new List<(Type InputType, Type MappingRuleType)>();
-
-            foreach (var type in this.assembly.GetTypes())
-            {
-                if (type.GetInterface(nameof(IMappingRule)) != null && type.BaseType?.IsAbstract == true && !type.IsAbstract)
-                {
-                    var typeArguments = type.BaseType?.GetGenericArguments();
-                    assignableType.Add((typeArguments[0], type));
-                }
+                var typeArguments = type.BaseType?.GetGenericArguments();
+                assignableType.Add(typeArguments[0], (IMappingRule)Activator.CreateInstance(type));
             }
 
             this.Rules = assignableType;

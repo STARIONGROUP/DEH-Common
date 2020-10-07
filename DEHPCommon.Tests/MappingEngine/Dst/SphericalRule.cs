@@ -14,16 +14,12 @@ namespace DEHPCommon.Tests.MappingEngine.Dst
 
     public class SphericalRule : MappingRule<Cube, Sphere>
     {
-        public SphericalRule(Cube input) : base(input)
+        public override Sphere Transform(Cube input)
         {
-        }
-
-        public override void Transform()
-        {
-            this.Output = new Sphere()
+            return new Sphere()
             {
-                Iid = this.Input.Id.ToByteArray().First(),
-                Points = this.Input.Sides.Select(x => new Point(x, ((int)x)^((int)x-1))).ToArray()
+                Iid = input.Id.ToByteArray().First(),
+                Points = input.Sides.Select(x => new Point(x, ((int)x)^((int)x-1))).ToArray()
             };
         }
     }
