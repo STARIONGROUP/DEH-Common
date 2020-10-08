@@ -7,6 +7,7 @@
 
 namespace DEHPCommon.Tests.MappingEngine.Dst
 {
+    using System;
     using System.Linq;
     using System.Windows;
 
@@ -19,7 +20,7 @@ namespace DEHPCommon.Tests.MappingEngine.Dst
             return new Sphere()
             {
                 Iid = input.Id.ToByteArray().First(),
-                Points = input.Sides.Select(x => new Point(x, ((int)x)^((int)x-1))).ToArray()
+                Points = input.Sides.Select(x => new Point(x, ((int)x) ^ ((int)x - 1))).ToArray()
             };
         }
     }

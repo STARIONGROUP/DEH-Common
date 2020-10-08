@@ -12,19 +12,31 @@ namespace DEHPCommon.MappingEngine
     using System.Linq;
     using System.Reflection;
 
+    using DEHPCommon.Exceptions;
     using DEHPCommon.MappingRules.Core;
 
     using NLog;
 
     /// <summary>
-    /// The <see cref="MappingEngine"/> allows to map dst tool models to ECSS-E-TM-10-25A model
+    /// The <see cref="MappingEngine"/> allows to map dst tool models to ECSS-E-TM-10-25A model or the other way arround
     /// </summary>
     public class MappingEngine
     {
+        /// <summary>
+        /// The <see cref="NLog"/> logger
+        /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(MappingEngine));
 
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains all the available <see cref="IMappingRule"/> based on the provided assembly
+        /// where the Key is the Input type of the Value of a corresponding <see cref="IMappingRule{TInput,TOutput}"/>
+        /// </summary>
         public Dictionary<Type, IMappingRule> Rules { get; private set; } = new Dictionary<Type, IMappingRule>();
 
+        /// <summary>
+        /// Initializes a new <see cref="MappingEngine"/>
+        /// </summary>
+        /// <param name="ruleAssembly">The assembly that contains the rules</param>
         public MappingEngine(Assembly ruleAssembly)
         {
             this.PopulateRules(ruleAssembly);
@@ -33,41 +45,57 @@ namespace DEHPCommon.MappingEngine
         /// <summary>
         /// Maps the provided <see cref="object"/> to another type if a rule is found
         /// </summary>
-        /// <param name="input">The external object to map</param>
-        /// <returns>The new object</returns>
+        /// <param name="input">The object to map</param>
+        /// <returns>The transformed <paramref name="input"/></returns>
         public object Map(object input)
         {
             if (!this.Rules.Any())
             {
-                return null;
+                return default;
             }
 
-            var ruleExist = this.Rules.TryGetValue(input.GetType(), out var foundRule);
-
-            if (ruleExist)
+            if (this.Rules.TryGetValue(input.GetType(), out var foundRule))
             {
-                return foundRule.GetType().GetMethod("Transform")?.Invoke(foundRule, new[] { input });
+                try
+                {
+                    return foundRule.GetType().GetMethod("Transform")?.Invoke(foundRule, new[] { input });
+                }
+                catch (TargetInvocationException exception)
+                {
+                    throw new MappingException($"Could not map {input} to a {this.GetBaseTypeGenericArgument(foundRule.GetType(), 1)}", exception.InnerException);
+                }
             }
-                
-            Logger.Error($"Could not map {input}, no corresponding mapping rule has been found");
-            return null;
+
+            Logger.Warn($"Could not map {input}, no corresponding mapping rule has been found");
+
+            return default;
         }
 
         /// <summary>
         /// Populates the rules that have been found. A rule shall implement <see cref="MappingRule{TInput,TOutput}"/>
         /// </summary>
-        /// <param name="ruleAssembly"></param>
+        /// <param name="ruleAssembly">The assembly that contains the rules</param>
         private void PopulateRules(Assembly ruleAssembly)
         {
-            var assignableType =  new Dictionary<Type, IMappingRule>();
+            this.Rules = ruleAssembly.GetTypes()
+                .Where(x => x.GetInterface(nameof(IMappingRule)) != null && x.BaseType != null && x.BaseType.IsAbstract && !x.IsAbstract)
+                .ToDictionary(type => this.GetBaseTypeGenericArgument(type, 0), type => (IMappingRule) Activator.CreateInstance(type));
+        }
 
-            foreach (var type in ruleAssembly.GetTypes().Where(x => x.GetInterface(nameof(IMappingRule)) != null && x.BaseType != null && x.BaseType.IsAbstract && !x.IsAbstract))
+        /// <summary>
+        /// Gets the generic argument from <see cref="Type.BaseType"/>
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/></param>
+        /// <param name="index">Indicates which argument to get</param>
+        /// <returns>The generic argument <see cref="Type"/></returns>
+        public Type GetBaseTypeGenericArgument(Type type, int index = 0)
+        {
+            if (type.BaseType == null)
             {
-                var typeArguments = type.BaseType?.GetGenericArguments();
-                assignableType.Add(typeArguments[0], (IMappingRule)Activator.CreateInstance(type));
+                throw new ArgumentException($"The provided type {type.Name} does not have a ${nameof(Type.BaseType)}", nameof(type));
             }
-
-            this.Rules = assignableType;
+            
+            return type.BaseType.GetGenericArguments()[index];
         }
     }
 }

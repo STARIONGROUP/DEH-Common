@@ -7,6 +7,7 @@
 
 namespace DEHPCommon.Services.FileDialogService
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     using Microsoft.Win32;
@@ -14,6 +15,7 @@ namespace DEHPCommon.Services.FileDialogService
     /// <summary>
     /// The service that handle open and save file requests
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class OpenSaveFileDialogService : IOpenSaveFileDialogService
     {
         /// <summary>
