@@ -1,36 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{276E61DF-CFF9-4261-B81E-BEFE017A496B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DEHPCommon</RootNamespace>
-    <AssemblyName>DEHPCommon</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>net472</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <AssemblyTitle>DEHPCommon</AssemblyTitle>
+    <Company>RHEA System S.A.</Company>
+    <Product>DEHPCommon</Product>
+    <Description>DEHPCommon library</Description>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -53,72 +33,19 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonUserInterface\ViewModels\Tabs\LoginLayoutGroupViewModel.cs" />
-    <Compile Include="CommonUserInterface\ViewModels\Common\LoginViewModel.cs" />
-    <Compile Include="CommonUserInterface\ViewModels\Rows\DefinedThingRowViewModel.cs" />
-    <Compile Include="CommonUserInterface\ViewModels\Rows\EngineeringModelRowViewModel.cs" />
-    <Compile Include="CommonUserInterface\Views\Common\LoginView.xaml.cs">
-      <DependentUpon>LoginView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="CommonUserInterface\Views\Tabs\LoginLayoutGroup.xaml.cs">
-      <DependentUpon>LoginLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="HubController\HubController.cs" />
-    <Compile Include="HubController\Interfaces\IHubController.cs" />
-    <Compile Include="MessageHub\Events\IsBusyEvent.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\FileDialogService\IOpenSaveFileDialogService.cs" />
-    <Compile Include="Services\FileDialogService\OpenSaveFileDialogService.cs" />
-    <Compile Include="UserPreferenceHandler\Enums\ServerType.cs" />
-    <Compile Include="UserPreferenceHandler\Interfaces\IUserPreference.cs" />
-    <Compile Include="UserPreferenceHandler\ServerConnection.cs" />
-    <Compile Include="UserPreferenceHandler\UserPreference.cs" />
-    <Compile Include="UserPreferenceHandler\UserPreferenceService\IUserPreferenceService.cs" />
-    <Compile Include="UserPreferenceHandler\UserPreferenceService\UserPreferenceService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MappingEngine\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CDP4Common-CE">
-      <Version>6.1.1</Version>
-    </PackageReference>
-    <PackageReference Include="CDP4Dal-CE">
-      <Version>6.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="CDP4JsonFileDal-CE">
-      <Version>6.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE">
-      <Version>6.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE">
-      <Version>0.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="CDP4ServicesDal-CE">
-      <Version>6.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="CDP4WspDal-CE">
-      <Version>6.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout">
-      <Version>20.1.7</Version>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core">
-      <Version>20.1.7</Version>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid">
-      <Version>20.1.7</Version>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Layout">
-      <Version>20.1.7</Version>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Navigation">
-      <Version>20.1.7</Version>
-    </PackageReference>
-    <PackageReference Include="reactiveui-core.Net40">
-      <Version>6.5.0</Version>
-    </PackageReference>
+    <PackageReference Include="CDP4Common-CE" Version="6.1.1" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.1.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.1.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.1.0" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.3.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="6.1.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="6.1.0" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.7" />
+    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="CommonUserInterface\Views\Common\LoginView.xaml">
@@ -130,5 +57,4 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

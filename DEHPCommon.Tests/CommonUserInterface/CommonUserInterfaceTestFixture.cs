@@ -7,6 +7,7 @@
 
 namespace DEHPCommon.Tests.CommonUserInterface
 {
+    using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
@@ -18,7 +19,6 @@ namespace DEHPCommon.Tests.CommonUserInterface
 
     using DEHPCommon.CommonUserInterface.ViewModels.Common;
     using DEHPCommon.CommonUserInterface.ViewModels.Tabs;
-
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserPreferenceHandler.Enums;
 
@@ -35,7 +35,7 @@ namespace DEHPCommon.Tests.CommonUserInterface
     public class CommonUserInterfaceTestFixture
     {
         private Mock<ISession> session;
-        private Mock<IHubController> controller;
+        private Mock<IHubController> hubController;
         private LoginViewModel loginViewModel;
         public LoginLayoutGroupViewModel loginLayoutGroupViewModel;
         
@@ -51,10 +51,19 @@ namespace DEHPCommon.Tests.CommonUserInterface
 
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
-            this.controller = new Mock<IHubController>();
-            this.controller.Setup(x => x.Session).Returns(this.session.Object);
-            this.controller.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(Task.FromResult(true));
-            this.loginViewModel = new LoginViewModel(this.controller.Object);
+            this.hubController = new Mock<IHubController>();
+            this.hubController.Setup(x => x.Session).Returns(this.session.Object);
+            this.hubController.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(Task.FromResult(true));
+            
+            this.hubController.Setup(x => x.GetEngineeringModels()).Returns(
+                new List<EngineeringModelSetup>()
+                {
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null) { Name = "test0" },
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null) { Name = "test1" },
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null) { Name = "test2" }
+                });
+
+            this.loginViewModel = new LoginViewModel(this.hubController.Object);
             this.loginLayoutGroupViewModel = new LoginLayoutGroupViewModel();
             this.loginLayoutGroupViewModel.LoginViewModel = this.loginViewModel;
 
@@ -62,12 +71,6 @@ namespace DEHPCommon.Tests.CommonUserInterface
             this.uri = "http://localhost:4000";
             this.userName = "DEHP-UserNew";
             this.password = "1234";
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-
         }
 
         [Test]
@@ -79,6 +82,9 @@ namespace DEHPCommon.Tests.CommonUserInterface
             this.loginViewModel.Uri = this.uri;
             this.loginViewModel.UserName = this.userName;
             this.loginViewModel.Password = this.password;
+
+            Assert.IsTrue(this.loginViewModel.DataSourceList.TryGetValue(ServerType.OcdtWspServer, out _));
+            Assert.IsTrue(this.loginViewModel.DataSourceList.TryGetValue(ServerType.Cdp4WebServices, out _));
 
             Assert.IsTrue(this.loginViewModel.LoginCommand.CanExecute(null));
         }

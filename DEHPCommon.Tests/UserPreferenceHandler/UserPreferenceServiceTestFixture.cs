@@ -97,7 +97,6 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         [Test]
         public void Verify_that_the_UserPreference_settings_can_be_read_from_disk()
         {
-            this.userPreferenceService.CheckConfigurationDirectory();
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"), this.expectedUserPreferencePath);
             Assert.IsTrue(File.Exists(this.expectedUserPreferencePath));
 
@@ -106,7 +105,6 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             Assert.AreEqual(this.userPreference.SavedServerConections[0].Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[0].Uri);
             Assert.AreEqual(this.userPreference.SavedServerConections[1].ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[1].ServerType);
             Assert.AreEqual(this.userPreference.SavedServerConections[1].Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[1].Uri);
-
         }
 
         [Test]
@@ -137,6 +135,16 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             this.userPreferenceService.Read();
             Assert.AreEqual(this.serverConnection3.ServerType, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[2].ServerType);
             Assert.AreEqual(this.serverConnection3.Uri, this.userPreferenceService.UserPreferenceSettings.SavedServerConections[2].Uri);
+        }
+
+        [Test]
+        public void VerifyCheckConfigurationDirectory()
+        {
+            var configurationDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceService");
+            Directory.Delete(configurationDirectory, true);
+            Assert.IsFalse(Directory.Exists(configurationDirectory));
+            this.userPreferenceService.CheckConfigurationDirectory();
+            Assert.IsTrue(Directory.Exists(configurationDirectory));
         }
     }
 }
