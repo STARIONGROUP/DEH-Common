@@ -79,19 +79,13 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
 
             this.userPreferenceService.Read();
 
-            Assert.AreEqual(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count, 0);
+            Assert.AreEqual(0, this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count);
 
             this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(this.serverConnection1);
             this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(this.serverConnection2);
 
             Assert.DoesNotThrow(() => this.userPreferenceService.Save());
-            Assert.AreEqual(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count, 2);
-
-            this.userPreferenceService.Read();
-            var expectedUserPreferenceContent = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceHandler", "expectedUserPreference.json"));
-            var writtenContent = File.ReadAllText(this.expectedUserPreferencePath);
-
-            Assert.AreEqual(expectedUserPreferenceContent, writtenContent);
+            Assert.AreEqual(2, this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Count);
         }
 
         [Test]
