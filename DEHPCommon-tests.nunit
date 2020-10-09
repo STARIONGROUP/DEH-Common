@@ -1,0 +1,9 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Debug" processModel="Default" domainUsage="Default" />
+  <Config name="Debug">
+    <assembly path="DEHPCommon.Tests/bin/Debug/net472/DEHPCommon.Tests.dll" />
+  </Config>
+  <Config name="Release">
+    <assembly path="DEHPCommon.Tests/bin/Release/net472/DEHPCommon.Tests.dll" />
+  </Config>
+</NUnitProject>
