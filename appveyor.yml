@@ -91,7 +91,7 @@ deploy:
     release: DEHPCommon-$(version)
     description: 'DEHPCommon Library'
     auth_token:
-      secure: GITHUB_TOKEN
+      secure: $env:GITHUB_TOKEN
     artifact: /.*\.nupkg/
     draft: false
     prerelease: true
@@ -102,7 +102,7 @@ deploy:
     release: DEHPCommon-$(version)
     description: 'DEHPCommon Library'
     auth_token:
-      secure: GITHUB_TOKEN
+      secure: $env:GITHUB_TOKEN
     artifact: /.*\.nupkg/
     draft: false
     prerelease: false
