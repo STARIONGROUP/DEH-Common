@@ -87,28 +87,27 @@ after_test:
       }
 
 deploy:
-  release: DEHPCommon-$(version)
-  description: 'DEHPCommon Library'
-  provider: GitHub
-  auth_token:
-    secure: GITHUB_TOKEN
-  artifact: /.*\.nupkg/
-  draft: false
-  prerelease: true
-  on:
-    branch: development
-
-deploy:
-  release: DEHPCommon-v$(version)
-  description: 'DEHPCommon Library'
-  provider: GitHub
-  auth_token:
-    secure: GITHUB_TOKEN
+  - provider: GitHub
+    release: DEHPCommon-$(version)
+    description: 'DEHPCommon Library'
+    auth_token:
+      secure: GITHUB_TOKEN
     artifact: /.*\.nupkg/
-  draft: false
-  prerelease: false
-  on:
-    branch: master
+    draft: false
+    prerelease: true
+    on:
+        branch: development
+
+  - provider: GitHub
+    release: DEHPCommon-$(version)
+    description: 'DEHPCommon Library'
+    auth_token:
+      secure: GITHUB_TOKEN
+    artifact: /.*\.nupkg/
+    draft: false
+    prerelease: false
+    on:
+      branch: master
 
 notifications:
   - provider: Email
