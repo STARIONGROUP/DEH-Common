@@ -11,6 +11,9 @@ environment:
   SONARCLOUD_URL: 'https://sonarcloud.io'
   SONARCLOUD_TOKEN:
     secure: th/5nKHJ0jW1sM3a0bs0cohRLIeMAx4Y5Do/al3L11XbWHOgoCdNYrNBQmSo9tFs
+  
+  # To be changed in the future since this token belongs to a personal account. See below.
+  # https://github.com/RHEAGROUP/DEHP-Common/wiki/Build-And-Release#modifying-the-github-token
   GITHUB_TOKEN:
     secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
 
@@ -91,7 +94,7 @@ deploy:
     release: DEHPCommon-$(version)
     description: 'DEHPCommon Library'
     auth_token:
-      secure: $env:GITHUB_TOKEN
+      secure: $(GITHUB_TOKEN)
     artifact: /.*\.nupkg/
     draft: false
     prerelease: true
@@ -102,7 +105,7 @@ deploy:
     release: DEHPCommon-$(version)
     description: 'DEHPCommon Library'
     auth_token:
-      secure: $env:GITHUB_TOKEN
+      secure: $(GITHUB_TOKEN)
     artifact: /.*\.nupkg/
     draft: false
     prerelease: false
