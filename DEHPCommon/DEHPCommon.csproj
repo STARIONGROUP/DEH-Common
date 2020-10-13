@@ -11,6 +11,15 @@
     <FileVersion>1.0.0.0</FileVersion>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>DEHPCommon</PackageId>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageDescription>DEHPCommon library</PackageDescription>
+    <RepositoryUrl>https://github.com/RHEAGROUP/DEHP-Common.git</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSource>true</IncludeSource>
+    <IncludeSymbols>true</IncludeSymbols>
+    <PackageTags>DEHP DEHPCommon ECSS-E-TM-10-25</PackageTags>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

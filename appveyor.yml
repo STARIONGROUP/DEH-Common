@@ -1,4 +1,6 @@
 image: Visual Studio 2019
+version: 1.0.{build}
+
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -9,6 +11,11 @@ environment:
   SONARCLOUD_URL: 'https://sonarcloud.io'
   SONARCLOUD_TOKEN:
     secure: th/5nKHJ0jW1sM3a0bs0cohRLIeMAx4Y5Do/al3L11XbWHOgoCdNYrNBQmSo9tFs
+  
+  # To be changed in the future since this token belongs to a personal account. See below.
+  # https://github.com/RHEAGROUP/DEHP-Common/wiki/Build-And-Release#modifying-the-github-token
+  GITHUB_TOKEN:
+    secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
 
 for:
 # configuration for "master" branch, build in Release mode
@@ -30,6 +37,13 @@ configuration: Debug
 install:
   - choco install opencover.portable
   - choco install "sonarscanner-msbuild-net46" -y
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
 
 before_build:
   - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
@@ -66,13 +80,37 @@ test_script:
     -returntargetcode
     -hideskipped:All
     -output:"%TEST_COVERAGE%"
-    -filter:"+[CDP4*]* -[*.Tests*]* -[*.Views]*"
+    -filter:"+[DEHP*]* -[*.Tests*]* -[*.Views]*"
     -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
+
 after_test:
   - ps: >-
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
         SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
       }
+
+deploy:
+  - provider: GitHub
+    release: DEHPCommon-$(version)
+    description: 'DEHPCommon Library'
+    auth_token:
+      secure: $(GITHUB_TOKEN)
+    artifact: /.*\.nupkg/
+    draft: false
+    prerelease: true
+    on:
+        branch: development
+
+  - provider: GitHub
+    release: DEHPCommon-$(version)
+    description: 'DEHPCommon Library'
+    auth_token:
+      secure: $(GITHUB_TOKEN)
+    artifact: /.*\.nupkg/
+    draft: false
+    prerelease: false
+    on:
+      branch: master
 
 notifications:
   - provider: Email
