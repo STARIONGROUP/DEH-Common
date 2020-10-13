@@ -41,9 +41,9 @@ install:
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
+  version: $(APPVEYOR_BUILD_VERSION)
+  package_version: $(APPVEYOR_BUILD_VERSION)
+  assembly_version: $(APPVEYOR_BUILD_VERSION)
 
 before_build:
   - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
