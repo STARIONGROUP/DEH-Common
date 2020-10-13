@@ -38,13 +38,6 @@ install:
   - choco install opencover.portable
   - choco install "sonarscanner-msbuild-net46" -y
 
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj'
-  version: $(APPVEYOR_BUILD_VERSION)
-  package_version: $(APPVEYOR_BUILD_VERSION)
-  assembly_version: $(APPVEYOR_BUILD_VERSION)
-
 before_build:
   - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
@@ -57,14 +50,20 @@ before_build:
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
         Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
-      } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
+      } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
         nuget sources add -name github -username RHEAGROUP -password $env:GITHUB_TOKEN -source https://nuget.pkg.github.com/RHEAGROUP/index.json
         Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
-      } elseif ($env:APPVEYOR_REPO_BRANCH -eq "master") {
-        nuget sources add -name github -username RHEAGROUP -password $env:GITHUB_TOKEN -source https://nuget.pkg.github.com/RHEAGROUP/index.json
-        Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
-        SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+        $versionToUse = $env:APPVEYOR_BUILD_VERSION  # <====== Change this version
+        Get-Content 'DEHPCommon.sln' |   # <====== Change this name
+          Select-String 'Project\(' |
+            ForEach-Object {
+              $csprojLines = $_ -Split '[,=]' | ForEach-Object { $_.Trim('[ "{}]') }; 
+              $content = Get-Content $csprojLines[2];
+              $originalValue =[regex]::matches($content, "<AssemblyVersion>(.*?)</AssemblyVersion>").value
+              Write-Host "PROJECT: $($csprojLines[1]) | $($originalValue)"
+              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" | Set-Content $csprojLines[2]
+    }
       } else {
         Write-Host Skipping Sonar Scanning
       }
