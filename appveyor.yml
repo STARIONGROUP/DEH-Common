@@ -1,5 +1,5 @@
 image: Visual Studio 2019
-version: 1.0.{build}
+version: 1.0.{APPVEYOR_BUILD_NUMBER}
 
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -58,17 +58,20 @@ before_build:
         Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
       } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
+        dotnet nuget add source https://nuget.pkg.github.com/RHEAGROUP/index.json -n github -u RHEAGROUP -p $env:GITHUB_TOKEN
         Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
       } elseif ($env:APPVEYOR_REPO_BRANCH -eq "master") {
+        dotnet nuget add source https://nuget.pkg.github.com/RHEAGROUP/index.json -n github -u RHEAGROUP -p $env:GITHUB_TOKEN
         Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
       } else {
         Write-Host Skipping Sonar Scanning
       }
-
+  
 build:
   project: DEHPCommon.sln
+
 
 test_script:
   - >
@@ -88,29 +91,10 @@ after_test:
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
         SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
       }
-
-deploy:
-  - provider: GitHub
-    release: DEHPCommon-$(version)
-    description: 'DEHPCommon Library'
-    auth_token:
-      secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
-    artifact: /.*\.nupkg/
-    draft: false
-    prerelease: true
-    on:
-        branch: development
-
-  - provider: GitHub
-    release: DEHPCommon-$(version)
-    description: 'DEHPCommon Library'
-    auth_token:
-      secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
-    artifact: /.*\.nupkg/
-    draft: false
-    prerelease: false
-    on:
-      branch: master
+      if ($env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
+          dotnet pack --configuration Release
+          dotnet nuget push "bin/Release/DEHP-Common.$env:APPVEYOR_BUILD_VERSION.nupkg" --source "github" 
+      }
 
 notifications:
   - provider: Email
