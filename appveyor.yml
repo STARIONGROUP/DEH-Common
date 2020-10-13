@@ -54,15 +54,19 @@ before_build:
         nuget sources add -name github -username RHEAGROUP -password $env:GITHUB_TOKEN -source https://nuget.pkg.github.com/RHEAGROUP/index.json
         Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
-        $versionToUse = $env:APPVEYOR_BUILD_VERSION  # <====== Change this version
-        Get-Content 'DEHPCommon.sln' |   # <====== Change this name
-          Select-String -pattern 'Project\("{[A-Za-z0-9\-]*}"\)\s=\s(?!"Solution Items"{0})' |
+        $versionToUse = $env:APPVEYOR_BUILD_VERSION
+        Get-Content 'DEHPCommon.sln' |
+          Select-String -pattern 'Project\("{[A-Za-z0-9\-]*}"\)\s=\s(?!"Solution Items")' |
             ForEach-Object {
-              $csprojLines = $_ -Split '[,=]' | ForEach-Object { $_.Trim('[ "{}]') }; 
+              $csprojLines = $_ -Split '[,=]' | ForEach-Object { $_.Trim('[ "{}]') };
+              # index 1 => project name; index 2 => project path; index 3 => project GUID
               $content = Get-Content $csprojLines[2];
               $originalValue =[regex]::matches($content, "<AssemblyVersion>(.*?)</AssemblyVersion>").value
               Write-Host "PROJECT: $($csprojLines[1]) | $($originalValue)"
-              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" | Set-Content -Encoding UTF8 $csprojLines[2]
+              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" |
+              $content -replace "<FileVersion>(.*?)</FileVersion>", "<FileVersion>$($versionToUse)</FileVersion>" |
+              $content -replace "<Version>(.*?)</Version>", "<Version>$($versionToUse)</Version>" |
+              Set-Content $csprojLines[2] -Encoding UTF8| Set-Content -Encoding UTF8 $csprojLines[2]
             }
       } else {
         Write-Host Skipping Sonar Scanning
