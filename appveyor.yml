@@ -1,5 +1,5 @@
 image: Visual Studio 2019
-version: 1.0.{build}
+version: {APPVEYOR_BUILD_VERSION}
 
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -92,6 +92,7 @@ after_test:
         SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
       }
       if ($env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
+          nuget setApiKey $env:GITHUB_TOKEN -Source "github"
           nuget pack DEHPCommon\DEHPCommon.csproj
           nuget push "DEHPCommon.$env:APPVEYOR_BUILD_VERSION.nupkg" -Source "github" 
       }
