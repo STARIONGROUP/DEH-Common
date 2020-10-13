@@ -62,7 +62,7 @@ before_build:
               $content = Get-Content $csprojLines[2];
               $originalValue =[regex]::matches($content, "<AssemblyVersion>(.*?)</AssemblyVersion>").value
               Write-Host "PROJECT: $($csprojLines[1]) | $($originalValue)"
-              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" | Set-Content $csprojLines[2]
+              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" | Set-Content -Encoding UTF8 $csprojLines[2]
             }
       } else {
         Write-Host Skipping Sonar Scanning
