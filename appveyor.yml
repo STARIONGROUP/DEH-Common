@@ -63,9 +63,9 @@ before_build:
               $content = Get-Content $csprojLines[2];
               $originalValue =[regex]::matches($content, "<AssemblyVersion>(.*?)</AssemblyVersion>").value
               Write-Host "PROJECT: $($csprojLines[1]) | $($originalValue)"
-              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" |
-              $content -replace "<FileVersion>(.*?)</FileVersion>", "<FileVersion>$($versionToUse)</FileVersion>" |
-              $content -replace "<Version>(.*?)</Version>", "<Version>$($versionToUse)</Version>" |
+              $content -replace "<AssemblyVersion>(.*?)</AssemblyVersion>", "<AssemblyVersion>$($versionToUse)</AssemblyVersion>" 
+              -replace "<FileVersion>(.*?)</FileVersion>", "<FileVersion>$($versionToUse)</FileVersion>" 
+              -replace "<Version>(.*?)</Version>", "<Version>$($versionToUse)</Version>" |
               Set-Content $csprojLines[2] -Encoding UTF8| Set-Content -Encoding UTF8 $csprojLines[2]
             }
       } else {
