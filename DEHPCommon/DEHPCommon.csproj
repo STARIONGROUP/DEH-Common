@@ -21,6 +21,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <PackageTags>DEHP DEHPCommon ECSS-E-TM-10-25</PackageTags>
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
