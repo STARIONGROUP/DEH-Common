@@ -11,11 +11,11 @@
     <FileVersion>1.0.0.0</FileVersion>
     <Version>1.0.0.0</Version>
     <LangVersion>latest</LangVersion>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DEHPCommon</PackageId>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageDescription>DEHPCommon library</PackageDescription>
-    <RepositoryUrl>https://github.com/RHEAGROUP/DEHP-Common</RepositoryUrl>
+    <RepositoryUrl>https://github.com/RHEAGROUP/DEHP-Common.git</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
