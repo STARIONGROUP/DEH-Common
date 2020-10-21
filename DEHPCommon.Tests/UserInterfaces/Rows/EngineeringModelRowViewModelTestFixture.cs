@@ -21,7 +21,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Tests.CommonUserInterface.Rows
+namespace DEHPCommon.Tests.UserInterfaces.Rows
 {
     using System;
 
