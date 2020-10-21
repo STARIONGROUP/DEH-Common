@@ -23,7 +23,45 @@
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/RHEAGROUP/DEHP-Common</PackageProjectUrl>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="readme.txt" pack="true" PackagePath="." />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\Images\ExclamationRed_16x16.png" />
+    <None Remove="Resources\Images\ExclamationRed_32x32.png" />
+    <None Remove="Resources\Images\Info_16x16.png" />
+    <None Remove="Resources\Images\linkgreen_16x16.png" />
+    <None Remove="Resources\Images\linkgreen_32x32.png" />
+    <None Remove="Resources\Images\Thing\ActualFiniteState_48x48.png" />
+    <None Remove="Resources\Images\Thing\Book.png" />
+    <None Remove="Resources\Images\Thing\category_16x16.png" />
+    <None Remove="Resources\Images\Thing\category_32x32.png" />
+    <None Remove="Resources\Images\Thing\domainofexpertise_16x16.png" />
+    <None Remove="Resources\Images\Thing\domainofexpertise_32x32.png" />
+    <None Remove="Resources\Images\Thing\grayscaleIterationSetup_16x16.png" />
+    <None Remove="Resources\Images\Thing\grayscaleIterationSetup_32x32.png" />
+    <None Remove="Resources\Images\Thing\grayscaleParticipant_16x16.png" />
+    <None Remove="Resources\Images\Thing\grayscaleParticipant_32x32.png" />
+    <None Remove="Resources\Images\Thing\grayscalePerson_16x16.png" />
+    <None Remove="Resources\Images\Thing\grayscalePerson_32x32.png" />
+    <None Remove="Resources\Images\Thing\lock.png" />
+    <None Remove="Resources\Images\Thing\measurementunit_16x16.png" />
+    <None Remove="Resources\Images\Thing\measurementunit_32x32.png" />
+    <None Remove="Resources\Images\Thing\naturallanguage.png" />
+    <None Remove="Resources\Images\Thing\Organization_16x16.png" />
+    <None Remove="Resources\Images\Thing\Organization_32x32.png" />
+    <None Remove="Resources\Images\Thing\parameterComponent_32x32.png" />
+    <None Remove="Resources\Images\Thing\parametertype_16x16.png" />
+    <None Remove="Resources\Images\Thing\parametertype_32x32.png" />
+    <None Remove="Resources\Images\Thing\PossibleFiniteState_48x48.png" />
+    <None Remove="Resources\Images\Thing\requirement.png" />
+    <None Remove="Resources\Images\Thing\requirementContainer.png" />
+    <None Remove="Resources\Images\Thing\siteRdl_16x16.png" />
+    <None Remove="Resources\Images\Thing\siteRdl_32x32.png" />
+    <None Remove="Resources\Images\Warning_16x16.png" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -45,28 +83,144 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="6.1.1" />
-    <PackageReference Include="CDP4Dal-CE" Version="6.1.0" />
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.1.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.1.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.3.0" />
-    <PackageReference Include="CDP4ServicesDal-CE" Version="6.1.0" />
-    <PackageReference Include="CDP4WspDal-CE" Version="6.1.0" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.7" />
+    <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="CDP4Common-CE" Version="6.2.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.2.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.2.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.2.0" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.4.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="6.2.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="6.2.0" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.8" />
     <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
+    <PackageReference Include="Splat.Net40" Version="1.6.2" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CommonUserInterface\Views\Common\LoginView.xaml">
+    <Page Include="UserInterfaces\Views\Browser1025Header.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CommonUserInterface\Views\Tabs\LoginLayoutGroup.xaml">
+    <Page Include="UserInterfaces\Views\SplashScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserInterfaces\Views\StatusBarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\Tabs\LoginLayoutGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\Rows\Mapping1025ThingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\ExclamationRed_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\ExclamationRed_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Info_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\linkgreen_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\linkgreen_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\ActualFiniteState_48x48.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\Book.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\category_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\category_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\domainofexpertise_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\domainofexpertise_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\grayscaleIterationSetup_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\grayscaleIterationSetup_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\grayscaleParticipant_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\grayscaleParticipant_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\grayscalePerson_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\grayscalePerson_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\lock.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\measurementunit_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\measurementunit_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\naturallanguage.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\Organization_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\Organization_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\parameterComponent_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\parametertype_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\parametertype_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\PossibleFiniteState_48x48.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\requirement.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\requirementContainer.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\siteRdl_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Thing\siteRdl_32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Warning_16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 </Project>
