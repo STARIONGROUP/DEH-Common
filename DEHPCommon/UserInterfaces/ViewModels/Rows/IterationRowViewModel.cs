@@ -34,31 +34,45 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
     public class IterationRowViewModel : ThingRowViewModel<IterationSetup>
     {
         /// <summary>
-        /// Backing field for <see cref="Name"/>
+        /// Backing field for <see cref="Number"/>
         /// </summary>
-        private string name;
+        private string number;
 
         /// <summary>
-        /// Backing field for <see cref="ShortName"/>
+        /// Backing field for <see cref="Description"/>
         /// </summary>
-        private string shortName;
+        private string description;
 
         /// <summary>
-        /// Gets or sets the name
+        /// Backing field for <see cref="FrozenOn"/>
         /// </summary>
-        public string Name
+        private string frozenOn;
+
+        /// <summary>
+        /// Gets or sets the iteration number
+        /// </summary>
+        public string Number
         {
-            get => this.name;
-            private set => this.RaiseAndSetIfChanged(ref this.name, value);
+            get => this.number;
+            private set => this.RaiseAndSetIfChanged(ref this.number, value);
         }
 
         /// <summary>
-        /// Gets or sets the shortName
+        /// Gets or sets the description
         /// </summary>
-        public string ShortName
+        public string Description
         {
-            get => this.shortName;
-            private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
+            get => this.description;
+            private set => this.RaiseAndSetIfChanged(ref this.description, value);
+        }
+        
+        /// <summary>
+        /// Gets or sets the datetime when the iteration has been frozen
+        /// </summary>
+        public string FrozenOn
+        {
+            get => this.frozenOn;
+            private set => this.RaiseAndSetIfChanged(ref this.frozenOn, value);
         }
 
         /// <summary>
@@ -67,8 +81,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         /// <param name="iterationSetup"></param>
         public IterationRowViewModel(IterationSetup iterationSetup) : base(iterationSetup)
         {
-            this.Name = iterationSetup.UserFriendlyName;
-            this.ShortName = iterationSetup.UserFriendlyShortName;
+            this.Number = iterationSetup.IterationNumber.ToString();
+            this.Description = iterationSetup.Description;
+            this.FrozenOn = iterationSetup.FrozenOn != null ? iterationSetup.FrozenOn.Value.ToString("g") : "Active";
         }
     }
 }

@@ -210,7 +210,21 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             get => this.selectedDomainOfExpertise;
             set => this.RaiseAndSetIfChanged(ref this.selectedDomainOfExpertise, value);
         }
-        
+
+        /// <summary>
+        /// Backing field for <see cref="LogMessage"/>
+        /// </summary>
+        private string logMessage;
+
+        /// <summary>
+        /// Gets or sets the log message
+        /// </summary>
+        public string LogMessage
+        {
+            get => this.logMessage;
+            set => this.RaiseAndSetIfChanged(ref this.logMessage, $"{DateTime.Now:t}: {value}");
+        }
+
         /// <summary>
         /// Gets the server login command
         /// </summary>
@@ -219,7 +233,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets the close command that closes the view when everything is setup
         /// </summary>
-        public ReactiveCommand<object> CloseCommand { get; private set; }
+        public ReactiveCommand<Unit> CloseCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICloseWindowBehavior"/> instance
@@ -252,11 +266,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 x => x.SelectedEngineeringModel,
                 x => x.SelectedDomainOfExpertise,
                 (loginSuccess, iteration, engineeringModel, domain) =>
-                    loginSuccess && iteration != null && engineeringModel != null && domain != null);
+                    loginSuccess && iteration != null && engineeringModel != null && domain != null).Where(x => x is true);
             
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
-            this.CloseCommand = ReactiveCommand.Create(canClose);
-            this.CloseCommand.Subscribe(_ => this.CloseCommandExecute());
+            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, async _ => await this.ExecuteLogin());
+            this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose, async _ => await this.CloseCommandExecute());
 
             this.LoginSuccessfull = false;
             this.LoginFailed = false;
@@ -265,9 +278,26 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Executes the <see cref="CloseCommand"/>
         /// </summary>
-        private void CloseCommandExecute()
+        private async Task CloseCommandExecute()
         {
-            this.CloseWindowBehavior?.Close();
+            try
+            {
+                var model = new EngineeringModel(this.SelectedEngineeringModel.Thing.EngineeringModelIid, this.hubController.Session.Assembler.Cache, this.hubController.Session.Credentials.Uri)
+                {
+                    EngineeringModelSetup = this.SelectedEngineeringModel.Thing
+                };
+
+                var iteration = new Iteration(this.SelectedIteration.Thing.IterationIid, this.hubController.Session.Assembler.Cache, this.hubController.Session.Credentials.Uri);
+
+                model.Iteration.Add(iteration);
+                await this.hubController.GetIteration(iteration, this.SelectedDomainOfExpertise.Thing);
+                this.CloseWindowBehavior?.Close();
+            }
+            catch (Exception exception)
+            {
+                this.logger.Error($"Loading Iteration failed: {exception}");
+                this.LogMessage = $"Loading Iteration failed: {exception.Message}";
+            }
         }
 
         /// <summary>
@@ -276,6 +306,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteLogin()
         {
+            this.LogMessage = "Loggin in...";
             this.LoginSuccessfull = false;
             this.LoginFailed = false;
 
@@ -284,11 +315,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
                 this.LoginSuccessfull = await this.hubController.Open(credentials, this.SelectedServerType.Key);
                 this.PopulateEngineeringModels();
+                this.LogMessage = "Loggin successful";
             }
             catch (Exception exception)
             {
                 this.LoginFailed = true;
                 this.logger.Error($"Loggin failed: {exception}");
+                this.LogMessage = $"Loggin failed: {exception.Message}";
             }
         }
         
@@ -298,8 +331,18 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void PopulateDomainOfExpertise()
         {
             this.DomainsOfExpertise.Clear();
-            var availableDomain = this.hubController.GetSiteDirectory().Domain.Where(d => this.SelectedIteration.Thing.ExcludedDomain.All(x => x.Iid != d.Iid));
-            this.DomainsOfExpertise.AddRange(availableDomain.Select(x => new DomainOfExpertiseRowViewModel(x)));
+
+
+            var activeParticipant = this.SelectedEngineeringModel.Thing.Participant.Single(x => x.Person == this.hubController.Session.ActivePerson);
+            
+            if (activeParticipant.Domain.Count != 0)
+            {
+                this.DomainsOfExpertise.AddRange(activeParticipant.Domain.OrderBy(x => x.Name).Select(x => new DomainOfExpertiseRowViewModel(x)));
+
+                this.SelectedDomainOfExpertise = this.DomainsOfExpertise.Any(x => x.Thing == activeParticipant.Person.DefaultDomain)
+                    ? new DomainOfExpertiseRowViewModel(activeParticipant.Person.DefaultDomain)
+                    : this.DomainsOfExpertise.First();
+            }
         }
 
         /// <summary>
@@ -308,7 +351,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void PopulateIterations()
         {
             this.Iterations.Clear();
-            this.Iterations.AddRange(this.SelectedEngineeringModel.Thing.IterationSetup.Select(x => new IterationRowViewModel(x)));
+            this.Iterations.AddRange(this.SelectedEngineeringModel.Thing.IterationSetup.OrderBy(x => x.IterationNumber).Select(x => new IterationRowViewModel(x)));
         }
 
         /// <summary>
