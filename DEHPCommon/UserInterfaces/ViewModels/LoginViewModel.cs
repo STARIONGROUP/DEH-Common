@@ -331,8 +331,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void PopulateDomainOfExpertise()
         {
             this.DomainsOfExpertise.Clear();
-
-
+            
             var activeParticipant = this.SelectedEngineeringModel.Thing.Participant.Single(x => x.Person == this.hubController.Session.ActivePerson);
             
             if (activeParticipant.Domain.Count != 0)

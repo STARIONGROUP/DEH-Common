@@ -27,6 +27,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Common.SiteDirectoryData;
@@ -41,6 +42,8 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
     using Moq;
 
+    using NLog.Config;
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -48,7 +51,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     /// <summary>
     /// Suite of tests for the <see cref="LoginViewModelTestFixture"/> class.
     /// </summary>
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class LoginViewModelTestFixture
     {
         private Mock<ISession> session;
@@ -60,14 +63,31 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         private string uri;
         private string userName;
         private string password;
+        private DomainOfExpertise domain;
+        private Person person;
+        private Participant participant;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, null);
+
+            this.person = new Person(Guid.NewGuid(), null, null)
+            {
+                DefaultDomain = this.domain
+            };
+            
+            this.participant = new Participant(Guid.NewGuid(), null, null)
+            {
+                Domain = { this.domain },
+                Person = this.person
+            };
+            
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.hubController = new Mock<IHubController>();
             this.hubController.Setup(x => x.Session).Returns(this.session.Object);
             this.hubController.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(Task.FromResult(true));
@@ -80,14 +100,25 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.hubController.Setup(x => x.GetEngineeringModels()).Returns(
                 new List<EngineeringModelSetup>()
                 {
-                    new EngineeringModelSetup(Guid.NewGuid(), null, null) { Name = "test0", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)}},
-                    new EngineeringModelSetup(Guid.NewGuid(), null, null) { Name = "test1", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)}},
-                    new EngineeringModelSetup(Guid.NewGuid(), null, null) { Name = "test2", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)}}
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null)
+                    {
+                        Name = "test0", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)},
+                        Participant = { this.participant }
+                    },
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null)
+                    {
+                        Name = "test1", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)},
+                        Participant = { this.participant }
+                    },
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null) 
+                    { 
+                        Name = "test2", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)},
+                        Participant = { this.participant }
+                    }
                 });
 
             this.loginViewModel = new LoginViewModel(this.hubController.Object);
-            this.loginLayoutGroupViewModel = new LoginLayoutGroupViewModel();
-            this.loginLayoutGroupViewModel.LoginViewModel = this.loginViewModel;
+            this.loginLayoutGroupViewModel = new LoginLayoutGroupViewModel { LoginViewModel = this.loginViewModel };
 
             this.serverType = new KeyValuePair<ServerType, string>(ServerType.Cdp4WebServices, "CDP4 WebServices");
             this.uri = "http://localhost:4000";
@@ -167,7 +198,6 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.loginViewModel.SelectedIteration = this.loginViewModel.Iterations.First();
             Assert.IsNotEmpty(this.loginViewModel.DomainsOfExpertise);
             
-            Assert.IsFalse(this.loginViewModel.CloseCommand.CanExecute(null));
             this.loginViewModel.SelectedDomainOfExpertise = this.loginViewModel.DomainsOfExpertise.FirstOrDefault();
             Assert.IsTrue(this.loginViewModel.CloseCommand.CanExecute(null));
         }
