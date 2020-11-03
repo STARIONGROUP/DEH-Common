@@ -77,12 +77,18 @@ namespace DEHPCommon.Utilities
         /// </summary>
         public static readonly Uri HiddenOverlayUri = new Uri($"{RootResourcesPath}Resources/Images/hidden_16x16.png");
 
+        /// <summary>
+        /// Converts a <see cref="Icon"/> to a <see cref="ImageSource"/>
+        /// </summary>
+        /// <param name="icon"></param>
+        /// <returns></returns>
         public static ImageSource ToImageSource(this Icon icon)
         {
             var imageSource = Imaging.CreateBitmapSourceFromHIcon(
                 icon.Handle,
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
+
             return imageSource;
         }
 

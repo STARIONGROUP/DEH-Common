@@ -251,10 +251,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             var canLogin = this.WhenAnyValue(
                 vm => vm.SelectedServerType,
                 vm => vm.UserName,
-                vm => vm.Password,
                 vm => vm.Uri,
-                (serverType, username, password, uri) =>
-                    !string.IsNullOrEmpty(serverType.Value) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) &&
+                (serverType, username, uri) =>
+                    !string.IsNullOrEmpty(serverType.Value) && !string.IsNullOrEmpty(username) &&
                     !string.IsNullOrEmpty(uri));
 
             this.WhenAnyValue(x => x.SelectedEngineeringModel).Where(x => x != null).Subscribe(_ => this.PopulateIterations());

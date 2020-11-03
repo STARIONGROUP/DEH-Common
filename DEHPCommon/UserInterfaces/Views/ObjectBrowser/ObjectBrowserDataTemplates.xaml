@@ -1,0 +1,188 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:converters="clr-namespace:DEHPCommon.Converters" 
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+                    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                    xmlns:rowViewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows"
+                    xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
+                    xmlns:viewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels">
+
+    <converters:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+
+    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <converters:EnumerationValueDefinitionConverter x:Key="EnumerationValueDefinitionConverter" />
+
+    <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+    <DataTemplate x:Key="InactiveTemplate">
+        <TextBox Name="PART_Editor" Visibility="{Binding RowData.Row.IsValueSetEditorActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </DataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type viewModels:BrowserViewModelBase}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}" Source="{dx:DXImage 'SvgImages/XAF/ModelEditor_Class_Object.svg'}"/>
+                </dx:PixelSnapper>
+
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                  Content="{Binding}"
+                                  ContentTemplate="{Binding View.DefaultDataRowTemplate}"/>
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" UpdateSourceTrigger="PropertyChanged"/>
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ElementUsageRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ParameterGroupRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <dx:PixelSnapper />
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ParameterOrOverrideBaseRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ParameterSubscriptionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ParameterOptionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" ConverterParameter="{x:Static commonData:ClassKind.Option}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ParameterStateRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}">
+                        <Image.Source>
+                            <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" ConverterParameter="{x:Static commonData:ClassKind.ActualFiniteState}" Mode="OneWay">
+                                <Binding Path="DataContext.Row.ThingStatus" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                            </MultiBinding>
+                        </Image.Source>
+                    </Image>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type rowViewModels:ParameterComponentValueRowViewModel}">
+        <dx:MeasurePixelSnapper>
+            <StackPanel Orientation="Horizontal">
+                <dx:PixelSnapper>
+                    <Image Style="{StaticResource ThingIcon}"
+                                   Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/parameterComponent_32x32.png"/>
+                </dx:PixelSnapper>
+                <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </StackPanel>
+        </dx:MeasurePixelSnapper>
+    </HierarchicalDataTemplate>
+</ResourceDictionary>
+    

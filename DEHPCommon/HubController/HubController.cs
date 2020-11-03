@@ -49,12 +49,14 @@ namespace DEHPCommon.HubController
 
     using NLog;
 
+    using ReactiveUI;
+
     using File = CDP4Common.EngineeringModelData.File;
 
     /// <summary>
     /// Definition of the <see cref="HubController"/>, which is responsible to provides <see cref="ISession"/> related functionnalities
     /// </summary>
-    public class HubController : IHubController
+    public class HubController : ReactiveObject, IHubController
     {
         /// <summary>
         /// The current class <see cref="NLog.Logger"/>
@@ -67,9 +69,60 @@ namespace DEHPCommon.HubController
         private readonly IOpenSaveFileDialogService fileDialogService;
         
         /// <summary>
+        /// Backing field for <see cref="IsSessionOpen"/>
+        /// </summary>
+        private bool isSessionOpen;
+        
+        /// <summary>
+        /// Checks whether the session is open
+        /// </summary>
+        public bool IsSessionOpen
+        {
+            get => this.isSessionOpen;
+            set => this.RaiseAndSetIfChanged(ref this.isSessionOpen, value);
+        }
+        
+        /// <summary>
+        /// Backing field for <see cref="OpenIteration"/>
+        /// </summary>
+        private Iteration openIteration;
+        
+        /// <summary>
+        /// Get the single open <see cref="Iteration"/>
+        /// </summary>
+        public Iteration OpenIteration
+        {
+            get => this.openIteration;
+            set => this.RaiseAndSetIfChanged(ref this.openIteration, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="CurrentDomainOfExpertise"/>
+        /// </summary>
+        private DomainOfExpertise currentDomainOfExpertise;
+
+        /// <summary>
+        /// Ges or sets the current active <see cref="DomainOfExpertise"/>
+        /// </summary>
+        public DomainOfExpertise CurrentDomainOfExpertise
+        {
+            get => this.currentDomainOfExpertise;
+            set => this.RaiseAndSetIfChanged(ref this.currentDomainOfExpertise, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="Session"/>
+        /// </summary>
+        private ISession session;
+
+        /// <summary>
         /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="HubController"/>.
         /// </summary>
-        public ISession Session { get; set; }
+        public ISession Session
+        {
+            get => this.session;
+            set => this.RaiseAndSetIfChanged(ref this.session, value);
+        }
         
         /// <summary>
         /// Initializes a new <see cref="HubController"/>
@@ -87,7 +140,7 @@ namespace DEHPCommon.HubController
         /// <param name="iid">The id of the <see cref="Thing"/></param>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="thing">The <see cref="Thing"/></param>
-        /// <returns>An assert whether the <see cref="thing"/> has been found</returns>
+        /// <returns>An assert whether the <paramref name="thing"/> has been found</returns>
         public bool GetThingById<TThing>(Guid iid, Iteration iteration, out TThing thing) where TThing : Thing
         {
             thing = default;
@@ -156,14 +209,9 @@ namespace DEHPCommon.HubController
 
             this.Session = new Session(dal, credentials);
             await this.Session.Open();
+            this.IsSessionOpen = this.Session?.RetrieveSiteDirectory() != null;
             return this.IsSessionOpen;
         }
-
-        /// <summary>
-        /// Checks whether the session is open by checking if
-        /// the <see cref="CDP4Common.SiteDirectoryData.SiteDirectory" /> is available
-        /// </summary>
-        public bool IsSessionOpen => this.Session?.RetrieveSiteDirectory() != null;
 
         /// <summary>
         /// Closes connection to the data-source and end the execution of this app
@@ -179,6 +227,10 @@ namespace DEHPCommon.HubController
             try
             {
                 this.Session.Close().GetAwaiter().GetResult();
+                this.Session = null;
+                this.IsSessionOpen = false;
+                this.CurrentDomainOfExpertise = null;
+                this.OpenIteration = null;
             }
             catch (Exception ex)
             {
@@ -203,7 +255,13 @@ namespace DEHPCommon.HubController
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task GetIteration(Iteration iteration, DomainOfExpertise domain) => await this.Session.Read(iteration, domain);
+        public async Task GetIteration(Iteration iteration, DomainOfExpertise domain)
+        {
+            await this.Session.Read(iteration, domain);
+            var iterationDomainAndPerson = this.GetIteration().First();
+            this.OpenIteration = iterationDomainAndPerson.Key;
+            this.CurrentDomainOfExpertise = iterationDomainAndPerson.Value.Item1;
+        }
 
         /// <summary>
         /// Reads an <see cref="Iteration"/> and set the active <see cref="DomainOfExpertise"/> for the Iteration

@@ -1,8 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Browser1025Header.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+// <copyright file="EngineeringModelRowViewModelTestFixture.cs"company="RHEA System S.A.">
+//    Copyright(c) 2020 RHEA System S.A.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -22,21 +21,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.Views
+namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows
 {
-    using System.Windows.Controls;
+    using System;
 
-    /// <summary>
-    /// Interaction logic for Browser1025Header.xaml
-    /// </summary>
-    public partial class Browser1025Header : UserControl
+    using CDP4Common.SiteDirectoryData;
+
+    using DEHPCommon.UserInterfaces.ViewModels.Rows;
+
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class EngineeringModelRowViewModelTestFixture
     {
-        /// <summary>
-        /// Initializes a new <see cref="Browser1025Header"/>
-        /// </summary>
-        public Browser1025Header()
+        [Test]
+        public void VerifyProperties()
         {
-            this.InitializeComponent();
+            var model = new EngineeringModelSetup(Guid.NewGuid(), null, null);
+
+            var row = new EngineeringModelRowViewModel(model);
+
+            Assert.AreSame(row.Thing, model);
+            Assert.AreEqual(row.Iid, model.Iid);
+            Assert.AreSame(row.Name, model.Name);
+            Assert.AreSame(row.ShortName, model.ShortName);
+            Assert.AreEqual(row.RevisionNumber, model.RevisionNumber);
+            Assert.AreEqual(row.Kind, model.Kind);
+            Assert.IsTrue(row.IsSelected);
         }
     }
 }

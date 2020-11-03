@@ -42,24 +42,33 @@ namespace DEHPCommon.HubController.Interfaces
     public interface IHubController
     {
         /// <summary>
+        /// Checks whether the session is open
+        /// </summary>
+        bool IsSessionOpen { get; set; }
+
+        /// <summary>
+        /// Get the single open <see cref="Iteration"/>
+        /// </summary>
+        Iteration OpenIteration { get; set; }
+
+        /// <summary>
+        /// Ges or sets the current active <see cref="DomainOfExpertise"/>
+        /// </summary>
+        DomainOfExpertise CurrentDomainOfExpertise { get; set; }
+
+        /// <summary>
         /// Gets the <see cref="Session"/> object that is encapsulated by the current <see cref="HubController"/>.
         /// </summary>
         ISession Session { get; set; }
-
-        /// <summary>
-        /// Checks whether the session is open by checking if
-        /// the <see cref="CDP4Common.SiteDirectoryData.SiteDirectory" /> is available
-        /// </summary>
-        bool IsSessionOpen { get; }
 
         /// <summary>
         /// Gets the <see cref="Thing"/> by its <see cref="iid"/> from the cache
         /// </summary>
         /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
         /// <param name="iid">The id of the <see cref="Thing"/></param>
-        /// <param name="iteration"></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="thing">The <see cref="Thing"/></param>
-        /// <returns>An assert whether the <see cref="thing"/> has been found</returns>
+        /// <returns>An assert whether the <paramref name="thing"/> has been found</returns>
         bool GetThingById<TThing>(Guid iid, Iteration iteration, out TThing thing) where TThing : Thing;
 
         /// <summary>
