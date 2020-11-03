@@ -107,6 +107,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
                 return;
             }
 
+            this.Initialize();
+        }
+        
+        /// <summary>
+        /// Used to call virtual member when this gets initialized
+        /// </summary>
+        private void Initialize()
+        {
             this.InitializeSubscriptions();
             this.UpdateTooltip();
         }
@@ -145,9 +153,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         /// <summary>
         /// Gets the top container <see cref="IViewModelBase{T}"/>
         /// </summary>
-        /// <remarks>
-        /// this should either be a <see cref="IDialogViewModelBase{T}"/> or a <see cref="IBrowserViewModelBase{T}"/>
-        /// </remarks>
         public IViewModelBase<Thing> TopContainerViewModel { get; protected set; }
 
         /// <summary>

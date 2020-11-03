@@ -44,9 +44,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets the top container <see cref="IViewModelBase{T}"/>
         /// </summary>
-        /// <remarks>
-        /// this should either be a <see cref="IDialogViewModelBase{T}"/> or a <see cref="IObjectBrowserViewModel"/>
-        /// </remarks>
         IViewModelBase<Thing> TopContainerViewModel { get; }
 
         /// <summary>

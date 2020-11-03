@@ -268,7 +268,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameter1.ValueSet.Add(valueSet1);
             this.parameter1.ValueSet.Add(valueSet2);
 
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.AreEqual("PTName", row.Name);
             Assert.AreEqual("active", row.OwnerName);
@@ -290,7 +290,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameter1.ValueSet.Add(valueSet);
             // *******************
 
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.AreEqual("PTName", row.Name);
             Assert.AreEqual("active", row.OwnerName);
@@ -312,7 +312,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameter1.ValueSet.Add(valueSet);
             // *******************
 
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
         
             Assert.AreEqual("PTName", row.Name);
             Assert.AreEqual("active", row.OwnerName);
@@ -340,7 +340,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameter1.ValueSet.Add(valueSetOption1);
             this.parameter1.ValueSet.Add(valueSetOption2);
 
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.AreEqual(2, row.ContainedRows.Count);
             var firstOption = (ParameterOptionRowViewModel)row.ContainedRows.First();
@@ -369,7 +369,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameter1.ValueSet.Add(valueSetState2);
 
             this.parameter1.StateDependence = this.stateList;
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.AreEqual(1, row.ContainedRows.Count);
             var firstState = (ParameterStateRowViewModel)row.ContainedRows.First();
@@ -391,7 +391,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             this.parameterCompound.ValueSet.Add(valueSet);
 
-            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null);
 
             Assert.AreEqual("APTName", row.Name);
 
@@ -427,7 +427,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             this.parameter1.IsOptionDependent = true;
             this.parameter1.StateDependence = this.stateList;
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.AreEqual("PTName", row.Name);
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -470,7 +470,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameterCompound.StateDependence = this.stateList;
 
             // Test starts
-            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null);
 
             Assert.AreEqual("APTName", row.Name);
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -507,7 +507,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameterCompound.ValueSet.Add(valueSetState1);
 
             this.parameterCompound.StateDependence = this.stateList;
-            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null);
 
             Assert.AreEqual("APTName", row.Name);
             Assert.AreEqual(1, row.ContainedRows.Count);
@@ -541,7 +541,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             this.parameter5Subscription.ValueSet.Add(valueSetSub);
 
-            var row = new ParameterSubscriptionRowViewModel(this.parameter5Subscription, this.session.Object, null, false);
+            var row = new ParameterSubscriptionRowViewModel(this.parameter5Subscription, this.session.Object, null);
             Assert.AreEqual(0, row.ContainedRows.Count);
             Assert.AreEqual("PTName", row.Name);
             Assert.AreEqual("[other]", row.OwnerName);
@@ -553,7 +553,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         [Test]
         public void VerifyThatParameterComponentRowsUpdateOnParameterTypeUpdate()
         {
-            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null);
 
             Assert.AreEqual(2, this.cptType.Component.Count);
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -584,7 +584,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.parameter1.ValueSet.Add(valueSetState2);
 
             this.parameter1.StateDependence = this.stateList;
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.AreEqual(1, row.ContainedRows.Count);
 

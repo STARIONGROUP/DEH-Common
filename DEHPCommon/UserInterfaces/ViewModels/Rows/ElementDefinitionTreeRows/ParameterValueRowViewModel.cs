@@ -72,12 +72,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// Backing field for <see cref="IsPublishable"/>
         /// </summary>
         private bool isPublishable;
-
-        /// <summary>
-        /// A value indicating whether this <see cref="ParameterBase"/> is editable in the current context
-        /// </summary>
-        private readonly bool isParameterBaseReadOnlyInDataContext;
-
+        
         /// <summary>
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
@@ -87,7 +82,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// Backing field for <see cref="Formula"/>
         /// </summary>
         private string formula;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterValueRowViewModel"/> class
@@ -110,21 +104,26 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="valueIndex">
         /// The index of the component if applicable
         /// </param>
-        /// <param name="isReadOnly"> A value indicating whether the row is read-only </param>
-        protected ParameterValueRowViewModel(ParameterBase parameterBase, ISession session, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow, int valueIndex = 0, bool isReadOnly = false)
+        protected ParameterValueRowViewModel(ParameterBase parameterBase, ISession session, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow, int valueIndex = 0)
             : base(parameterBase, session, containerRow)
         {
-            this.isParameterBaseReadOnlyInDataContext = isReadOnly;
             this.ActualOption = actualOption;
             this.ActualState = actualState;
 
             this.ValueIndex = valueIndex;
             this.ParameterTypeClassKind = this.Thing.ParameterType.ClassKind;
-
-            this.UpdateThingStatus();
+            this.Initialize();
             this.SetOwnerValue();
         }
-        
+
+        /// <summary>
+        /// Used to call virtual member when this gets initialized
+        /// </summary>
+        private void Initialize()
+        {
+            this.UpdateThingStatus();
+        }
+
         /// <summary>
         /// Gets the model-code
         /// </summary>
@@ -358,6 +357,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         private ParameterValueSet GetParameterValueSet()
         {
             var parameter = (Parameter)this.Thing;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 return parameter.ValueSet.FirstOrDefault();

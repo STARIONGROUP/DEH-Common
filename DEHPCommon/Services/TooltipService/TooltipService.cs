@@ -59,106 +59,155 @@ namespace DEHPCommon.Services.TooltipService
                 return string.Empty;
             }
 
-            var sb = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             if (thing is IShortNamedThing shortNamedThing)
             {
-                sb.AppendLine($"Short Name: {shortNamedThing.ShortName}");
+                stringBuilder.AppendLine($"Short Name: {shortNamedThing.ShortName}");
             }
 
             if (thing is INamedThing namedThing)
             {
-                sb.AppendLine($"Name: {namedThing.Name}");
+                stringBuilder.AppendLine($"Name: {namedThing.Name}");
             }
 
-            if (thing is IOwnedThing ownedThing)
+            GetOwner(thing, stringBuilder);
+            GetCategories(thing, stringBuilder);
+            GetModelCode(thing, stringBuilder);
+            GetDefinition(thing, stringBuilder);
+
+            stringBuilder.Append($"Type: {thing.ClassKind}");
+
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DomainOfExpertise"/> of the provided <see cref="Thing"/> and append it to the <see cref="StringBuilder"/> 
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/></param>
+        private static void GetOwner(Thing thing, StringBuilder stringBuilder)
+        {
+            if (!(thing is IOwnedThing ownedThing))
             {
-                string owner;
-
-                if (ownedThing.Owner != null)
-                {
-                    owner = ownedThing.Owner.ShortName;
-                }
-                else
-                {
-                    owner = "NA";
-                    Logger.Debug($"Owner of {thing.ClassKind} is null");
-                }
-
-                sb.AppendLine($"Owner: {owner}");
+                return;
             }
 
-            if (thing is ICategorizableThing categorizableThing)
+            string owner;
+
+            if (ownedThing.Owner != null)
             {
-                if (!categorizableThing.Category.Any())
-                {
-                    sb.AppendLine($"Category: -");
-                }
-                else
-                {
-                    var categoryCounter = 1;
-                    
-                    foreach (var category in categorizableThing.Category)
-                    {
-                        var superCategoryShortNames = category.SuperCategory.Count != 0 ? " {" + string.Join(", ", category.SuperCategory.Select(x => x.ShortName)) + "}" : string.Empty;
-                        var categoryEntry = $"{category.ShortName}{superCategoryShortNames}";
-                        sb.AppendLine(categoryCounter == 1 ? $"Category: {categoryEntry}" : $"          {categoryEntry}");
-
-                        categoryCounter++;
-                    }
-                }
-
-                if (thing is ElementUsage elementUsage)
-                {
-                    if (elementUsage.ElementDefinition.Category.Count == 0)
-                    {
-                        sb.AppendLine($"ED Category: -");
-                    }
-                    else
-                    {
-                        var categoryCounter = 1;
-                        
-                        foreach (var category in elementUsage.ElementDefinition.Category)
-                        {
-                            var superCategoryShortNames = category.SuperCategory.Count != 0 ? " {" + string.Join(", ", category.SuperCategory.Select(x => x.ShortName)) + "}" : string.Empty;
-                            var categoryEntry = $"{category.ShortName}{superCategoryShortNames}";
-                            sb.AppendLine(categoryCounter == 1 ? $"ED Category: {categoryEntry}" : $"           {categoryEntry}");
-
-                            categoryCounter++;
-                        }
-                    }
-                }
+                owner = ownedThing.Owner.ShortName;
             }
-
-            if (thing is IModelCode modelCodeThing)
+            else
             {
-                string modelCode;
-
-                try
-                {
-                    modelCode = modelCodeThing.ModelCode();
-                }
-                catch (Exception e)
-                {
-                    modelCode = "Invalid Model Code";
-                    Logger.Error(e);
-                }
-
-                sb.AppendLine($"Model Code: {modelCode}");
+                owner = "NA";
+                Logger.Debug($"Owner of {thing.ClassKind} is null");
             }
 
-            if (thing is DefinedThing definedThing)
+            stringBuilder.AppendLine($"Owner: {owner}");
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Definition"/> of the provided <see cref="Thing"/> and append it to the <see cref="StringBuilder"/> 
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/></param>
+        private static void GetDefinition(Thing thing, StringBuilder stringBuilder)
+        {
+            if (!(thing is DefinedThing definedThing))
             {
-                var definition = definedThing.Definition.FirstOrDefault();
-                
-                sb.AppendLine(definition == null
-                    ? "Definition : -"
-                    : $"Definition [{definition.LanguageCode}]: {definition.Content}");
+                return;
             }
 
-            sb.Append($"Type: {thing.ClassKind}");
+            var definition = definedThing.Definition.FirstOrDefault();
 
-            return sb.ToString();
+            stringBuilder.AppendLine(definition == null
+                ? "Definition : -"
+                : $"Definition [{definition.LanguageCode}]: {definition.Content}");
+        }
+        
+        /// <summary>
+        /// Gets the <see cref="IModelCode"/> of the provided <see cref="Thing"/> and append it to the <see cref="StringBuilder"/> 
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/></param>
+        private static void GetModelCode(Thing thing, StringBuilder stringBuilder)
+        {
+            if (!(thing is IModelCode modelCodeThing))
+            {
+                return;
+            }
+
+            string modelCode;
+
+            try
+            {
+                modelCode = modelCodeThing.ModelCode();
+            }
+            catch (Exception e)
+            {
+                modelCode = "Invalid Model Code";
+                Logger.Error(e);
+            }
+
+            stringBuilder.AppendLine($"Model Code: {modelCode}");
+        }
+        
+        /// <summary>
+        /// Gets the <see cref="Category"/>s of the provided <see cref="Thing"/> and append it to the <see cref="StringBuilder"/> 
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/></param>
+        private static void GetCategories(Thing thing, StringBuilder stringBuilder)
+        {
+            if (!(thing is ICategorizableThing categorizableThing))
+            {
+                return;
+            }
+
+            if (!categorizableThing.Category.Any())
+            {
+                stringBuilder.AppendLine($"Category: -");
+            }
+            else
+            {
+                ProcessCategories(stringBuilder, categorizableThing, "Category");
+            }
+
+            if (!(thing is ElementUsage elementUsage))
+            {
+                return;
+            }
+
+            if (elementUsage.ElementDefinition.Category.Count == 0)
+            {
+                stringBuilder.AppendLine($"ED Category: -");
+            }
+            else
+            {
+                ProcessCategories(stringBuilder, categorizableThing, "ED Category");
+            }
+        }
+
+        /// <summary>
+        /// Flattens the categories of the <paramref name="categorizableThing"/> into a string and appends it to the <paramref name="stringBuilder"/>
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder"/></param>
+        /// <param name="categorizableThing">The <see cref="ICategorizableThing"/></param>
+        /// <param name="categoryLabel">The label that states whether the categories are attached to an <see cref="ElementDefinition"/> of a <see cref="ElementUsage"/></param>
+        private static void ProcessCategories(StringBuilder stringBuilder, ICategorizableThing categorizableThing, string categoryLabel)
+        {
+            var categoryCounter = 1;
+
+            foreach (var category in categorizableThing.Category)
+            {
+                var superCategoryShortNames = category.SuperCategory.Count != 0 ? " {" + string.Join(", ", category.SuperCategory.Select(x => x.ShortName)) + "}" : string.Empty;
+                var categoryEntry = $"{category.ShortName}{superCategoryShortNames}";
+                stringBuilder.AppendLine(categoryCounter == 1 ? $"{categoryLabel}: {categoryEntry}" : $"          {categoryEntry}");
+
+                categoryCounter++;
+            }
         }
     }
 }

@@ -55,9 +55,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="actualState">The associated <see cref="ActualFiniteState"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container row</param>
-        /// <param name="isReadOnly">A value indicating whether the row is read-only</param>
-        public ParameterStateRowViewModel(ParameterBase parameterBase, Option option, ActualFiniteState actualState, ISession session, IRowViewModelBase<Thing> containerViewModel, bool isReadOnly)
-            : base(parameterBase, session, option, actualState, containerViewModel, 0, isReadOnly)
+        public ParameterStateRowViewModel(ParameterBase parameterBase, Option option, ActualFiniteState actualState, ISession session, IRowViewModelBase<Thing> containerViewModel)
+            : base(parameterBase, session, option, actualState, containerViewModel, 0)
         {
             this.Name = this.ActualState.Name;
             this.State = this.ActualState.Name;

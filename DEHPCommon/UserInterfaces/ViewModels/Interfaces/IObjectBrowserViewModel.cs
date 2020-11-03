@@ -24,6 +24,8 @@
 
 namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
+    using System;
+
     using ReactiveUI;
 
     /// <summary>
@@ -45,10 +47,5 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// Gets the tooltip of the control
         /// </summary>
         string ToolTip { get; }
-
-        /// <summary>
-        /// Dispose of this <see cref="ObjectBrowserViewModel"/>
-        /// </summary>
-        void Dispose();
     }
 }

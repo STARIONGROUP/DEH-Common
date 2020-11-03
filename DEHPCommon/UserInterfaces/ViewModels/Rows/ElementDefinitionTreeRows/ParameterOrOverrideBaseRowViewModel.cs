@@ -70,11 +70,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="containerViewModel">
         /// The container Row.
         /// </param>
-        /// <param name="isReadOnly">
-        /// A value indicating whether this row shall be made read-only in the current context.
-        /// </param>
-        protected ParameterOrOverrideBaseRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, IViewModelBase<Thing> containerViewModel, bool isReadOnly)
-            : base(parameterOrOverrideBase, session, containerViewModel, isReadOnly)
+        protected ParameterOrOverrideBaseRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, IViewModelBase<Thing> containerViewModel)
+            : base(parameterOrOverrideBase, session, containerViewModel)
         {
             var engineeringModel = (EngineeringModel)this.Thing.TopContainer;
             this.activeParticipant = engineeringModel.GetActiveParticipant(this.Session.ActivePerson);
@@ -107,7 +104,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             this.SetProperties(valueset);
             this.CheckPublishabledStatus();
 
-            if (this.valueSetListener.Any())
+            if (this.ValueSetListener.Any())
             {
                 return;
             }
@@ -117,7 +114,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.SetProperties());
 
-            this.valueSetListener.Add(listener);
+            this.ValueSetListener.Add(listener);
         }
         
         /// <summary>
@@ -190,9 +187,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         private void RefreshContainerRows()
         {
-            var containerUsageRow = this.ContainerViewModel as ElementUsageRowViewModel;
-
-            if (containerUsageRow == null)
+            if (!(this.ContainerViewModel is ElementUsageRowViewModel containerUsageRow))
             {
                 if (this.ContainerViewModel is ElementDefinitionRowViewModel elementDefinitionRow)
                 {
@@ -322,7 +317,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                         }
                     }
                 }
-                catch (ArgumentOutOfRangeException e)
+                catch (ArgumentOutOfRangeException)
                 {
                     this.Logger.Error($"The ParameterValueSetBase {parameterValueSetBase.Iid} has an incorrect number of values");
                 }

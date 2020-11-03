@@ -1,5 +1,5 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ElementBaseChildRowComparer.cs" company="RHEA System S.A.">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="BaseChildRowComparer.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2020 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -29,17 +29,26 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
     using System.Linq;
 
     using CDP4Common.CommonData;
-    using CDP4Common.Comparers;
-    using CDP4Common.EngineeringModelData;
 
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     /// <summary>
-    /// The <see cref="IComparer{T}"/> used to sort the child rows of the <see cref="ElementBaseRowViewModel{T}"/>
+    /// Base <see cref="IComparer{T}"/> for <see cref="ParameterGroupChildRowComparer"/> and <see cref="ElementBaseChildRowComparer"/>
     /// </summary>
-    public class ElementBaseChildRowComparer : BaseChildRowComparer, IComparer<IRowViewModelBase<Thing>>
+    public abstract class BaseChildRowComparer
     {
+        /// <summary>
+        /// The Permissible Kind of child <see cref="IRowViewModelBase{T}"/>
+        /// </summary>
+        private static readonly List<Type> PermissibleRowTypes = new List<Type>
+        {
+            typeof(ParameterOrOverrideBaseRowViewModel),
+            typeof(ParameterSubscriptionRowViewModel),
+            typeof(ParameterGroupRowViewModel),
+            typeof(ElementUsageRowViewModel)
+        };
+
         /// <summary>
         /// Compares two <see cref="IRowViewModelBase{Thing}"/>
         /// </summary>
@@ -50,25 +59,37 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
         /// Zero: x "equals" y. 
         /// Greater than zero: x is "greater" than y.
         /// </returns>
-        public int Compare(IRowViewModelBase<Thing> x, IRowViewModelBase<Thing> y)
+        public int? CommonCompare(IRowViewModelBase<Thing> x, IRowViewModelBase<Thing> y)
         {
-            var result = base.CommonCompare(x, y);
-
-            if (result.HasValue)
+            if (!PermissibleRowTypes.Any(type => type.IsInstanceOfType(x)) || !PermissibleRowTypes.Any(type => type.IsInstanceOfType(y)))
             {
-                return result.Value;
+                throw new NotSupportedException("The list contains other types of row than the specified ones.");
             }
 
-            // x is a ParameterGroupRow
-            if(y is ParameterOrOverrideBaseRowViewModel || y is ParameterSubscriptionRowViewModel)
+            if (x.GetType() == y.GetType())
+            {
+                return this.CompareSameType(x.Thing, y);
+            }
+
+            if ((x is ParameterOrOverrideBaseRowViewModel || x is ParameterSubscriptionRowViewModel) && 
+                (y is ParameterOrOverrideBaseRowViewModel || y is ParameterSubscriptionRowViewModel))
+            {
+                return this.CompareSameType(x.Thing, y);
+            }
+
+            if (x is ParameterOrOverrideBaseRowViewModel || x is ParameterSubscriptionRowViewModel)
+            {
+                return -1;
+            }
+
+            if (x is ElementUsageRowViewModel)
             {
                 return 1;
             }
 
-            // x is ParameterGroupRow, y is ElementUsageRow
-            return -1;
+            return null;
         }
-        
+
         /// <summary>
         /// Compares two <see cref="IRowViewModelBase{Thing}"/> of the same type
         /// </summary>
@@ -79,27 +100,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
         /// Zero: x "equals" y. 
         /// Greater than zero: x is "greater" than y.
         /// </returns>
-        protected override int CompareSameType(Thing xThing, IViewModelBase<Thing> y)
-        {
-            switch (y)
-            {
-                case ParameterOrOverrideBaseRowViewModel _:
-                case ParameterSubscriptionRowViewModel _:
-                {
-                    var comparer = new ParameterBaseComparer();
-                    return comparer.Compare((ParameterBase) xThing, (ParameterBase) y.Thing);
-                }
-                case ParameterGroupRowViewModel _:
-                {
-                    var comparer = new ParameterGroupComparer();
-                    return comparer.Compare((ParameterGroup) xThing, (ParameterGroup) y.Thing);
-                }
-                default:
-                {
-                    var usageComparer = new ElementUsageComparer();
-                    return usageComparer.Compare((ElementUsage)xThing, (ElementUsage)y.Thing);
-                }
-            }
-        }
+        protected abstract int CompareSameType(Thing xThing, IViewModelBase<Thing> y);
     }
 }

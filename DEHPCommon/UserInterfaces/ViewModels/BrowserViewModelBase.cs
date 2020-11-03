@@ -46,7 +46,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// <summary>
     /// The view model that represents the root element of hierarchical data to be displayed in the <see cref="ObjectBrowser"/>
     /// </summary>
-    public abstract class BrowserViewModelBase : ReactiveObject, IHaveContainedRows, IBrowsableThing
+    public abstract class BrowserViewModelBase : ReactiveObject, IHaveContainedRows, IBrowsableThing, IDisposable
     {
         /// <summary>
         /// The NLog logger
@@ -139,12 +139,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase{T}"/> class.
         /// </summary>
-        /// <param name="thing">
-        /// The thing.
-        /// </param>
-        /// <param name="session">
-        /// The session this view model belongs to.
-        /// </param>
+        /// <param name="session"> The session this view model belongs to. </param>
         protected BrowserViewModelBase(ISession session)
         {
             this.Logger = LogManager.GetLogger(this.GetType().FullName);

@@ -57,8 +57,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">the container view-model</param>
-        public ParameterSubscriptionRowViewModel(ParameterSubscription parameterSubscription, ISession session, IViewModelBase<Thing> containerViewModel, bool isReadOnly)
-            : base(parameterSubscription, session, containerViewModel, isReadOnly)
+        public ParameterSubscriptionRowViewModel(ParameterSubscription parameterSubscription, ISession session, IViewModelBase<Thing> containerViewModel)
+            : base(parameterSubscription, session, containerViewModel)
         {
             this.UpdateOwnerValue();
         }
@@ -138,7 +138,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             this.Reference = valueset.Reference.Any() ? valueset.Reference.First().ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
             this.Formula = valueset.SubscribedValueSet.Formula.Any() ? valueset.SubscribedValueSet.Formula.First() : "-";
 
-            if (this.valueSetListener.Any())
+            if (this.ValueSetListener.Any())
             {
                 return;
             }
@@ -147,13 +147,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetProperties());
-            this.valueSetListener.Add(listener);
+            this.ValueSetListener.Add(listener);
 
             var subscribedListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset.SubscribedValueSet)
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetProperties());
-            this.valueSetListener.Add(subscribedListener);
+            this.ValueSetListener.Add(subscribedListener);
         }
 
         /// <summary>

@@ -55,7 +55,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// The container view-model.
         /// </param>
         public ParameterOverrideRowViewModel(ParameterOverride parameterOverride, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(parameterOverride, session, containerViewModel, false)
+            : base(parameterOverride, session, containerViewModel)
         {
         }
 

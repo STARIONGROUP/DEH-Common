@@ -268,7 +268,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
                 SubscribedValueSet = this.valueset4
             });
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
+            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null);
             var option1Row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
 
@@ -348,7 +348,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             };
             this.subscription.ValueSet.Add(subscriptionValueSet);
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
+            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null);
 
             var revInfo = typeof (Thing).GetProperty("RevisionNumber");
             revInfo.SetValue(subscriptionValueSet, 10);
@@ -383,7 +383,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             this.subscription.ValueSet.Add(subset1);
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
+            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null);
             Assert.AreEqual("abc", row.Computed);
             Assert.AreEqual("abc", row.Reference);
 

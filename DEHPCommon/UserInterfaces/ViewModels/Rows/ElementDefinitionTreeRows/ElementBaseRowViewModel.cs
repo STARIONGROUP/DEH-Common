@@ -110,7 +110,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// The <see cref="IComparer{T}"/>
         /// </summary>
-        public static readonly IComparer<IRowViewModelBase<Thing>> ChildRowComparer = new ElementBaseChildRowComparer(); 
+        public IComparer<IRowViewModelBase<Thing>> ChildRowComparer { get; } = new ElementBaseChildRowComparer();
 
         /// <summary>
         /// A cache for all <see cref="ParameterBase"/>
@@ -166,24 +166,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
             this.ModelCode = ((IModelCode)this.Thing).ModelCode();
         }
-        
+
         /// <summary>
         /// Gets or sets the <see cref="HasExcludes"/>. Null if <see cref="ElementUsage"/> is in no options.
         /// </summary>
-        public virtual bool? HasExcludes
-        {
-            get => null;
-            set { /*does nothing, for binding purposes only*/ }
-        }
+        public virtual bool? HasExcludes { get; set; } = null;
 
         /// <summary>
         /// Gets the value indicating whether the row is a top element. Property implemented here to fix binding errors.
         /// </summary>
-        public virtual bool IsTopElement
-        {
-            get => false;
-            set { /*does nothing, for binding purposes only*/ }
-        }
+        public virtual bool IsTopElement { get; set; } = false;
 
         /// <summary>
         /// Gets the active <see cref="DomainOfExpertise"/>
@@ -237,10 +229,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 else if ((newContainer == null) && (oldContainer != null))
                 {
                     this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
+                    this.ContainedRows.SortedInsert(associatedRow, this.ChildRowComparer);
                     this.ParameterBaseContainerMap[parameterBase] = null;
                 }
-                else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
+                else if ((newContainer != null) && (newContainer != oldContainer))
                 {
                     this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.ParameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
@@ -277,7 +269,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                     this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                     this.ParameterGroupContainment[parameterGroup] = null;
                 }
-                else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
+                else if (newContainer != null && newContainer != oldContainer)
                 {
                     this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.ParameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
@@ -461,38 +453,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             foreach (var parameterBase in addedParameterBase)
             {
-                IRowViewModelBase<ParameterBase> row = null;
-                var parameter = parameterBase as Parameter;
-                if (parameter != null)
-                {
-                    row = new ParameterRowViewModel(parameter, this.Session, this, typeof(T) == typeof(ElementUsage));
-                    this.AddParameterOrOverrideListener(parameter);
-                }
-
-                var parameterOverride = parameterBase as ParameterOverride;
-                if (parameterOverride != null)
-                {
-                    row = new ParameterOverrideRowViewModel(parameterOverride, this.Session, this);
-                    this.AddParameterOrOverrideListener(parameterOverride);
-                }
-
-                var parameterSubscription = parameterBase as ParameterSubscription;
-                if (parameterSubscription != null)
-                {
-                    var subscribedParameter = parameterSubscription.Container as Parameter;
-                    if (subscribedParameter != null)
-                    {
-                        row = new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this, typeof(T) == typeof(ElementUsage));
-                    }
-
-                    var subscribedParameterOverride = parameterSubscription.Container as ParameterOverride;
-                    if (subscribedParameterOverride != null)
-                    {
-                        row = new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this, false);
-                    }
-                    
-                    this.AddParameterSubscriptionListener(parameterSubscription);
-                }
+                var row = this.AddParameter(parameterBase);
 
                 if (row == null)
                 {
@@ -510,13 +471,48 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 }
                 else
                 {
-                    ParameterGroupRowViewModel parameterGroupRowViewModel;
-                    if (this.ParameterGroupCache.TryGetValue(group, out parameterGroupRowViewModel))
+                    if (this.ParameterGroupCache.TryGetValue(group, out var parameterGroupRowViewModel))
                     {
                         parameterGroupRowViewModel.ContainedRows.SortedInsert(row, ParameterGroupRowViewModel.ChildRowComparer);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Adds the <paramref name="parameterBase"/> depending whether its a <see cref="Parameter"/>, <see cref="ParameterOverride"/> or a <see cref="ParameterSubscription"/>
+        /// </summary>
+        /// <param name="parameterBase">The <see cref="ParameterBase"/></param>
+        /// <returns>A <see cref="IRowViewModelBase{T}"/></returns>
+        private IRowViewModelBase<ParameterBase> AddParameter(ParameterBase parameterBase)
+        {
+            var row = default(IRowViewModelBase<ParameterBase>);
+
+            switch (parameterBase)
+            {
+                case Parameter parameter:
+                    row = new ParameterRowViewModel(parameter, this.Session, this);
+                    this.AddParameterOrOverrideListener(parameter);
+                    break;
+                case ParameterOverride parameterOverride:
+                    row = new ParameterOverrideRowViewModel(parameterOverride, this.Session, this);
+                    this.AddParameterOrOverrideListener(parameterOverride);
+                    break;
+                case ParameterSubscription parameterSubscription:
+                {
+                    row = parameterSubscription.Container switch
+                    {
+                        Parameter _ => new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this),
+                        ParameterOverride _ => new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this),
+                        _ => null
+                    };
+
+                    this.AddParameterSubscriptionListener(parameterSubscription);
+                    break;
+                }
+            }
+
+            return row;
         }
 
         /// <summary>
@@ -573,21 +569,18 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="parameterBase">The <see cref="ParameterBase"/></param>
         private void RemoveParameterBaseListener(ParameterBase parameterBase)
         {
-            var parameter = parameterBase as Parameter;
-            if (parameter != null)
+            if (parameterBase is Parameter parameter)
             {
                 this.RemoveParameterOrOverrideListener(parameter);
                 return;
             }
 
-            var parameterOverride = parameterBase as ParameterOverride;
-            if (parameterOverride != null)
+            if (parameterBase is ParameterOverride parameterOverride)
             {
                 this.RemoveParameterOrOverrideListener(parameterOverride);
             }
 
-            var parameterSubscription = parameterBase as ParameterSubscription;
-            if (parameterSubscription != null)
+            if (parameterBase is ParameterSubscription parameterSubscription)
             {
                 this.RemoveParameterSubscriptionListener(parameterSubscription);
             }
@@ -599,40 +592,25 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="parameter">The <see cref="Parameter"/></param>
         private void RemoveParameterOrOverrideListener(Parameter parameter)
         {
-            IDisposable disposable;
-            if (this.ParameterBaseListener.TryGetValue(parameter, out disposable))
+            if (!this.ParameterBaseListener.TryGetValue(parameter, out var disposable))
             {
-                var elementDef = this.Thing as ElementDefinition;
-                if (elementDef == null)
-                {
-                    var usage = this.Thing as ElementUsage;
-                    if (usage == null)
-                    {
-                        return;
-                    }
-
-                    elementDef = usage.ElementDefinition;
-                }
-
-                if (!elementDef.Parameter.Contains(parameter))
-                {
-                    disposable.Dispose();
-                    this.ParameterBaseListener.Remove(parameter);   
-                }
+                return;
             }
-        }
 
-        /// <summary>
-        /// Remove the listener associated to the <see cref="ParameterSubscription"/>
-        /// </summary>
-        /// <param name="parameterSubscription">The <see cref="ParameterSubscription"/></param>
-        private void RemoveParameterSubscriptionListener(ParameterSubscription parameterSubscription)
-        {
-            IDisposable disposable;
-            if(this.ParameterBaseListener.TryGetValue(parameterSubscription, out disposable))
+            if (!(this.Thing is ElementDefinition elementDef))
+            {
+                if (!(this.Thing is ElementUsage usage))
+                {
+                    return;
+                }
+
+                elementDef = usage.ElementDefinition;
+            }
+
+            if (!elementDef.Parameter.Contains(parameter))
             {
                 disposable.Dispose();
-                this.ParameterBaseListener.Remove(parameterSubscription);
+                this.ParameterBaseListener.Remove(parameter);   
             }
         }
 
@@ -642,21 +620,31 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="parameterOverride">The <see cref="ParameterOverride"/></param>
         private void RemoveParameterOrOverrideListener(ParameterOverride parameterOverride)
         {
-            IDisposable disposable;
-            if (this.ParameterBaseListener.TryGetValue(parameterOverride, out disposable))
+            if (!this.ParameterBaseListener.TryGetValue(parameterOverride, out var disposable) || !(this.Thing is ElementUsage usage))
             {
-                var usage = this.Thing as ElementUsage;
-                if (usage == null)
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (!usage.ParameterOverride.Contains(parameterOverride))
-                {
-                    disposable.Dispose();
-                    this.ParameterBaseListener.Remove(parameterOverride);
-                }
-            }    
+            if (!usage.ParameterOverride.Contains(parameterOverride))
+            {
+                disposable.Dispose();
+                this.ParameterBaseListener.Remove(parameterOverride);
+            }
+        }
+
+        /// <summary>
+        /// Remove the listener associated to the <see cref="ParameterSubscription"/>
+        /// </summary>
+        /// <param name="parameterSubscription">The <see cref="ParameterSubscription"/></param>
+        private void RemoveParameterSubscriptionListener(ParameterSubscription parameterSubscription)
+        {
+            if (!this.ParameterBaseListener.TryGetValue(parameterSubscription, out var disposable))
+            {
+                return;
+            }
+
+            disposable.Dispose();
+            this.ParameterBaseListener.Remove(parameterSubscription);
         }
     }
 }

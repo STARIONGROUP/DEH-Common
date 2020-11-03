@@ -229,7 +229,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         [Test]
         public void VerifyThatUpdateValueSetWorks()
         {
-            var row = new ParameterRowViewModel(this.cptParameter, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.cptParameter, this.session.Object, null);
 
             var option1Row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
@@ -304,7 +304,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.ValueSet.Add(valueset);
 
-            var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter, this.session.Object, null);
 
             var revInfo = typeof(Thing).GetProperty("RevisionNumber");
             revInfo.SetValue(valueset, 10);

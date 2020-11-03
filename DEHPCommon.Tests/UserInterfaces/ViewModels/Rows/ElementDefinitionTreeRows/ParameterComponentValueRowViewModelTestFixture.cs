@@ -130,7 +130,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             parameter.ParameterType = textParameterType;
 
-            Assert.Throws<InvalidOperationException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null, false));
+            Assert.Throws<InvalidOperationException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null));
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             parameter.ParameterType = compoundParameterType;
 
-            Assert.Throws<IndexOutOfRangeException>(() => new ParameterComponentValueRowViewModel(parameter, 2, this.session.Object, null, null, null, false));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new ParameterComponentValueRowViewModel(parameter, 2, this.session.Object, null, null, null));
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             compoundParameterType.Component.Add(component1);
             parameter.ParameterType = compoundParameterType;
 
-            Assert.Throws<ArgumentNullException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null, false));
+            Assert.Throws<ArgumentNullException>(() => new ParameterComponentValueRowViewModel(parameter, 0, this.session.Object, null, null, null));
         }
 
         [Test]
@@ -175,7 +175,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             this.elementDefinition.Parameter.Add(parameter);
 
-            var parameterRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, null, false);
+            var parameterRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, null);
             var component1row = (ParameterComponentValueRowViewModel)parameterRowViewModel.ContainedRows.First();
             var component2row = (ParameterComponentValueRowViewModel)parameterRowViewModel.ContainedRows.Last();
             component1row.Switch = ParameterSwitchKind.COMPUTED;
@@ -228,7 +228,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             parameter.ParameterSubscription.Add(parameterSubscription);
 
-            var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, null, false);
+            var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, null);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
             var component2row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.Last();
@@ -256,7 +256,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
 
             parameter.ParameterSubscription.Add(parameterSubscription);
 
-            var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, null, false);
+            var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, null);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
             Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));
@@ -284,7 +284,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             parameter.ParameterType = compoundParameterType;
             this.elementDefinition.Parameter.Add(parameter);
 
-            var parameterSubscriptionRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, null, false);
+            var parameterSubscriptionRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, null);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
             Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));

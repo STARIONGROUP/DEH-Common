@@ -39,7 +39,7 @@ namespace DEHPCommon.Converters
     public abstract class GenericListToObjectListConverter<T> : IValueConverter
     {
         /// <summary>
-        /// The conversion method converts a <see cref="ReactiveList{T}"/> of <see cref="T"/> to an <see cref="object"/>.
+        /// The conversion method converts a <see cref="ReactiveList{T}"/> of <typeparamref name="T" /> to an <see cref="object"/>.
         /// </summary>
         /// <param name="value"> The incoming value. </param>
         /// <param name="targetType"> The target type. </param>
@@ -52,13 +52,13 @@ namespace DEHPCommon.Converters
         }
 
         /// <summary>
-        /// The conversion back method converts the <see cref="object"/> to <see cref="ReactiveList{T}"/> of <see cref="T"/>.
+        /// The conversion back method converts the <see cref="object"/> to <see cref="ReactiveList{T}"/> of <typeparamref name="T" />.
         /// </summary>
         /// <param name="value"> The incoming collection. </param>
         /// <param name="targetType"> The target type. </param>
         /// <param name="parameter"> The parameter passed on to this conversion. </param>
         /// <param name="culture"> The culture information. </param>
-        /// <returns> The <see cref="ReactiveList{T}"/> of <see cref="T"/> containing the same objects as the input collection. </returns>
+        /// <returns> The <see cref="ReactiveList{T}"/> of <typeparamref name="T" /> containing the same objects as the input collection. </returns>
         public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var selection = (IList)value;

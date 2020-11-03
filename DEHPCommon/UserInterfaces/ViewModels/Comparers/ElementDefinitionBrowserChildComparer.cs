@@ -34,7 +34,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     /// <summary>
-    /// The <see cref="IComparer{T}"/> for the child-rows of the <see cref="ElementDefinitionBrowserViewModel"/>
+    /// The <see cref="IComparer{T}"/> for the child-rows of the <see cref="ElementDefinitionsBrowserViewModel"/>
     /// </summary>
     public class ElementDefinitionBrowserChildComparer : IComparer<IRowViewModelBase<Thing>>
     {

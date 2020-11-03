@@ -31,7 +31,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -271,9 +270,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.Thing = thing;
             this.SetProperties();
 
-            this.Initialize();
-            this.InitializeCommands();
-
             this.WhenAnyValue(vm => vm.SelectedThing).Subscribe(_ =>
             {
                 this.OnSelectedThingChanged();
@@ -405,7 +401,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private void OnSelectedThingChanged()
         {
-            var thing = SelectedThing?.Thing;
+            var thing = this.SelectedThing?.Thing;
 
             if (thing == null)
             {
@@ -426,13 +422,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         protected virtual void OnAssemblerUpdate(SessionEvent sessionEvent)
         {
             this.HasUpdateStarted = sessionEvent.Status == SessionStatus.BeginUpdate;
-        }
-
-        /// <summary>
-        /// Loads the <see cref="Thing"/>s from the cache when the browser is instantiated.
-        /// </summary>
-        protected virtual void Initialize()
-        {
         }
 
         /// <summary>

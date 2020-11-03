@@ -122,7 +122,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             parameter.IsOptionDependent = true;
             parameter.Container = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
 
-            var row = new ParameterOptionRowViewModel(parameter, this.option, this.session.Object, null, false);
+            var row = new ParameterOptionRowViewModel(parameter, this.option, this.session.Object, null);
 
             Assert.IsNotNull(row.ThingStatus);
         }

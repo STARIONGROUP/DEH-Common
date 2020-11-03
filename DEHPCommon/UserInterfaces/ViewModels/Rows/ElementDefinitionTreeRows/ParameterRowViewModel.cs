@@ -39,20 +39,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterRowViewModel"/> class.
         /// </summary>
-        /// <param name="parameter">
-        /// The parameter.
-        /// </param>
-        /// <param name="session">
-        /// The session.
-        /// </param>
-        /// <param name="containerViewModel">
-        /// The container row.
-        /// </param>
-        /// <param name="isReadOnly">
-        /// A value indicating whether this row shall be made read-only in the current context.
-        /// </param>
-        public ParameterRowViewModel(Parameter parameter, ISession session, IViewModelBase<Thing> containerViewModel, bool isReadOnly)
-            : base(parameter, session, containerViewModel, isReadOnly)
+        /// <param name="parameter"> The parameter. </param>
+        /// <param name="session"> The session. </param>
+        /// <param name="containerViewModel"> The container row. </param>
+        public ParameterRowViewModel(Parameter parameter, ISession session, IViewModelBase<Thing> containerViewModel) : base(parameter, session, containerViewModel)
         {
         }
     }

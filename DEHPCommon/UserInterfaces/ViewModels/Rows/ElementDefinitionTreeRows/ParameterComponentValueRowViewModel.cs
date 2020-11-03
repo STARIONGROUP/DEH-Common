@@ -64,26 +64,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="containerRow">
         /// the row container
         /// </param>
-        /// <param name="isReadOnly">
-        /// A value indicating whether the row is read-only
-        /// </param>
-        public ParameterComponentValueRowViewModel(ParameterBase parameterBase, int valueIndex, ISession session, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow, bool isReadOnly)
-            : base(parameterBase, session, actualOption, actualState, containerRow, valueIndex, isReadOnly)
+        public ParameterComponentValueRowViewModel(ParameterBase parameterBase, int valueIndex, ISession session, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow)
+            : base(parameterBase, session, actualOption, actualState, containerRow, valueIndex)
         {
-            if (!(this.Thing.ParameterType is CompoundParameterType compoundParameterType))
-            {
-                throw new InvalidOperationException("This row shall only be used for CompoundParameterType.");
-            }
-
-            if (valueIndex >= compoundParameterType.Component.Count)
-            {
-                throw new IndexOutOfRangeException($"The compoundParameterType {compoundParameterType.Name} has only {compoundParameterType.Component.Count} components");
-            }
-
-            if (containerRow == null)
-            {
-                throw new ArgumentNullException(nameof(containerRow), "The container row is mandatory");
-            }
+            var compoundParameterType = this.AssertThatTheParameterIsElligible(valueIndex, containerRow);
 
             // reset the classkind of this row to match the component classkind
             var component = compoundParameterType.Component[valueIndex];
@@ -98,37 +82,51 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             this.WhenAnyValue(x => x.Switch).Skip(1).Subscribe(x =>
             {
-                if (this.ContainerViewModel is ParameterValueRowViewModel valueBaseRow)
+                switch (this.ContainerViewModel)
                 {
-                    foreach (var rowViewModelBase in valueBaseRow.ContainedRows)
-                    {
-                        var row = (ParameterComponentValueRowViewModel) rowViewModelBase;
-                        row.Switch = x;
-                    }
+                    case ParameterValueRowViewModel _:
+                    case ParameterOrOverrideBaseRowViewModel _:
+                    case ParameterSubscriptionRowViewModel _:
+                        {
+                            foreach (var rowViewModelBase in ((IRowViewModelBase<Thing>)this.ContainerViewModel).ContainedRows)
+                            {
+                                var row = (ParameterComponentValueRowViewModel)rowViewModelBase;
+                                row.Switch = x;
+                            }
 
-                    return;
-                }
-
-                if (this.ContainerViewModel is ParameterOrOverrideBaseRowViewModel parameterBaseRow)
-                {
-                    foreach (var rowViewModelBase in parameterBaseRow.ContainedRows)
-                    {
-                        var row = (ParameterComponentValueRowViewModel) rowViewModelBase;
-                        row.Switch = x;
-                    }
-
-                    return;
-                }
-
-                if (this.ContainerViewModel is ParameterSubscriptionRowViewModel subscriptionRow)
-                {
-                    foreach (var rowViewModelBase in subscriptionRow.ContainedRows)
-                    {
-                        var row = (ParameterComponentValueRowViewModel) rowViewModelBase;
-                        row.Switch = x;
-                    }
+                            return;
+                        }
                 }
             });
+        }
+
+        /// <summary>
+        /// Throws a <see cref="InvalidOperationException"/> if this <see cref="Thing"/> <see cref="ParameterType"/> is a <see cref="CompoundParameterType"/>,
+        /// Throws a <see cref="IndexOutOfRangeException"/> if the <paramref name="valueIndex"/> is bigger or even with the <see cref="ParameterType"/> component count,
+        /// Throws a <see cref="ArgumentNullException"/> if the <param name="containerRow"> is null</param> 
+        /// </summary
+        /// <param name="valueIndex">The value index</param>
+        /// <param name="containerRow">The <see cref="IViewModelBase{T}"/> Container</param>
+        /// <returns>A <see cref="CompoundParameterType"/></returns>
+        private CompoundParameterType AssertThatTheParameterIsElligible(int valueIndex, IViewModelBase<Thing> containerRow)
+        {
+            if (!(this.Thing.ParameterType is CompoundParameterType compoundParameterType))
+            {
+                throw new InvalidOperationException("This row shall only be used for CompoundParameterType.");
+            }
+
+            if (valueIndex >= compoundParameterType.Component.Count)
+            {
+                this.Logger.Error($"The compoundParameterType {compoundParameterType.Name} has only {compoundParameterType.Component.Count} components");
+                _ = compoundParameterType.Component[valueIndex];
+            }
+
+            if (containerRow == null)
+            {
+                throw new ArgumentNullException(nameof(containerRow), "The container row is mandatory");
+            }
+
+            return compoundParameterType;
         }
 
         /// <summary>

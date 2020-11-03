@@ -48,7 +48,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="Clear(bool)"/> method WITH automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="Clear(bool)"/> method WITH automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void ClearAndDispose()
         {
@@ -56,7 +56,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="Clear(bool)"/> method WITHOUT automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="Clear(bool)"/> method WITHOUT automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void ClearWithoutDispose()
         {
@@ -64,9 +64,9 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Clear all items of type <see cref="T"/> from this instance
+        /// Clear all items of type <typeparamref name="T" /> from this instance
         /// </summary>
-        /// <param name="dispose">States if the removed objects of type <see cref="T"/> should also be disposed on removal</param>
+        /// <param name="dispose">States if the removed objects of type <typeparamref name="T" /> should also be disposed on removal</param>
         private void Clear(bool dispose)
         {
             if (dispose)
@@ -91,7 +91,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="RemoveAll(IEnumerable{T}, bool)"/> method WITH automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="RemoveAll(IEnumerable{T}, bool)"/> method WITH automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void RemoveAllAndDispose(IEnumerable<T> items)
         {
@@ -99,7 +99,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="RemoveAll(IEnumerable{T}, bool)"/> method WITHOUT automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="RemoveAll(IEnumerable{T}, bool)"/> method WITHOUT automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void RemoveAllWithoutDispose(IEnumerable<T> items)
         {
@@ -107,10 +107,10 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Remove the specific items in <see cref="items"/> from this instance
+        /// Remove the specific items in <paramref name="items"/> from this instance
         /// </summary>
-        /// <param name="items">The objects of type <see cref="T"/> that need to be removed from this instance</param>
-        /// <param name="dispose">States if the removed objects of type <see cref="T"/> should also be disposed on removal</param>
+        /// <param name="items">The objects of type <typeparamref name="T" /> that need to be removed from this instance</param>
+        /// <param name="dispose">States if the removed objects of type <typeparamref name="T" /> should also be disposed on removal</param>
         private void RemoveAll(IEnumerable<T> items, bool dispose)
         {
             var disposables = items as T[] ?? items.ToArray();
@@ -137,7 +137,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="RemoveAt(int, bool)"/> method WITH automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="RemoveAt(int, bool)"/> method WITH automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void RemoveAtAndDispose(int index)
         {
@@ -145,7 +145,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="RemoveAt(int, bool)"/> method WITHOUT automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="RemoveAt(int, bool)"/> method WITHOUT automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void RemoveAtWithoutDispose(int index)
         {
@@ -153,10 +153,10 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Remove the item at specific position <see cref="index"/> from this instance
+        /// Remove the item at specific position <paramref name="index"/> from this instance
         /// </summary>
-        /// <param name="index">Index of the object of type <see cref="T"/> that needs to be removed from this instance</param>
-        /// <param name="dispose">States if the removed objects of type <see cref="T"/> should also be disposed on removal</param>
+        /// <param name="index">Index of the object of type <typeparamref name="T" /> that needs to be removed from this instance</param>
+        /// <param name="dispose">States if the removed objects of type <typeparamref name="T" /> should also be disposed on removal</param>
         private void RemoveAt(int index, bool dispose)
         {
             try
@@ -189,7 +189,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="Remove(T, bool)"/> method WITH automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="Remove(T, bool)"/> method WITH automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public bool RemoveAndDispose(T item)
         {
@@ -197,7 +197,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="Remove(T, bool)"/> method WITHOUT automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="Remove(T, bool)"/> method WITHOUT automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public bool RemoveWithoutDispose(T item)
         {
@@ -205,10 +205,10 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Removes the <see cref="item"/> of type <see cref="T"/> from this instance
+        /// Removes the <paramref name="item"/> of type <typeparamref name="T" /> from this instance
         /// </summary>
-        /// <param name="item">Item of type <see cref="T"/> that needs to be removed from this instance</param>
-        /// <param name="dispose">States if the removed objects of type <see cref="T"/> should also be disposed on removal</param>
+        /// <param name="item">Item of type <typeparamref name="T" /> that needs to be removed from this instance</param>
+        /// <param name="dispose">States if the removed objects of type <typeparamref name="T" /> should also be disposed on removal</param>
         /// <returns>true if removed from this instance, otherwise false</returns>
         private bool Remove(T item, bool dispose)
         {
@@ -231,7 +231,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="RemoveRange(int, int, bool)"/> method WITH automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="RemoveRange(int, int, bool)"/> method WITH automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void RemoveRangeAndDispose(int index, int count)
         {
@@ -239,7 +239,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Wrapper for executing <see cref="RemoveRange(int, int, bool)"/> method WITHOUT automatic disposal of concerning objects of type <see cref="T"/>
+        /// Wrapper for executing <see cref="RemoveRange(int, int, bool)"/> method WITHOUT automatic disposal of concerning objects of type <typeparamref name="T" />
         /// </summary>
         public void RemoveRangeWithoutDispose(int index, int count)
         {
@@ -247,11 +247,11 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Removes <see cref="count"/> consecutive items of type <see cref="T"/> starting at position <see cref="index"/> from this instance
+        /// Removes <paramref name="count"/> consecutive items of type <typeparamref name="T" /> starting at position <paramref name="index"/> from this instance
         /// </summary>
         /// <param name="index">The starting position in the <see cref="IList{T}"/> of the items to be removed</param>
-        /// <param name="count">Number of items to be removed consecutively, starting at position <see cref="index"/></param>
-        /// <param name="dispose">States if the removed objects of type <see cref="T"/> should also be disposed on removal</param>
+        /// <param name="count">Number of items to be removed consecutively, starting at position <paramref name="index"/></param>
+        /// <param name="dispose">States if the removed objects of type <typeparamref name="T" /> should also be disposed on removal</param>
         private void RemoveRange(int index, int count, bool dispose)
         {
             if (dispose)
@@ -266,7 +266,7 @@ namespace DEHPCommon.Mvvm
         }
 
         /// <summary>
-        /// Try to dispose an item of type <see cref="T"/> in this instance
+        /// Try to dispose an item of type <typeparamref name="T" /> in this instance
         /// </summary>
         /// <param name="item">The item to dispose</param>
         private void TryDispose(T item)

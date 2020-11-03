@@ -99,9 +99,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session) : base(iteration, session)
         {
             this.Name = nameof(ElementDefinition);
+            this.Initialize();
             this.UpdateElementDefinition();
 
-            this.InitializeCommands();
             this.AddSubscriptions();
             this.UpdateProperties();
         }
@@ -178,8 +178,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Initializes the create <see cref="ReactiveCommand"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
         /// </summary>
-        protected void InitializeCommands()
+        protected override void InitializeCommands()
         {
+            base.InitializeCommands();
             this.ComputeNotContextDependentPermission();
 
             this.HighlightElementUsagesCommand = ReactiveCommand.Create();
@@ -192,9 +193,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Compute the permissions to create the different kinds of <see cref="ParameterType"/>s using the <see cref="IPermissionService"/>
         /// </summary>
-        public void ComputePermission()
+        public override void ComputePermission()
         {
             base.ComputePermission();
+
             if (this.SelectedThing == null)
             {
                 return;
@@ -291,7 +293,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
-        /// executes the <see cref="ChangeFocusCommand"/>
+        /// executes the <see cref="BrowserViewModel{T}.ChangeFocusCommand"/>
         /// </summary>
         protected override void ExecuteChangeFocusCommand()
         {
@@ -333,6 +335,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     Clipboard.SetText(thing.ModelCode);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Used to call virtual member when this gets initialized
+        /// </summary>
+        private void Initialize()
+        {
+            this.InitializeCommands();
         }
 
         /// <summary>
@@ -381,7 +391,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
-        /// Executes the <see cref="ShowElementUsagesCommand"/>.
+        /// Executes the <see cref="HighlightElementUsagesCommand"/>.
         /// </summary>
         protected virtual void ExecuteHighlightElementUsagesCommand()
         {
