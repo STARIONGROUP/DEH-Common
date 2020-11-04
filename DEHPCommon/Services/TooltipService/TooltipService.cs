@@ -186,7 +186,7 @@ namespace DEHPCommon.Services.TooltipService
             }
             else
             {
-                ProcessCategories(stringBuilder, categorizableThing, "ED Category");
+                ProcessCategories(stringBuilder, elementUsage.ElementDefinition, "ED Category");
             }
         }
 

@@ -36,7 +36,6 @@ namespace DEHPCommon.Tests.Converters
     using DEHPCommon.Services.IconCacheService;
     using DEHPCommon.Utilities;
 
-    using Moq;
     using NUnit.Framework;
 
     /// <summary>
@@ -85,12 +84,10 @@ namespace DEHPCommon.Tests.Converters
         [Test]
         public void VerifyThatConvertProvidesTheExpectedIconForParameterBaseWithOptionNoState()
         {
-            var generic = (BitmapImage)this.genericConverter.Convert(new object[] { new Option(), }, null, null, null);
-
             var parameter = new Parameter { ParameterType = new BooleanParameterType() };
-            var icon = this.converter.Convert(new object[] { parameter }, null, ClassKind.Option, null);
-            // overlay
-            Assert.IsTrue(icon is BitmapSource);
+            var icon = (BitmapImage)this.converter.Convert(new object[] { parameter }, null, ClassKind.Option, null);
+
+            Assert.IsNotNull(icon);
         }
 
         [Test]
@@ -104,7 +101,19 @@ namespace DEHPCommon.Tests.Converters
             // overlay
             Assert.AreEqual(generic.UriSource.ToString(), icon.UriSource.ToString());
         }
+        
+        [Test]
+        public void VerifyThatConvertProvidesTheExpectedIconForParameterBaseWithOption()
+        {
+            var generic = (BitmapImage)this.genericConverter.Convert(new object[] { new Parameter(), }, null, null, null);
 
+            var parameter = new Parameter { ParameterType = new TextParameterType() };
+            var icon = (BitmapImage)this.converter.Convert(new object[] { parameter }, null, ClassKind.Option, null);
+
+            Assert.IsNotNull(icon);
+            Assert.AreEqual(generic.UriSource.ToString(), icon.UriSource.ToString());
+        }
+        
         [Test]
         public void VerifyThatConvertBackThrowsException()
         {

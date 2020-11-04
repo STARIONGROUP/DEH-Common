@@ -155,6 +155,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.Refresh());
         }
 
         [TearDown]
@@ -188,10 +189,14 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             Assert.AreEqual(1, vm.ContainedRows.Count);
 
-            //Assert.IsNotNull(vm.ToolTip);
             Assert.IsNotNull(vm.DataSource);
             Assert.IsNotNull(vm.CurrentModel);
             Assert.IsNotNull(vm.DomainOfExpertise);
+            Assert.IsFalse(vm.HasUpdateStarted);
+            Assert.IsNull(vm.FocusedRow);
+            Assert.IsNull(vm.Feedback);
+            Assert.IsNotNull(vm.Identifier);
+
             Assert.AreEqual(0, vm.CurrentIteration);
 
             var row = (ElementDefinitionRowViewModel) vm.ContainedRows.First();            
@@ -402,6 +407,68 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.rev.SetValue(this.iteration, 51);
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.IsTrue(def2Row.IsTopElement);
+        }
+
+        [Test]
+        public void VerifyCommand()
+        {
+            var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ParameterType = this.pt
+            };
+
+            var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var usage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var paramOverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Parameter = parameter2
+            };
+
+            parameter2.ParameterType = this.pt;
+
+            var usage2 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ElementDefinition = def2
+            };
+
+            def2.Parameter.Add(parameter2);
+            usage.ParameterOverride.Add(paramOverride);
+            usage.ElementDefinition = def2;
+
+            this.elementDef.Parameter.Add(parameter);
+            this.elementDef.ParameterGroup.Add(group);
+            this.elementDef.ContainedElement.Add(usage);
+            this.elementDef.ContainedElement.Add(usage2);
+
+            this.iteration.Element.Add(this.elementDef);
+            this.iteration.Element.Add(def2);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object);
+            Assert.IsTrue(vm.ExportCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => vm.ExportCommand.Execute(null));
+
+            Assert.IsTrue(vm.HelpCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => vm.HelpCommand.Execute(null));
+
+            Assert.IsTrue(vm.RefreshCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => vm.RefreshCommand.Execute(null));
+            this.session.Verify(x => x.Refresh(), Times.Once);
+
+            Assert.IsTrue(vm.ExpandRowsCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => vm.ExpandRowsCommand.Execute(null));
+
+            Assert.IsTrue(vm.CollpaseRowsCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => vm.CollpaseRowsCommand.Execute(null));
+
+            vm.SelectedThing = vm.ContainedRows.First();
+            Assert.DoesNotThrow(() => vm.ExpandRowsCommand.Execute(null));
+            Assert.DoesNotThrow(() => vm.CollpaseRowsCommand.Execute(null));
+            Assert.IsTrue(vm.ChangeFocusCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => vm.ChangeFocusCommand.Execute(null));
         }
     }
 }

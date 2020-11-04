@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HighlightByCategoryEvent.cs" company="RHEA System S.A.">
+// <copyright file="ContextMenuItemViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2020 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -15,38 +15,42 @@
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with this program; if not, write to the Free Software Foundation,
 //    Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Events
+using NUnit.Framework;
+
+namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 {
+    using System;
+
     using CDP4Common.CommonData;
-    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.EngineeringModelData;
 
-    /// <summary>
-    /// The purpose of the <see cref="HighlightByCategoryEvent"/> is to notify an observer
-    /// that it has to highlight if it is categorized by the provided <see cref="CDP4Common.SiteDirectoryData.Category"/>.
-    /// </summary>
-    public class HighlightByCategoryEvent
+    using DEHPCommon.Enumerators;
+    using DEHPCommon.UserInterfaces.ViewModels;
+
+    [TestFixture]
+    public class ContextMenuItemViewModelTestFixture
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HighlightByCategoryEvent"/> class.
-        /// </summary>
-        /// <param name="category">
-        /// The payload <see cref="Category"/> to highlight <see cref="Thing"/>s by.
-        /// </param>
-        public HighlightByCategoryEvent(Category category)
+        [Test]
+        public void VerifyProperties()
         {
-            this.Category = category;
-        }
+            var parameter = new Parameter();
+            var vm = new ContextMenuItemViewModel("test", "Ctrl+Alt+Del", thing => { }, parameter, true, MenuItemKind.Export);
 
-        /// <summary>
-        /// Gets or sets the <see cref="Category"/> by which <see cref="Thing"/>s should be highlighted.
-        /// </summary>
-        public Category Category { get; set; }
+            Assert.AreEqual("test", vm.Header);
+            Assert.AreEqual(parameter, vm.RelatedThing);
+            Assert.IsNotNull(vm.MenuCommand);
+            Assert.IsTrue(vm.MenuCommand.CanExecute(null));
+            Assert.AreEqual(MenuItemKind.Export, vm.MenuItemKind);
+            Assert.AreEqual(parameter.ClassKind, vm.ThingKind);
+            Assert.AreEqual("Ctrl+Alt+Del", vm.InputGestureText);
+            Assert.IsNull(vm.SubMenu);
+        }
     }
 }

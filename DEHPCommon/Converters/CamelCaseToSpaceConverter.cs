@@ -22,14 +22,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Enumerators
+namespace DEHPCommon.Converters
 {
     using System;
     using System.Text.RegularExpressions;
     using System.Windows.Data;
 
     /// <summary>
-    /// The purpose of the <see cref="CamelCaseToSpaceConverter"/> is to return aa string with spaces based on the original's CamelCase.
+    /// The purpose of the <see cref="CamelCaseToSpaceConverter"/> is to return a string with spaces based on the original's CamelCase.
     /// </summary>
     public class CamelCaseToSpaceConverter : IValueConverter
     {

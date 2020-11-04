@@ -36,6 +36,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
+    using DEHPCommon.Converters;
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -124,14 +125,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             get => this.domainOfExpertise;
             protected set => this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value);
         }
-
-        /// <summary>
-        /// Gets a value indicating whether the browser is dirty
-        /// </summary>
-        /// <remarks>
-        /// May be overriden to show a confirmation on close
-        /// </remarks>
-        public virtual bool IsDirty => false;
 
         /// <summary>
         /// Gets or sets the Inspect Command
@@ -241,24 +234,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Gets the unique identifier of the view-model
         /// </summary>
         public Guid Identifier { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the Caption
-        /// </summary>
-        public string Caption
-        {
-            get => this.caption;
-            protected set => this.RaiseAndSetIfChanged(ref this.caption, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the ToolTip of the control
-        /// </summary>
-        public string ToolTip
-        {
-            get => this.tooltip;
-            protected set => this.RaiseAndSetIfChanged(ref this.tooltip, value);
-        }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModel{T}"/> class
@@ -354,36 +329,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.Logger.Info("Help Command called");
         }
         
-        /// <summary>
-        /// Gets a value indicating whether it is possible to Delete the Selected Thing />
-        /// </summary>
-        /// <param name="thing">The <see cref="Thing"/> that needs to be checked</param>
-        /// <returns>True if delete is allowed, otherwise false</returns>
-        protected virtual bool IsDeleteAllowed(Thing thing) => true;
-
-        /// <summary>
-        /// Write the inline operations to the Data-access-layer
-        /// </summary>
-        /// <param name="transaction">The <see cref="ThingTransaction"/> that contains the operations</param>
-        protected async Task DalWrite(ThingTransaction transaction)
-        {
-            try
-            {
-                this.IsBusy = true;
-                var operationContainer = transaction.FinalizeTransaction();
-                await this.Session.Write(operationContainer);
-            }
-            catch (Exception exception)
-            {
-                this.Logger.Error(exception, "The inline update operation failed");
-                this.Feedback = exception.Message;
-            }
-            finally
-            {
-                this.IsBusy = false;
-            }
-        }
-
         /// <summary>
         /// Gets the default thing class kind string to use before a row is selected
         /// </summary>

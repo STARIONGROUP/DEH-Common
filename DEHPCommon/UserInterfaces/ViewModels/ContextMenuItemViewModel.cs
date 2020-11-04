@@ -58,7 +58,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.InputGestureText = inputGestureText;
             this.MenuCommand = command;
             this.MenuItemKind = menuItemKind;
-            this.thingKind = thingKind;
+            this.ThingKind = thingKind;
             this.SubMenu = new List<ContextMenuItemViewModel>();
         }
 
@@ -80,7 +80,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.InputGestureText = inputGestureText;
             this.RelatedThing = thing;
             this.MenuItemKind = menuItemKind;
-            this.thingKind = thing.ClassKind;
+            this.ThingKind = thing.ClassKind;
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets the <see cref="ClassKind"/> this menu-item operates on
         /// </summary>
-        public ClassKind thingKind { get; private set; }
+        public ClassKind ThingKind { get; private set; }
 
         /// <summary>
         /// Gets the sub-menu of this <see cref="ContextMenuItemViewModel"/>

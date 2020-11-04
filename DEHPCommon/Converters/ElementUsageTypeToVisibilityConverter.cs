@@ -61,10 +61,10 @@ namespace DEHPCommon.Converters
         /// <param name="targetType"> The target type. </param>
         /// <param name="parameter"> The parameter passed on to this conversion. </param>
         /// <param name="culture"> The culture information. </param>
-        /// <returns> Throws <see cref="NotImplementedException"/> always. </returns>
+        /// <returns> Throws <see cref="NotSupportedException"/> always. </returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

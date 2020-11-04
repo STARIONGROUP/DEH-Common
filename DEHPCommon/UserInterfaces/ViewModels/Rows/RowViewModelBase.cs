@@ -38,6 +38,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using DEHPCommon.Converters;
     using DEHPCommon.Enumerators;
     using DEHPCommon.Events;
     using DEHPCommon.Mvvm;
