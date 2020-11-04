@@ -103,8 +103,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// Throws a <see cref="InvalidOperationException"/> if this <see cref="Thing"/> <see cref="ParameterType"/> is a <see cref="CompoundParameterType"/>,
         /// Throws a <see cref="IndexOutOfRangeException"/> if the <paramref name="valueIndex"/> is bigger or even with the <see cref="ParameterType"/> component count,
-        /// Throws a <see cref="ArgumentNullException"/> if the <param name="containerRow"> is null</param> 
-        /// </summary
+        /// Throws a <see cref="ArgumentNullException"/> if the <paramref name="containerRow"/> is null
+        /// </summary>
         /// <param name="valueIndex">The value index</param>
         /// <param name="containerRow">The <see cref="IViewModelBase{T}"/> Container</param>
         /// <returns>A <see cref="CompoundParameterType"/></returns>

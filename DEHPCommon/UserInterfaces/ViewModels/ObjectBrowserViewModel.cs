@@ -42,7 +42,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// The <see cref="ObjectBrowserViewModel"/> is a View Model that is responsible for managing the data and interactions with that data for a view
     /// that shows all the <see cref="Thing"/>s contained by a data-source following the containment tree that is modelled in 10-25 and the CDP4 extensions.
     /// </summary>
-    public class ObjectBrowserViewModel : ReactiveObject, IObjectBrowserViewModel
+    public class ObjectBrowserViewModel : ReactiveObject, IObjectBrowserViewModel, IDisposable
     {
         /// <summary>
         /// The <see cref="IHubController"/>
@@ -130,6 +130,21 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         public void Dispose()
         {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose of this <see cref="ObjectBrowserViewModel"/>
+        /// </summary>
+        /// <param name="disposing">Assert whether to dispose of this.<see cref="IDisposable"/></param>
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
             foreach (var disposable in this.Disposables)
             {
                 disposable.Dispose();

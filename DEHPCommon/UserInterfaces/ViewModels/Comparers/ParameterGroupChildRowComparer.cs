@@ -26,7 +26,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
@@ -40,16 +39,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
     /// </summary>
     public class ParameterGroupChildRowComparer : BaseChildRowComparer, IComparer<IRowViewModelBase<Thing>>
     {
-        /// <summary>
-        /// The Permissible Kind of child <see cref="IRowViewModelBase{T}"/>
-        /// </summary>
-        private static readonly List<Type> PermissibleRowTypes = new List<Type>
-        {
-            typeof(ParameterOrOverrideBaseRowViewModel),
-            typeof(ParameterSubscriptionRowViewModel),
-            typeof(ParameterGroupRowViewModel)
-        };
-
         /// <summary>
         /// Compares two <see cref="IRowViewModelBase{Thing}"/> of the same type
         /// </summary>

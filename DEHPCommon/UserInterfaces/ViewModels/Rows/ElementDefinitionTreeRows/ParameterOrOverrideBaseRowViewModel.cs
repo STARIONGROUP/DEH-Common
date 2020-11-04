@@ -51,7 +51,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// The active participant.
         /// </summary>
-        protected Participant activeParticipant;
+        protected Participant ActiveParticipant;
 
         /// <summary>
         /// Backing field for <see cref="IsPublishable"/>
@@ -74,7 +74,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             : base(parameterOrOverrideBase, session, containerViewModel)
         {
             var engineeringModel = (EngineeringModel)this.Thing.TopContainer;
-            this.activeParticipant = engineeringModel.GetActiveParticipant(this.Session.ActivePerson);
+            this.ActiveParticipant = engineeringModel.GetActiveParticipant(this.Session.ActivePerson);
             this.SetOwnerValue();
         }
         
@@ -151,8 +151,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <remarks>
         /// Refreshes the container view-model of this row, i.e. <see cref="ElementDefinitionRowViewModel"/> or <see cref="ElementUsageRowViewModel"/> to re-draw its rows
         /// </remarks>
-        private void UpdateProperties()
+        protected override void UpdateProperties()
         {
+            base.UpdateProperties();
             this.SetOwnerValue();
 
             // refresh the container row if this is replaced by a subscription
