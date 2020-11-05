@@ -157,6 +157,15 @@ namespace DEHPCommon.Tests.HubController
         }
 
         [Test]
+        public void VerifyProperties()
+        {
+            Assert.IsFalse(this.hubController.IsSessionOpen);
+            Assert.IsNull(this.hubController.OpenIteration);
+            Assert.IsNotNull(this.hubController.Session);
+            Assert.IsNull(this.hubController.CurrentDomainOfExpertise);
+        }
+
+        [Test]
         public async Task VerifyCreateOrUpdate()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
@@ -188,14 +197,6 @@ namespace DEHPCommon.Tests.HubController
             Assert.ThrowsAsync<InvalidOperationException>(async () => await this.hubController.Delete(thingsToDelete));
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
-        }
-
-        [Test]
-        public void VerifyIsSessionOpen()
-        {
-            Assert.IsFalse(this.hubController.IsSessionOpen);
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
-            Assert.IsTrue(this.hubController.IsSessionOpen);
         }
 
         [Test]
@@ -251,12 +252,12 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public void VerifyClose()
         {
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(default(SiteDirectory));
-            Assert.DoesNotThrow(() => this.hubController.Close());
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
+            this.hubController.IsSessionOpen = true;
             this.session.Setup(x => x.Close()).Returns(Task.CompletedTask);
             Assert.DoesNotThrow(() => this.hubController.Close());
             this.session.Setup(x => x.Close()).Throws<Exception>();
+            Assert.DoesNotThrow(() => this.hubController.Close());
+            this.hubController.IsSessionOpen = true;
             Assert.DoesNotThrow(() => this.hubController.Close());
         }
 
@@ -267,6 +268,11 @@ namespace DEHPCommon.Tests.HubController
             this.session.Setup(x => x.OpenIterations).Returns(default(IReadOnlyDictionary<Iteration, Tuple<DomainOfExpertise, Participant>>));
             Assert.IsNull(this.hubController.GetIteration());
             this.session.Setup(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>())).Returns(Task.CompletedTask);
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>()
+            {
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)}
+
+            });
             Assert.DoesNotThrowAsync(async () => await this.hubController.GetIteration(this.iteration, this.domain));
         }
 

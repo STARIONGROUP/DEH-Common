@@ -24,7 +24,7 @@
 namespace DEHPCommon.UserInterfaces.ViewModels.Rows
 {
     using CDP4Common.SiteDirectoryData;
-
+    
     using ReactiveUI;
 
     /// <summary>

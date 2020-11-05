@@ -30,6 +30,7 @@ namespace DEHPCommon
     using DEHPCommon.Services.FileDialogService;
     using DEHPCommon.Services.IconCacheService;
     using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -55,6 +56,7 @@ namespace DEHPCommon
             containerBuilder.RegisterType<HubController.HubController>().As<IHubController>().SingleInstance();
             containerBuilder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
             containerBuilder.RegisterType<OpenSaveFileDialogService>().As<IOpenSaveFileDialogService>().SingleInstance();
+            containerBuilder.RegisterType<ObjectBrowserTreeSelectorService>().As<IObjectBrowserTreeSelectorService>().SingleInstance();
             Container = containerBuilder.Build();
         }
 
@@ -65,6 +67,8 @@ namespace DEHPCommon
         private static void RegisterViewModels(ContainerBuilder containerBuilder)
         {
             containerBuilder.RegisterType<LoginViewModel>().As<ILoginViewModel>();
+            containerBuilder.RegisterType<ObjectBrowserViewModel>().As<IObjectBrowserViewModel>();
+            containerBuilder.RegisterType<HubBrowserHeaderViewModel>().As<IHubBrowserHeaderViewModel>();
         }
     }
 }

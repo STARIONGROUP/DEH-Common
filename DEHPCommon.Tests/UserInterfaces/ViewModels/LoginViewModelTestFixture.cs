@@ -41,9 +41,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using DEHPCommon.UserPreferenceHandler.Enums;
 
     using Moq;
-
-    using NLog.Config;
-
+    
     using NUnit.Framework;
 
     using ReactiveUI;
