@@ -26,7 +26,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 {
     using System;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -34,7 +33,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
 
     using DEHPCommon.Converters;
     using DEHPCommon.Enumerators;
@@ -93,16 +91,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private bool canWriteSelectedThing;
         
-        /// <summary>
-        /// Backing Field for Caption
-        /// </summary>
-        private string caption;
-
-        /// <summary>
-        /// Backing Field For ToolTip
-        /// </summary>
-        private string tooltip;
-
         /// <summary>
         /// Backing field for <see cref="DomainOfExpertise"/>
         /// </summary>

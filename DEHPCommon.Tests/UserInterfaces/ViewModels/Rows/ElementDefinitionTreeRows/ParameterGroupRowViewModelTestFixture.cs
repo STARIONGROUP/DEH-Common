@@ -40,6 +40,8 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
     using CDP4Dal.Permission;
 
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Events;
+    using DEHPCommon.UserInterfaces.ViewModels.Rows;
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using Moq;
@@ -113,6 +115,26 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         public void TearDown()
         {
             CDPMessageBus.Current.ClearSubscriptions();
+        }
+
+        [Test]
+        public void VerifyHiglightingWorks()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var parameterGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "TestName" };
+            elementDefinition.ParameterGroup.Add(parameterGroup);
+
+            this.iteration.Element.Add(elementDefinition);
+
+            var row = new ParameterGroupRowViewModel(parameterGroup, domainOfExpertise, this.session.Object, null);
+
+            CDPMessageBus.Current.SendMessage(new HighlightEvent(row.Thing), row.Thing);
+            Assert.IsTrue(row.IsHighlighted);
+            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            Assert.IsFalse(row.IsHighlighted);
         }
 
         [Test]

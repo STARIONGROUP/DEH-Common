@@ -252,12 +252,12 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public void VerifyClose()
         {
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(default(SiteDirectory));
-            Assert.DoesNotThrow(() => this.hubController.Close());
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
+            this.hubController.IsSessionOpen = true;
             this.session.Setup(x => x.Close()).Returns(Task.CompletedTask);
             Assert.DoesNotThrow(() => this.hubController.Close());
             this.session.Setup(x => x.Close()).Throws<Exception>();
+            Assert.DoesNotThrow(() => this.hubController.Close());
+            this.hubController.IsSessionOpen = true;
             Assert.DoesNotThrow(() => this.hubController.Close());
         }
 

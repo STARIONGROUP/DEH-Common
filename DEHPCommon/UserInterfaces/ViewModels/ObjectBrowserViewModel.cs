@@ -83,7 +83,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.hubController = hubController;
             this.objectBrowserTreeSelectorService = objectBrowserTreeSelectorService;
             this.Caption = "Hub Object Browser";
-            
+
             this.WhenAnyValue(x => x.hubController.OpenIteration).Where(x => x != null).ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
@@ -101,7 +101,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
             foreach (var thingKind in this.objectBrowserTreeSelectorService.ThingKinds)
             {
-                if (thingKind == typeof(ElementDefinition) && this.Things.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.hubController.OpenIteration.Iid))
+                if (thingKind == typeof(ElementDefinition) && 
+                    this.Things.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.hubController.OpenIteration.Iid))
                 {
                     this.Things.Add(new ElementDefinitionsBrowserViewModel(this.hubController.OpenIteration, this.hubController.Session));
                 }
@@ -138,7 +139,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Dispose of this <see cref="ObjectBrowserViewModel"/>
         /// </summary>
         /// <param name="disposing">Assert whether to dispose of this.<see cref="IDisposable"/></param>
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {

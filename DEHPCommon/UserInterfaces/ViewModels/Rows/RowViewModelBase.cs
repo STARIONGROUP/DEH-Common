@@ -286,48 +286,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         protected virtual void UpdateThingStatus()
         {
         }
-
-        /// <summary>
-        /// Compute the rows to remove and to add from a <see cref="IEnumerable{TThing}"/> compared to the <see cref="ContainedRows"/> list
-        /// </summary>
-        /// <typeparam name="TThing">The type of <see cref="Thing"/> represented by the rows</typeparam>
-        /// <param name="currentThings">The current <see cref="IEnumerable{TThing}"/> that shall be represented</param>
-        /// <param name="addRowMethod">The method that instantiates and adds the rows to the <see cref="ContainedRows"/> list</param>
-        protected void ComputeRows<TThing>(IEnumerable<TThing> currentThings, Action<TThing> addRowMethod) where TThing : Thing
-        {
-            var current = currentThings.ToArray();
-
-            var existingRowThing = this.ContainedRows.Where(x => x.Thing is TThing).Select(x => (TThing) x.Thing).ToArray();
-
-            var newThing = current.Except(existingRowThing);
-
-            var oldThing = existingRowThing.Except(current);
-
-            foreach (var thing in oldThing)
-            {
-                this.RemoveRow(thing);
-            }
-
-            foreach (var thing in newThing)
-            {
-                addRowMethod(thing);
-            }
-        }
-
-        /// <summary>
-        /// Remove and dispose the row associated to the <paramref name="removedThing"/>
-        /// </summary>
-        /// <param name="removedThing">The <see cref="Thing"/> which associated row shall be removed</param>
-        protected void RemoveRow(Thing removedThing)
-        {
-            var row = this.ContainedRows.SingleOrDefault(rowViewModel => rowViewModel.Thing == removedThing);
-
-            if (row != null)
-            {
-                this.ContainedRows.RemoveAndDispose(row);
-            }
-        }
-
+        
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for highlight of row
         /// on the <see cref="Thing"/> that is being represented by the view-model

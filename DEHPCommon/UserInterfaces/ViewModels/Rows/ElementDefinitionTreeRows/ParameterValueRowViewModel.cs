@@ -147,68 +147,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         public ClassKind ParameterTypeClassKind { get; protected set; }
 
-
-        /// <summary>
-        /// Gets a value indicating whether the <see cref="ParameterType"/> of this <see cref="Parameter"/> is a <see cref="EnumerationParameterType"/>
-        /// </summary>
-        public bool IsMultiSelect
-        {
-            get
-            {
-                if (this.Thing.ParameterType is EnumerationParameterType enumPt)
-                {
-                    return enumPt.AllowMultiSelect;
-                }
-
-                if (!(this.Thing.ParameterType is CompoundParameterType cpt))
-                {
-                    return false;
-                }
-
-                enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
-                
-                if (enumPt == null)
-                {
-                    return false;
-                }
-
-                return enumPt.AllowMultiSelect;
-            }
-        }
-
-        /// <summary>
-        /// Gets the list of possible <see cref="EnumerationValueDefinition"/> for this <see cref="Parameter"/>
-        /// </summary>
-        public ReactiveList<EnumerationValueDefinition> EnumerationValueDefinition
-        {
-            get
-            {
-                var enumValues = new ReactiveList<EnumerationValueDefinition>();
-
-                if (this.Thing == null)
-                {
-                    return enumValues;
-                }
-
-                if (this.Thing.ParameterType is EnumerationParameterType enumPt)
-                {
-                    enumValues.AddRange(enumPt.ValueDefinition);
-                    return enumValues;
-                }
-
-                if (this.Thing.ParameterType is CompoundParameterType cpt)
-                {
-                    enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
-                    if (enumPt != null)
-                    {
-                        enumValues.AddRange(enumPt.ValueDefinition);
-                    }
-                }
-
-                return enumValues;
-            }
-        }
-
         /// <summary>
         /// Gets or sets the Formula column value
         /// </summary>
@@ -441,49 +379,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetValues());
+            
             this.Disposables.Add(listener);
 
             var subscribedListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing.SubscribedValueSet)
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetValues());
+            
             this.Disposables.Add(subscribedListener);
-
             this.isValueSetListenerInitialized = true;
-        }
-
-        /// <summary>
-        /// Update the clone of the <see cref="ParameterValueSetBase"/> represented by this row
-        /// </summary>
-        /// <param name="valueset">The clone of the <see cref="ParameterValueSetBase"/> to update</param>
-        private void UpdateValueSet(ParameterValueSetBase valueset)
-        {
-            if (this.ContainerViewModel is ParameterValueRowViewModel parameterValueBaseRow)
-            {
-                parameterValueBaseRow.UpdateValueSet(valueset);
-            }
-
-            if (this.ContainerViewModel is ParameterOrOverrideBaseRowViewModel parameterOrOverrideRow)
-            {
-                parameterOrOverrideRow.UpdateValueSets(valueset);
-            }
-        }
-
-        /// <summary>
-        /// Update the clone of the <see cref="ParameterSubscriptionValueSet"/> represented by this row
-        /// </summary>
-        /// <param name="valueset">The clone of the <see cref="ParameterSubscriptionValueSet"/> to update</param>
-        private void UpdateValueSet(ParameterSubscriptionValueSet valueset)
-        {
-            if (this.ContainerViewModel is ParameterValueRowViewModel parameterValueBaseRow)
-            {
-                parameterValueBaseRow.UpdateValueSet(valueset);
-            }
-
-            if (this.ContainerViewModel is ParameterSubscriptionRowViewModel parameterSubscriptionRow)
-            {
-                parameterSubscriptionRow.UpdateValueSets(valueset);
-            }
         }
 
         /// <summary>

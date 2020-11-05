@@ -59,8 +59,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         public string Name
         {
-            get { return this.name; }
-            set { this.RaiseAndSetIfChanged(ref this.name, value); }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -68,8 +68,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         public ParameterGroup ContainingGroup
         {
-            get { return this.containingGroup; }
-            set { this.RaiseAndSetIfChanged(ref this.containingGroup, value); }
+            get => this.containingGroup;
+            set => this.RaiseAndSetIfChanged(ref this.containingGroup, value);
         }
 
         /// <summary>
