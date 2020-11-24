@@ -9,7 +9,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors" 
         Title="Connections"
-        mc:Ignorable="d" Height="422" d:DesignWidth="409" MinWidth="400"  Width="400">
+        mc:Ignorable="d" Height="422" d:DesignWidth="409" MinWidth="600"  Width="400">
     <dxmvvm:Interaction.Behaviors>
         <behaviors:CloseWindowBehavior/>
     </dxmvvm:Interaction.Behaviors>
