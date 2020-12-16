@@ -2,7 +2,7 @@
 // <copyright file="LoginViewModel.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -31,19 +31,23 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
-    using CDP4Common.EngineeringModelData;
-
     using CDP4Dal.DAL;
 
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.Behaviors;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Rows;
+    using DEHPCommon.UserPreferenceHandler;
     using DEHPCommon.UserPreferenceHandler.Enums;
+    using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
     using NLog;
 
     using ReactiveUI;
+
+    using EngineeringModel = CDP4Common.EngineeringModelData.EngineeringModel;
+    using Iteration = CDP4Common.EngineeringModelData.Iteration;
+    using UserPreference = UserPreferenceHandler.UserPreference;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different datasources
@@ -59,6 +63,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// The <see cref="IHubController"/> instance
         /// </summary>
         private readonly IHubController hubController;
+
+        /// <summary>
+        /// The <see cref="IUserPreferenceService{UserPreference}"/> instance
+        /// </summary>
+        private readonly IUserPreferenceService<UserPreference> userPreferenceService;
 
         /// <summary>
         /// Gets or sets datasource server type
@@ -126,17 +135,31 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="LoginSuccessfull"/> property
+        /// Backing field for <see cref="SavedUris"/>
         /// </summary>
-        private bool loginSuccessfull;
+        private ReactiveList<string> savedUris;
+
+        /// <summary>
+        /// Gets or sets the saved server addresses
+        /// </summary>
+        public ReactiveList<string> SavedUris
+        {
+            get => this.savedUris;
+            set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="LoginSuccessful"/> property
+        /// </summary>
+        private bool loginSuccessful;
 
         /// <summary>
         /// Gets or sets login succesfully flag
         /// </summary>
-        public bool LoginSuccessfull
+        public bool LoginSuccessful
         {
-            get => this.loginSuccessfull;
-            private set => this.RaiseAndSetIfChanged(ref this.loginSuccessfull, value);
+            get => this.loginSuccessful;
+            private set => this.RaiseAndSetIfChanged(ref this.loginSuccessful, value);
         }
 
         /// <summary>
@@ -226,6 +249,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
+        /// Gets the command responsible for adding the current <see cref="Uri"/> to <see cref="SavedUris"/>
+        /// </summary>
+        public ReactiveCommand<object> SaveCurrentUriCommand { get; private set; }
+
+        /// <summary>
         /// Gets the server login command
         /// </summary>
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
@@ -244,9 +272,23 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
-        public LoginViewModel(IHubController hubController)
+        /// <param name="userPreferenceService">The <see cref="IUserPreferenceService{AppSettings}"/></param>
+        public LoginViewModel(IHubController hubController, IUserPreferenceService<UserPreference> userPreferenceService)
         {
             this.hubController = hubController;
+            this.userPreferenceService = userPreferenceService;
+
+            this.SavedUris = new ReactiveList<string> { ChangeTrackingEnabled = true };
+
+            var canSaveUri = this.WhenAnyValue(
+                vm => vm.Uri,
+                vm => vm.SavedUris,
+                (uri, savedUris) => !string.IsNullOrWhiteSpace(uri) && !savedUris.Contains(uri));
+
+            this.SaveCurrentUriCommand = ReactiveCommand.Create(canSaveUri);
+            this.SaveCurrentUriCommand.Subscribe(_ => this.ExecuteSaveCurrentUri());
+
+            this.PopulateSavedUris();
 
             var canLogin = this.WhenAnyValue(
                 vm => vm.SelectedServerType,
@@ -260,7 +302,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.WhenAnyValue(x => x.SelectedIteration).Where(x => x != null).Subscribe(_ => this.PopulateDomainOfExpertise());
             
             var canClose = this.WhenAnyValue(
-                x => x.LoginSuccessfull, 
+                x => x.LoginSuccessful, 
                 x => x.SelectedIteration,
                 x => x.SelectedEngineeringModel,
                 x => x.SelectedDomainOfExpertise,
@@ -270,8 +312,28 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, async _ => await this.ExecuteLogin());
             this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose, async _ => await this.CloseCommandExecute());
 
-            this.LoginSuccessfull = false;
+            this.LoginSuccessful = false;
             this.LoginFailed = false;
+        }
+
+        /// <summary>
+        /// Loads the saved server addresses into the <see cref="SavedUris"/>
+        /// </summary>
+        private void PopulateSavedUris()
+        {
+            this.userPreferenceService.Read();
+            this.SavedUris = new ReactiveList<string>(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Select(i => i.Uri));
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SaveCurrentUriCommand"/>
+        /// </summary>
+        private void ExecuteSaveCurrentUri()
+        {
+            var serverConnection = new ServerConnection { ServerType = this.SelectedServerType.Key, Uri = this.Uri};
+            this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(serverConnection);
+            this.userPreferenceService.Save();
+            this.PopulateSavedUris();
         }
 
         /// <summary>
@@ -306,13 +368,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private async Task ExecuteLogin()
         {
             this.LogMessage = "Loggin in...";
-            this.LoginSuccessfull = false;
+            this.LoginSuccessful = false;
             this.LoginFailed = false;
 
             try
             {
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
-                this.LoginSuccessfull = await this.hubController.Open(credentials, this.SelectedServerType.Key);
+                this.LoginSuccessful = await this.hubController.Open(credentials, this.SelectedServerType.Key);
                 this.PopulateEngineeringModels();
                 this.LogMessage = "Loggin successful";
             }

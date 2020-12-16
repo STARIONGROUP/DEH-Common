@@ -38,13 +38,17 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Tabs;
+    using DEHPCommon.UserPreferenceHandler;
     using DEHPCommon.UserPreferenceHandler.Enums;
+    using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
     using Moq;
     
     using NUnit.Framework;
 
     using ReactiveUI;
+
+    using UserPreference = DEHPCommon.UserPreferenceHandler.UserPreference;
 
     /// <summary>
     /// Suite of tests for the <see cref="LoginViewModelTestFixture"/> class.
@@ -54,6 +58,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     {
         private Mock<ISession> session;
         private Mock<IHubController> hubController;
+        private Mock<IUserPreferenceService<UserPreference>> userPreferenceService;
         private LoginViewModel loginViewModel;
         private LoginLayoutGroupViewModel loginLayoutGroupViewModel;
         
@@ -115,7 +120,10 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
                     }
                 });
 
-            this.loginViewModel = new LoginViewModel(this.hubController.Object);
+            this.userPreferenceService = new Mock<IUserPreferenceService<UserPreference>>();
+            this.userPreferenceService.SetupProperty(s => s.UserPreferenceSettings, new UserPreference { SavedServerConections = new List<ServerConnection>() });
+
+            this.loginViewModel = new LoginViewModel(this.hubController.Object, this.userPreferenceService.Object);
             this.loginLayoutGroupViewModel = new LoginLayoutGroupViewModel { LoginViewModel = this.loginViewModel };
 
             this.serverType = new KeyValuePair<ServerType, string>(ServerType.Cdp4WebServices, "CDP4 WebServices");
@@ -144,12 +152,12 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         public async Task Verify_that_ExecuteLogin_in_LoginViewModel_is_execute_correctly()
         {
             Assert.That(this.loginViewModel.LoginFailed, Is.False);
-            Assert.That(this.loginViewModel.LoginSuccessfull, Is.False);
+            Assert.That(this.loginViewModel.LoginSuccessful, Is.False);
 
             await this.loginViewModel.LoginCommand.ExecuteAsyncTask();
 
             Assert.That(this.loginViewModel.LoginFailed, Is.True);
-            Assert.That(this.loginViewModel.LoginSuccessfull, Is.False);
+            Assert.That(this.loginViewModel.LoginSuccessful, Is.False);
 
             this.loginViewModel.SelectedServerType = this.serverType;
             this.loginViewModel.Uri = this.uri;
@@ -158,7 +166,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             await this.loginViewModel.LoginCommand.ExecuteAsyncTask();
 
-            Assert.That(this.loginViewModel.LoginSuccessfull, Is.True);
+            Assert.That(this.loginViewModel.LoginSuccessful, Is.True);
             Assert.That(this.loginViewModel.LoginFailed, Is.False);
         }
 
@@ -187,7 +195,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             await this.loginViewModel.LoginCommand.ExecuteAsyncTask();
 
-            Assert.IsTrue(this.loginViewModel.LoginSuccessfull);
+            Assert.IsTrue(this.loginViewModel.LoginSuccessful);
             Assert.IsNotEmpty(this.loginViewModel.EngineeringModels);
 
             this.loginViewModel.SelectedEngineeringModel = this.loginViewModel.EngineeringModels.First();
@@ -198,6 +206,22 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             
             this.loginViewModel.SelectedDomainOfExpertise = this.loginViewModel.DomainsOfExpertise.FirstOrDefault();
             Assert.IsTrue(this.loginViewModel.CloseCommand.CanExecute(null));
+        }
+
+        [Test]
+        public void VerifyThat_SaveCurrentUriCommand_IsWorkingProperly()
+        {
+            Assert.IsFalse(this.loginViewModel.SaveCurrentUriCommand.CanExecute(null));
+
+            this.loginViewModel.Uri = "u://r.l";
+            Assert.IsTrue(this.loginViewModel.SaveCurrentUriCommand.CanExecute(null));
+            
+            this.loginViewModel.SaveCurrentUriCommand.Execute(null);
+
+            CollectionAssert.Contains(this.loginViewModel.SavedUris, "u://r.l");
+            Assert.AreEqual(1, this.loginViewModel.SavedUris.Count);
+
+            Assert.IsFalse(this.loginViewModel.SaveCurrentUriCommand.CanExecute(null));
         }
     }
 }
