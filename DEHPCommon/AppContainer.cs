@@ -33,6 +33,8 @@ namespace DEHPCommon
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+    using DEHPCommon.UserPreferenceHandler;
+    using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
     /// <summary>
     /// Provides the IOContainer for DI for this Application
@@ -57,6 +59,7 @@ namespace DEHPCommon
             containerBuilder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
             containerBuilder.RegisterType<OpenSaveFileDialogService>().As<IOpenSaveFileDialogService>().SingleInstance();
             containerBuilder.RegisterType<ObjectBrowserTreeSelectorService>().As<IObjectBrowserTreeSelectorService>().SingleInstance();
+            containerBuilder.RegisterType<UserPreferenceService<UserPreference>>().As<IUserPreferenceService<UserPreference>>().SingleInstance();
             Container = containerBuilder.Build();
         }
 

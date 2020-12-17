@@ -2,7 +2,7 @@
 // <copyright file="ILoginViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2020 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -65,7 +65,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets or sets login succesfully flag
         /// </summary>
-        bool LoginSuccessfull { get; }
+        bool LoginSuccessful { get; }
 
         /// <summary>
         /// Gets or sets login failed flag

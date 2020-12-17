@@ -17,10 +17,10 @@
         <ResourceDictionary>
             <Style x:Key="IsReadOnlyStyle" TargetType="{x:Type Control}">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding LoginSuccessfull}" Value="True">
+                    <DataTrigger Binding="{Binding LoginSuccessful}" Value="True">
                         <Setter Property="IsEnabled" Value="False" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding LoginSuccessfull}" Value="False">
+                    <DataTrigger Binding="{Binding LoginSuccessful}" Value="False">
                         <Setter Property="IsEnabled" Value="True" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -46,39 +46,60 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="140" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
 
             <!--  Data source type  -->
             <dxlc:LayoutItemLabel Grid.Row="0" Grid.Column="0" Height="Auto" Margin="5" Content="Data Source" />
-            <ComboBox Style="{StaticResource IsReadOnlyStyle}" Grid.Row="0" Grid.Column="1" Name="ServerType" Margin="5" DisplayMemberPath="Value" FontSize="12"
+            <ComboBox Style="{StaticResource IsReadOnlyStyle}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="ServerType" Margin="5" DisplayMemberPath="Value" FontSize="12"
                               ItemsSource="{Binding DataSourceList, Mode=OneTime}"
                               SelectedItem="{Binding Path=SelectedServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValuePath="Key" />
 
             <!--  Server Address  -->
             <dxlc:LayoutItemLabel Grid.Row="1" Grid.Column="0" Height="Auto" Margin="5" Content="Server address" FontSize="12" />
-            <dxe:TextEdit Style="{StaticResource IsReadOnlyStyle}" Grid.Row="1" Grid.Column="1" Height="Auto" Margin="5" FontSize="12" Text="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1"
+                              Height="Auto"
+                              Margin="5"
+                              FontSize="12"
+                              AutoComplete="True"
+                              AllowRejectUnknownValues="False"
+                              IncrementalFiltering="True"
+                              EditValue="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ItemsSource="{Binding SavedUris}">
+            </dxe:ComboBoxEdit>
+            <Button Grid.Row="1" Grid.Column="2"
+                    MinWidth="40"
+                    Height="Auto"
+                    MaxWidth="40"
+                    Margin="5"
+                    FontSize="12"
+                    Command="{Binding SaveCurrentUriCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{dx:DXImage Image=Save_16x16.png}" Stretch="Uniform" />
+                </StackPanel>
+            </Button>
 
             <!--  Username  -->
             <dxlc:LayoutItemLabel Grid.Row="2" Grid.Column="0" Height="Auto" Margin="5" Content="Username" FontSize="12" />
-            <dxe:TextEdit Style="{StaticResource IsReadOnlyStyle}" Grid.Row="2" Grid.Column="1" Height="Auto" Margin="5" FontSize="12" Text="{Binding Path=UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <dxe:TextEdit Style="{StaticResource IsReadOnlyStyle}" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Height="Auto" Margin="5" FontSize="12" Text="{Binding Path=UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Password  -->
             <dxlc:LayoutItemLabel Grid.Row="3" Grid.Column="0" Height="Auto" Margin="5" Content="Password" FontSize="12" />
-            <dxe:PasswordBoxEdit Style="{StaticResource IsReadOnlyStyle}" Name="PasswordBoxEdit" Grid.Row="3" Grid.Column="1" Height="Auto" Margin="5" FontSize="12"
+            <dxe:PasswordBoxEdit Style="{StaticResource IsReadOnlyStyle}" Name="PasswordBoxEdit" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Height="Auto" Margin="5" FontSize="12"
                                  Text="{Binding Path=Password, Mode=TwoWay}" />
-            <Separator Background="Black" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2"/>
-            
+            <Separator Background="Black" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3"/>
+
             <!--  HubConnection  -->
             <!--  Engineering Model  -->
             <dxlc:LayoutItemLabel Grid.Row="5" Grid.Column="0" Height="Auto" Margin="5" Content="Engineering Model" FontSize="12" />
-            <ComboBox Grid.Row="5" Grid.Column="1" Name="EngineeringModel" Margin="5" DisplayMemberPath="Name" FontSize="12"
+            <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Name="EngineeringModel" Margin="5" DisplayMemberPath="Name" FontSize="12"
                           ItemsSource="{Binding EngineeringModels, Mode=OneTime}"
                           SelectedItem="{Binding Path=SelectedEngineeringModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!--  Domain  -->
             <dxlc:LayoutItemLabel Grid.Row="6" Grid.Column="0" Height="Auto" Margin="5" Content="Iteration" FontSize="12" />
-            <ComboBox Grid.Row="6" Grid.Column="1" Name="Iteration" Margin="5" FontSize="12"
+            <ComboBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Name="Iteration" Margin="5" FontSize="12"
                       ItemsSource="{Binding Iterations}"
                       SelectedItem="{Binding Path=SelectedIteration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ComboBox.ItemTemplate>
@@ -98,7 +119,7 @@
 
             <!--  Domain  -->
             <dxlc:LayoutItemLabel Grid.Row="7" Grid.Column="0" Height="Auto" Margin="5" Content="Domain of expertise" FontSize="12" />
-            <ComboBox Grid.Row="7" Grid.Column="1" Name="Domain" Margin="5" DisplayMemberPath="Name" FontSize="12"
+            <ComboBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Name="Domain" Margin="5" DisplayMemberPath="Name" FontSize="12"
                       ItemsSource="{Binding DomainsOfExpertise}"
                       SelectedItem="{Binding Path=SelectedDomainOfExpertise, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
@@ -110,12 +131,11 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Label Content="{Binding LogMessage}" FontSize="14" VerticalContentAlignment="Center" Margin="5"></Label>
-            <Image Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Apply_32x32.png}" Visibility="{Binding Path=LoginSuccessfull, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
+            <Image Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Apply_32x32.png}" Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
             <Image Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Cancel_32x32.png}" Visibility="{Binding Path=LoginFailed, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
 
             <Button Grid.Column="2" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding LoginCommand}" Width="117"
-                    Visibility="{Binding Path=LoginSuccessfull, Converter={dxmvvm:BooleanToVisibilityConverter Inverse=True}, UpdateSourceTrigger=PropertyChanged}">
-                    <!--Visibility="{Binding Path=LoginSuccessfull, Converter={dxmvvm:BooleanToVisibilityConverter}, ConverterParameter={dx:VisibilityInverseConverter}, UpdateSourceTrigger=PropertyChanged}">-->
+                    Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter Inverse=True}, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" Text="Login" />
                     <Image Height="24" Width="24" Source="{dx:DXImage Image=Right_32x32.png}" Stretch="Uniform" />
@@ -123,7 +143,7 @@
             </Button>
 
             <Button Grid.Column="2" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right"
-                    Visibility="{Binding Path=LoginSuccessfull, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"  
+                    Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"  
                     Command="{Binding CloseCommand}" Width="117" Content="Continue"/>
         </Grid>
     </Grid>

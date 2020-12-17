@@ -1,7 +1,7 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LoginLayoutGroupViewModel.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -67,7 +67,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Tabs
         /// </summary>
         public LoginLayoutGroupViewModel()
         {
-            this.WhenAnyValue(vm => vm.LoginViewModel.LoginSuccessfull).Subscribe(value =>
+            this.WhenAnyValue(vm => vm.LoginViewModel.LoginSuccessful).Subscribe(value =>
             {
                 this.ServerIsChecked = value;
             });
