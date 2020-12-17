@@ -135,18 +135,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
-        /// Backing field for <see cref="SavedUris"/>
-        /// </summary>
-        private ReactiveList<string> savedUris;
-
-        /// <summary>
         /// Gets or sets the saved server addresses
         /// </summary>
-        public ReactiveList<string> SavedUris
-        {
-            get => this.savedUris;
-            set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
-        }
+        public ReactiveList<string> SavedUris { get; private set; } = new ReactiveList<string> { ChangeTrackingEnabled = true };
 
         /// <summary>
         /// Backing field for the <see cref="LoginSuccessful"/> property
@@ -176,7 +167,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
             private set => this.RaiseAndSetIfChanged(ref this.loginFailed, value);
         }
-        
+
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
@@ -186,7 +177,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Backing field for <see cref="SelectedEngineeringModel"/>
         /// </summary>
         private EngineeringModelRowViewModel selectedEngineeringModel;
-        
+
         /// <summary>
         /// Gets or sets the selected <see cref="EngineeringModel"/>
         /// </summary>
@@ -214,7 +205,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             get => this.selectedIteration;
             set => this.RaiseAndSetIfChanged(ref this.selectedIteration, value);
         }
-        
+
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
@@ -267,7 +258,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Gets or sets the <see cref="ICloseWindowBehavior"/> instance
         /// </summary>
         public ICloseWindowBehavior CloseWindowBehavior { get; set; }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
         /// </summary>
@@ -278,17 +269,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.hubController = hubController;
             this.userPreferenceService = userPreferenceService;
 
-            this.SavedUris = new ReactiveList<string> { ChangeTrackingEnabled = true };
+            this.PopulateSavedUris();
 
-            var canSaveUri = this.WhenAnyValue(
-                vm => vm.Uri,
-                vm => vm.SavedUris,
-                (uri, savedUris) => !string.IsNullOrWhiteSpace(uri) && !savedUris.Contains(uri));
+            var canSaveUri = this.SavedUris.CountChanged.StartWith(0).CombineLatest(this.WhenAnyValue(vm => vm.Uri),
+                (args, uri) => !string.IsNullOrWhiteSpace(uri) && !this.SavedUris.Contains(uri));
 
             this.SaveCurrentUriCommand = ReactiveCommand.Create(canSaveUri);
             this.SaveCurrentUriCommand.Subscribe(_ => this.ExecuteSaveCurrentUri());
-
-            this.PopulateSavedUris();
 
             var canLogin = this.WhenAnyValue(
                 vm => vm.SelectedServerType,
@@ -300,15 +287,15 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
             this.WhenAnyValue(x => x.SelectedEngineeringModel).Where(x => x != null).Subscribe(_ => this.PopulateIterations());
             this.WhenAnyValue(x => x.SelectedIteration).Where(x => x != null).Subscribe(_ => this.PopulateDomainOfExpertise());
-            
+
             var canClose = this.WhenAnyValue(
-                x => x.LoginSuccessful, 
+                x => x.LoginSuccessful,
                 x => x.SelectedIteration,
                 x => x.SelectedEngineeringModel,
                 x => x.SelectedDomainOfExpertise,
                 (loginSuccess, iteration, engineeringModel, domain) =>
                     loginSuccess && iteration != null && engineeringModel != null && domain != null).Where(x => x is true);
-            
+
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, async _ => await this.ExecuteLogin());
             this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose, async _ => await this.CloseCommandExecute());
 
@@ -322,7 +309,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void PopulateSavedUris()
         {
             this.userPreferenceService.Read();
-            this.SavedUris = new ReactiveList<string>(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Select(i => i.Uri));
+            this.SavedUris.Clear();
+            this.SavedUris.AddRange(this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Select(i => i.Uri));
         }
 
         /// <summary>
@@ -330,7 +318,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private void ExecuteSaveCurrentUri()
         {
-            var serverConnection = new ServerConnection { ServerType = this.SelectedServerType.Key, Uri = this.Uri};
+            var serverConnection = new ServerConnection { ServerType = this.SelectedServerType.Key, Uri = this.Uri };
             this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(serverConnection);
             this.userPreferenceService.Save();
             this.PopulateSavedUris();
@@ -385,16 +373,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 this.LogMessage = $"Loggin failed: {exception.Message}";
             }
         }
-        
+
         /// <summary>
-        /// Populates the <see cref="Iterations"/> collection
+        /// Populates the <see cref="DomainsOfExpertise"/> collection
         /// </summary>
         private void PopulateDomainOfExpertise()
         {
             this.DomainsOfExpertise.Clear();
-            
+
             var activeParticipant = this.SelectedEngineeringModel.Thing.Participant.Single(x => x.Person == this.hubController.Session.ActivePerson);
-            
+
             if (activeParticipant.Domain.Count != 0)
             {
                 this.DomainsOfExpertise.AddRange(activeParticipant.Domain.OrderBy(x => x.Name).Select(x => new DomainOfExpertiseRowViewModel(x)));
@@ -420,7 +408,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void PopulateEngineeringModels()
         {
             this.EngineeringModels.Clear();
-            
+
             this.EngineeringModels.AddRange(
                 this.hubController.GetEngineeringModels()
                     .OrderBy(m => m.Name)

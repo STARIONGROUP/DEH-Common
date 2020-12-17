@@ -220,7 +220,12 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             CollectionAssert.Contains(this.loginViewModel.SavedUris, "u://r.l");
             Assert.AreEqual(1, this.loginViewModel.SavedUris.Count);
+            Assert.IsFalse(this.loginViewModel.SaveCurrentUriCommand.CanExecute(null));
 
+            this.loginViewModel.Uri = "anotherUrl";
+            Assert.IsTrue(this.loginViewModel.SaveCurrentUriCommand.CanExecute(null));
+
+            this.loginViewModel.Uri = "u://r.l";
             Assert.IsFalse(this.loginViewModel.SaveCurrentUriCommand.CanExecute(null));
         }
     }
