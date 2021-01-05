@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ObjectBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2020 RHEA System S.A.
 // 
@@ -85,11 +85,22 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.objectBrowserTreeSelectorService = objectBrowserTreeSelectorService;
             this.Caption = "Hub Object Browser";
 
-            this.WhenAnyValue(x => x.hubController.OpenIteration).Where(x => x != null).ObserveOn(RxApp.MainThreadScheduler)
+            this.WhenAnyValue(x => x.hubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
-                    this.ToolTip = $"{this.hubController.Session.DataSourceUri}\n{this.hubController.Session.ActivePerson.Name}";
-                    this.BuildTrees();
+                    this.IsBusy = true;
+
+                    if (this.hubController.IsSessionOpen && this.hubController.OpenIteration != null)
+                    {
+                        this.ToolTip = $"{this.hubController.Session.DataSourceUri}\n{this.hubController.Session.ActivePerson.Name}";
+                        this.BuildTrees();
+                    }
+                    else
+                    {
+                        this.Things.Clear();
+                    }
+
+                    this.IsBusy = false;
                 });
         }
 
@@ -98,8 +109,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         public void BuildTrees()
         {
-            this.IsBusy = true;
-
             foreach (var thingKind in this.objectBrowserTreeSelectorService.ThingKinds)
             {
                 if (thingKind == typeof(ElementDefinition) && 
@@ -108,8 +117,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     this.Things.Add(new ElementDefinitionsBrowserViewModel(this.hubController.OpenIteration, this.hubController.Session));
                 }
             }
-
-            this.IsBusy = false;
         }
 
         /// <summary>

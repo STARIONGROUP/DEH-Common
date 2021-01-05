@@ -50,7 +50,7 @@ namespace DEHPCommon.Utilities
         /// <summary>
         /// The root path for resources
         /// </summary>
-        public const string RootResourcesPath = "pack://application:,,,/";
+        public const string RootResourcesPath = "pack://application:,,,/DEHPCommon;component/";
 
         /// <summary>
         /// The <see cref="Uri"/> to the error image overlay.
