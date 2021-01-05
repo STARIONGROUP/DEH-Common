@@ -83,7 +83,7 @@ namespace DEHPCommon.Tests.Converters
         [Test]
         public void VerifyThatConvertProvidesTheExpectedIcon()
         {
-            const string naturalLanguageIcon = "pack://application:,,,/Resources/Images/Thing/naturallanguage.png";
+            const string naturalLanguageIcon = "pack://application:,,,/DEHPCommon;component/Resources/Images/Thing/naturallanguage.png";
             var naturalLanguage = new NaturalLanguage();
             var firstConverterResult = (BitmapImage)this.converter.Convert(new object[]{naturalLanguage}, null, null, null);
 

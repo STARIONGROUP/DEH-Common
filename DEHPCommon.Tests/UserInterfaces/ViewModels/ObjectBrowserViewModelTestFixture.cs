@@ -124,6 +124,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             Assert.IsNull(this.viewModel.ToolTip);
             this.hubController.Setup(x => x.Session).Returns(this.session.Object);
             this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
+            this.hubController.Setup(x => x.IsSessionOpen).Returns(true);
             this.viewModel = new ObjectBrowserViewModel(this.hubController.Object, this.objectBrowserTreeSelectorService.Object);
             Assert.IsNotNull(this.viewModel.ToolTip);
             Assert.IsFalse(this.viewModel.IsBusy);
