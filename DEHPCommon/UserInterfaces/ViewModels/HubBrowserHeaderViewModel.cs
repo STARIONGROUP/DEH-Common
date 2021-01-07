@@ -139,7 +139,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.hubController = hubController;
 
             this.WhenAnyValue(x => x.hubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(iteration => this.UpdateProperties(iteration));
+                .Subscribe(this.UpdateProperties);
         }
 
         /// <summary>

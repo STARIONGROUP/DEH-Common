@@ -176,7 +176,7 @@ namespace DEHPCommon.Converters
         /// <returns> A <see cref="Uri"/> that points to a resource </returns>
         private object GrayScaleImageUri(ClassKind classKind, bool getsmallicon = true)
         {
-            var packUri = $"{IconUtilities.RootResourcesPath}DEHPCommon;component/Resources/Images/Thing/";
+            var packUri = $"{IconUtilities.RootResourcesPath}Resources/Images/Thing/";
             var imageSize = getsmallicon ? "_16x16" : "_32x32";
             const string extension = ".png";
 
