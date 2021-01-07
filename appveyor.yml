@@ -6,13 +6,6 @@ environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   TEST_RESULT:    'TestResult.xml'
   TEST_COVERAGE:  'CoverResults.xml'
-  SONARCLOUD_PROJECT_KEY: RHEAGROUP_DEHP-Common
-  SONARCLOUD_ORGANIZATION: rheagroup
-  SONARCLOUD_URL: 'https://sonarcloud.io'
-  SONARCLOUD_TOKEN:
-    secure: 67KNIhsvMPwHylkTvfGtu39hYkK94X8svR0pxSBeqbm92ffGeViAv7SVDHnC+kbv
-  GITHUB_TOKEN:
-    secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
 
 for:
 # configuration for "master" branch, build in Release mode
@@ -90,8 +83,3 @@ after_test:
           nuget push "DEHPCommon\bin\Debug\DEHPCommon.$env:APPVEYOR_BUILD_VERSION.nupkg" -Source "github"
         }
       }
-
-notifications:
-  - provider: Email
-    to:
-      - cdp_devs@rheagroup.com
