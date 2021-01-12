@@ -7,7 +7,7 @@
                     xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
                     xmlns:viewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels">
 
-    <converters:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+    <converters:ElementDefinitionBrowserIconConverter x:Key="ThingToIconUriConverter" />
 
     <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <converters:EnumerationValueDefinitionConverter x:Key="EnumerationValueDefinitionConverter" />
