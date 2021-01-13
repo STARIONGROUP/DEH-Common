@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MappingDirection.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="IContextMenuBehavior.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,21 +22,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Enumerators
+namespace DEHPCommon.UserInterfaces.Behaviors
 {
     /// <summary>
-    /// Enumeration of the two directions a mapping can be done
+    /// Interface Definition for the <see cref="ContextMenuBehavior"/>
     /// </summary>
-    public enum MappingDirection
+    public interface IContextMenuBehavior
     {
-        /// <summary>
-        /// FromDstToHub refers to a transfert direction of data from a DST tool specific data source to a 10-25 data source
-        /// </summary>
-        FromDstToHub,
-
-        /// <summary>
-        /// FromHubToDst refers to a transfert direction of data from a 10-25 data source to a DST tool specific data source
-        /// </summary>
-        FromHubToDst
     }
 }

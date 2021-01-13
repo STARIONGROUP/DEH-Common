@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MappingDirection.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="IHaveContextMenuViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,21 +22,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Enumerators
+namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
+    using ReactiveUI;
+
     /// <summary>
-    /// Enumeration of the two directions a mapping can be done
+    /// Interface definition for view models that has a context menu
     /// </summary>
-    public enum MappingDirection
+    public interface IHaveContextMenuViewModel
     {
         /// <summary>
-        /// FromDstToHub refers to a transfert direction of data from a DST tool specific data source to a 10-25 data source
+        /// Populate the context menu for the implementing view model
         /// </summary>
-        FromDstToHub,
-
+        void PopulateContextMenu();
+        
         /// <summary>
-        /// FromHubToDst refers to a transfert direction of data from a 10-25 data source to a DST tool specific data source
+        /// Gets the Context Menu for the implementing view model
         /// </summary>
-        FromHubToDst
+        ReactiveList<ContextMenuItemViewModel> ContextMenu { get; }
     }
 }

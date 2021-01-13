@@ -62,6 +62,7 @@
     <None Remove="Resources\Images\Thing\siteRdl_16x16.png" />
     <None Remove="Resources\Images\Thing\siteRdl_32x32.png" />
     <None Remove="Resources\Images\Warning_16x16.png" />
+    <None Remove="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -101,6 +102,9 @@
     <PackageReference Include="Splat.Net40" Version="1.6.2" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserInterfaces\Views\HubBrowserHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

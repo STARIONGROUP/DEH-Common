@@ -28,11 +28,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Windows;
+
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -43,7 +45,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// The <see cref="ObjectBrowserViewModel"/> is a View Model that is responsible for managing the data and interactions with that data for a view
     /// that shows all the <see cref="Thing"/>s contained by a data-source following the containment tree that is modelled in 10-25 and the CDP4 extensions.
     /// </summary>
-    public class ObjectBrowserViewModel : ReactiveObject, IObjectBrowserViewModel, IDisposable
+    public class ObjectBrowserViewModel : ReactiveObject, IObjectBrowserViewModel, IDisposable, IHaveContextMenuViewModel
     {
         /// <summary>
         /// The <see cref="IHubController"/>
@@ -54,12 +56,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// The <see cref="IObjectBrowserTreeSelectorService"/>
         /// </summary>
         private readonly IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService;
-        
+
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
         /// </summary>
         private bool? isBusy;
-        
+
         /// <summary>
         /// Gets or sets a value indicating whether the browser is busy
         /// </summary>
@@ -70,9 +72,44 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
+        /// Backing field for the <see cref="SelectedThing"/>
+        /// </summary>
+        private object selectedThing;
+
+        /// <summary>
+        /// Gets or sets the selected thing
+        /// </summary>
+        public object SelectedThing
+        {
+            get => this.selectedThing;
+            set => this.RaiseAndSetIfChanged(ref this.selectedThing, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the selected things collection
+        /// </summary>
+        public ReactiveList<object> SelectedThings { get; set; } = new ReactiveList<object>();
+
+        /// <summary>
         /// Gets the collection of <see cref="IRowViewModelBase{T}"/> to be displayed in the tree
         /// </summary>
         public ReactiveList<BrowserViewModelBase> Things { get; } = new ReactiveList<BrowserViewModelBase>();
+        
+        /// <summary>
+        /// Gets the Context Menu for the implementing view model
+        /// </summary>
+        public ReactiveList<ContextMenuItemViewModel> ContextMenu { get; } = new ReactiveList<ContextMenuItemViewModel>();
+
+        /// <summary>
+        /// Gets the command that allows to map the selected things
+        /// </summary>
+        public ReactiveCommand<object> MapCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IObservable{T}"/> of <see cref="bool"/> that is bound to the <see cref="MapCommand"/> <see cref="ReactiveCommand{T}.CanExecute"/> property
+        /// </summary>
+        /// <remarks>This observable is intended to be Merged with another observable</remarks>
+        public IObservable<bool> CanMap { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectBrowserViewModel"/> class.
@@ -84,7 +121,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.hubController = hubController;
             this.objectBrowserTreeSelectorService = objectBrowserTreeSelectorService;
             this.Caption = "Hub Object Browser";
+            this.InitializesCommandsAndObservables();
+        }
 
+        /// <summary>
+        /// Initializes this view model <see cref="ICommand"/>s
+        /// </summary>
+        private void InitializesCommandsAndObservables()
+        {
             this.WhenAnyValue(x => x.hubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
@@ -102,8 +146,15 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
                     this.IsBusy = false;
                 });
+            
+            this.CanMap = this.WhenAny(
+                vm => vm.SelectedThing,
+                vm => vm.SelectedThings.CountChanged,
+                vm => vm.hubController.OpenIteration,
+                (selected, selection, iteration) =>
+                    iteration.Value != null && (selected.Value != null || this.SelectedThings.Any()));
         }
-
+        
         /// <summary>
         /// Adds to the <see cref="Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
         /// </summary>
@@ -117,6 +168,22 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     this.Things.Add(new ElementDefinitionsBrowserViewModel(this.hubController.OpenIteration, this.hubController.Session));
                 }
             }
+        }
+
+        /// <summary>
+        /// Populate the context menu for the implementing view model
+        /// </summary>
+        public void PopulateContextMenu()
+        {
+            this.ContextMenu.Clear();
+
+            if (this.SelectedThing == null)
+            {
+                return;
+            }
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Map selection", "", this.MapCommand,
+                MenuItemKind.Export, ClassKind.NotThing));
         }
 
         /// <summary>

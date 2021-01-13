@@ -73,6 +73,7 @@ namespace DEHPCommon
             containerBuilder.RegisterType<ObjectBrowserViewModel>().As<IObjectBrowserViewModel>();
             containerBuilder.RegisterType<HubBrowserHeaderViewModel>().As<IHubBrowserHeaderViewModel>();
             containerBuilder.RegisterType<StatusBarControlViewModel>().As<IStatusBarControlViewModel>().SingleInstance();
+            containerBuilder.RegisterType<NetChangePreviewViewModel>().As<INetChangePreviewViewModel>();
         }
     }
 }

@@ -30,14 +30,19 @@ namespace DEHPCommon.MappingEngine
 
     using DEHPCommon.Exceptions;
     using DEHPCommon.MappingRules.Core;
-
+    
     using NLog;
 
     /// <summary>
     /// The <see cref="MappingEngine"/> allows to map dst tool models to ECSS-E-TM-10-25A model or the other way arround
     /// </summary>
-    public class MappingEngine
+    public class MappingEngine : IMappingEngine
     {
+        /// <summary>
+        /// Gets the constructor parameter name of this <see cref="MappingEngine"/>
+        /// </summary>
+        public static readonly string ParameterName = "ruleAssembly";
+
         /// <summary>
         /// The <see cref="NLog"/> logger
         /// </summary>

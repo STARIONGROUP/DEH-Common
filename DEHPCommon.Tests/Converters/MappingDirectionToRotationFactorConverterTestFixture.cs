@@ -48,8 +48,8 @@ namespace DEHPCommon.Tests.Converters
         {
             Assert.AreEqual(0, this.converter.Convert(null, null, null, null));
 
-            Assert.AreEqual(180, this.converter.Convert(MappingDirection.To1025DataSource, null, null, null));
-            Assert.AreEqual(0, this.converter.Convert(MappingDirection.From1025DataSource, null, null, null));
+            Assert.AreEqual(180, this.converter.Convert(MappingDirection.FromDstToHub, null, null, null));
+            Assert.AreEqual(0, this.converter.Convert(MappingDirection.FromHubToDst, null, null, null));
             Assert.AreEqual(0, this.converter.Convert(2, null, null, null));
         }
 

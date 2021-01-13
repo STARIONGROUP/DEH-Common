@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MappingDirection.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ListToElementUsageConverter.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,21 +22,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Enumerators
+namespace DEHPCommon.Converters
 {
-    /// <summary>
-    /// Enumeration of the two directions a mapping can be done
-    /// </summary>
-    public enum MappingDirection
-    {
-        /// <summary>
-        /// FromDstToHub refers to a transfert direction of data from a DST tool specific data source to a 10-25 data source
-        /// </summary>
-        FromDstToHub,
+    using CDP4Common.EngineeringModelData;
 
-        /// <summary>
-        /// FromHubToDst refers to a transfert direction of data from a 10-25 data source to a DST tool specific data source
-        /// </summary>
-        FromHubToDst
+    using ReactiveUI;
+
+    /// <summary>
+    /// Converts a <see cref="ElementUsage"/> to <see cref="ReactiveList{T}"/> used by the list-box views or multi select combobox
+    /// </summary>
+    public class ListToElementUsageConverter : GenericListToObjectListConverter<ElementUsage>
+    {
     }
 }
