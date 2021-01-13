@@ -25,6 +25,7 @@
 namespace DEHPCommon.UserInterfaces.Behaviors
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Input;
 
@@ -38,6 +39,7 @@ namespace DEHPCommon.UserInterfaces.Behaviors
     /// <summary>
     /// This behavior creates the context menu when the user right mouse clicks on a row in a <see cref="IHaveContextMenuViewModel"/>.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ContextMenuBehavior : Behavior<FrameworkElement>
     {
         /// <summary>
@@ -64,7 +66,7 @@ namespace DEHPCommon.UserInterfaces.Behaviors
         }
 
         /// <summary>
-        /// Event handler for the <see cref="MouseRightButtonUp"/> event
+        /// Event handler for the MouseRightButtonUp event
         /// </summary>
         /// <remarks>
         /// Occurs when the right mouse button is released while the mouse pointer is over this element.

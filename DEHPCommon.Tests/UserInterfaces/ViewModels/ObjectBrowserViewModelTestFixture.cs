@@ -128,6 +128,9 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.viewModel = new ObjectBrowserViewModel(this.hubController.Object, this.objectBrowserTreeSelectorService.Object);
             Assert.IsNotNull(this.viewModel.ToolTip);
             Assert.IsFalse(this.viewModel.IsBusy);
+            Assert.IsNull(this.viewModel.MapCommand);
+            Assert.IsEmpty(this.viewModel.ContextMenu);
+            Assert.IsNull(this.viewModel.SelectedThing);
         }
 
         [Test]
@@ -145,6 +148,16 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         public void VerifyDispose()
         {
             Assert.DoesNotThrow(() => this.viewModel.Dispose());
+        }
+
+        [Test]
+        public void VerifyPopulateContextMenu()
+        {
+            this.viewModel.PopulateContextMenu();
+            Assert.IsEmpty(this.viewModel.ContextMenu);
+            this.viewModel.SelectedThing = string.Empty;
+            this.viewModel.PopulateContextMenu();
+            Assert.IsNotEmpty(this.viewModel.ContextMenu);
         }
     }
 }

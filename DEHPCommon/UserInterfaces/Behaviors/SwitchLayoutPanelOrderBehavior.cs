@@ -24,9 +24,9 @@
 
 namespace DEHPCommon.UserInterfaces.Behaviors
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows;
-    using System.Windows.Media;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -40,6 +40,7 @@ namespace DEHPCommon.UserInterfaces.Behaviors
     /// <remarks>The behavior well function relies on the panels to be of type <see cref="LayoutGroup"/> and on their name.
     /// Those needs to match the <see cref="LayoutGroupName"/>, <see cref="DstPanelName"/> and <see cref="HubPanelName"/> </remarks>
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class SwitchLayoutPanelOrderBehavior : Behavior<Window>, ISwitchLayoutPanelOrderBehavior
     {
         /// <summary>
@@ -65,12 +66,12 @@ namespace DEHPCommon.UserInterfaces.Behaviors
         /// <summary>
         /// Gets an assert whether the Hub Panel is the source 
         /// </summary>
-        private bool IsHubPanelTheSource;
+        private bool isHubPanelTheSource;
         
         /// <summary>
         /// Gets the actual <see cref="MappingDirection"/>
         /// </summary>
-        public MappingDirection MappingDirection { get; private set; }
+        public MappingDirection MappingDirection => this.isHubPanelTheSource ? MappingDirection.FromHubToDst : MappingDirection.FromDstToHub;
 
         /// <summary>
         /// Occurs when this behavior attaches to a view
@@ -108,13 +109,12 @@ namespace DEHPCommon.UserInterfaces.Behaviors
             this.layoutGroup ??= (LayoutGroup)this.AssociatedObject.VisualChildren().OfType<FrameworkElement>().SingleOrDefault(x => x.Name == LayoutGroupName);
 
             var ecosimPanel = this.GetLayoutPanelIndex(DstPanelName);
-            this.layoutGroup.Items.Move(ecosimPanel, this.IsHubPanelTheSource ? 0 : 2);
+            this.layoutGroup.Items.Move(ecosimPanel, this.isHubPanelTheSource ? 0 : 2);
 
             var hubPanel = this.GetLayoutPanelIndex(HubPanelName);
-            this.layoutGroup.Items.Move(hubPanel, this.IsHubPanelTheSource ? 2 : 0);
+            this.layoutGroup.Items.Move(hubPanel, this.isHubPanelTheSource ? 2 : 0);
 
-            this.IsHubPanelTheSource = !this.IsHubPanelTheSource;
-            this.MappingDirection = this.IsHubPanelTheSource ? MappingDirection.FromHubToDst : MappingDirection.FromDstToHub;
+            this.isHubPanelTheSource = !this.isHubPanelTheSource;
         }
 
         /// <summary>
