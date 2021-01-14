@@ -11,13 +11,14 @@
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:viewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows"
              xmlns:converters="clr-namespace:DEHPCommon.Converters"
+             xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors"
              MinWidth="400" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ObjectBrowserDataTemplates.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/DEHPCommon;component/UserInterfaces/Views/ContextMenu/ContextMenuStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
             <converters:ElementUsageOptionsConverter x:Key="ElementUsageOptionsConverter" />
             <converters:DataTypeConverter x:Key="DataTypeConverter" />
             <converters:ElementUsageTypeToVisibilityConverter x:Key="ElementUsageTypeToVisibilityConverter" />
@@ -30,8 +31,11 @@
         <Grid>
             <dxg:TreeListControl ItemsSource="{Binding Things}"
                                  SelectedItem="{Binding SelectedThing}"
-                                 CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 SelectionMode="Row">
+                                 SelectedItems="{Binding SelectedThings}"
+                                 SelectionMode="MultipleRow">
+                <dxmvvm:Interaction.Behaviors>
+                    <behaviors:ContextMenuBehavior/>
+                </dxmvvm:Interaction.Behaviors>
                 <dxg:TreeListControl.View>
                     <dxg:TreeListView Name="View"
                                       AllowEditing="False"

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MappingDirection.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ISwitchLayoutPanelOrderBehavior.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,21 +22,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.Enumerators
+namespace DEHPCommon.UserInterfaces.Behaviors
 {
+    using DEHPCommon.Enumerators;
+
     /// <summary>
-    /// Enumeration of the two directions a mapping can be done
+    /// Interface definition for the <see cref="SwitchLayoutPanelOrderBehavior"/>
     /// </summary>
-    public enum MappingDirection
+    public interface ISwitchLayoutPanelOrderBehavior
     {
         /// <summary>
-        /// FromDstToHub refers to a transfert direction of data from a DST tool specific data source to a 10-25 data source
+        /// Gets the actual <see cref="MappingDirection"/>
         /// </summary>
-        FromDstToHub,
+        MappingDirection MappingDirection { get; }
 
         /// <summary>
-        /// FromHubToDst refers to a transfert direction of data from a 10-25 data source to a DST tool specific data source
+        /// Swithes the place of the two panels 
         /// </summary>
-        FromHubToDst
+        void Switch();
     }
 }

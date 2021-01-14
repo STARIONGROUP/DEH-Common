@@ -26,6 +26,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
     using System;
 
+    using CDP4Common.CommonData;
+
+    using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
+
     using ReactiveUI;
 
     /// <summary>
@@ -34,9 +38,40 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
     public interface IObjectBrowserViewModel
     {
         /// <summary>
-        /// Gets the collection of <see cref="BrowserViewModelBase"/> to be displayed in the tree
+        /// Gets or sets a value indicating whether the browser is busy
+        /// </summary>
+        bool? IsBusy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected thing
+        /// </summary>
+        object SelectedThing { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected things collection
+        /// </summary>
+        ReactiveList<object> SelectedThings { get; set; }
+
+        /// <summary>
+        /// Gets the collection of <see cref="IRowViewModelBase{T}"/> to be displayed in the tree
         /// </summary>
         ReactiveList<BrowserViewModelBase> Things { get; }
+
+        /// <summary>
+        /// Gets the Context Menu for the implementing view model
+        /// </summary>
+        ReactiveList<ContextMenuItemViewModel> ContextMenu { get; }
+
+        /// <summary>
+        /// Gets the command that allows to map the selected things
+        /// </summary>
+        ReactiveCommand<object> MapCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IObservable{T}"/> of <see cref="bool"/> that is bound to the <see cref="MapCommand"/> <see cref="ReactiveCommand{T}.CanExecute"/> property
+        /// </summary>
+        /// <remarks>This observable is intended to be Merged with another observable</remarks>
+        IObservable<bool> CanMap { get; set; }
 
         /// <summary>
         /// Gets the Caption of the control
@@ -47,5 +82,20 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// Gets the tooltip of the control
         /// </summary>
         string ToolTip { get; }
+
+        /// <summary>
+        /// Adds to the <see cref="ObjectBrowserViewModel.Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
+        /// </summary>
+        void BuildTrees();
+
+        /// <summary>
+        /// Populate the context menu for the implementing view model
+        /// </summary>
+        void PopulateContextMenu();
+
+        /// <summary>
+        /// Dispose of this <see cref="ObjectBrowserViewModel"/>
+        /// </summary>
+        void Dispose();
     }
 }
