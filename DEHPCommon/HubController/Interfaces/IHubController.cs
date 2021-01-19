@@ -33,6 +33,7 @@ namespace DEHPCommon.HubController.Interfaces
 
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
 
     using DEHPCommon.UserPreferenceHandler.Enums;
 
@@ -121,32 +122,53 @@ namespace DEHPCommon.HubController.Interfaces
         /// <summary>
         /// Creates or updates all <see cref="Thing"/> from the provided <see cref="IEnumerable{T}"/>
         /// </summary>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
         /// <param name="things">The <see cref="IEnumerable{T}"/> of <see cref="Thing"/></param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task CreateOrUpdate(IEnumerable<Thing> things, bool deep = false);
+        Task CreateOrUpdate<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Creates or updates the provided <see cref="Thing"/>
         /// </summary>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
         /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task CreateOrUpdate(Thing thing, bool deep = false);
+        Task CreateOrUpdate<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Deletes all the <see cref="Thing"/> from the provided <see cref="IEnumerable{T}"/>
         /// </summary>
-        /// <param name="things">The <see cref="Thing"/> to delete</param>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
+        /// <param name="things">The things to delete</param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
+        /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Delete(IEnumerable<Thing> things);
+        Task Delete<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Deletes a <see cref="Thing"/>
         /// </summary>
-        /// <param name="thing">The <see cref="Thing"/> to delete</param>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
+        /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Delete(Thing thing);
+        Task Delete<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
+
+        /// <summary>
+        /// Write the transaction to the session
+        /// </summary>
+        /// <param name="transaction">The <see cref="ThingTransaction"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        Task Write(ThingTransaction transaction);
 
         /// <summary>
         /// Generates the nested element based on the provided <see cref="Option"/>
@@ -187,5 +209,10 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <returns>A <see cref="Task"/></returns>
         Task Download(FileRevision fileRevision);
+
+        /// <summary>
+        /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
+        /// </summary>
+        IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName);
     }
 }
