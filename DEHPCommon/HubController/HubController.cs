@@ -28,6 +28,7 @@ namespace DEHPCommon.HubController
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Transactions;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -268,89 +269,108 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <returns>A <see cref="IReadOnlyDictionary{T,T}"/> of <see cref="Iteration"/> and <see cref="Tuple{T,T}"/> of <see cref="DomainOfExpertise"/> and <see cref="Participant"/></returns>
         public IReadOnlyDictionary<Iteration, Tuple<DomainOfExpertise, Participant>> GetIteration() => this.Session.OpenIterations;
-
+        
         /// <summary>
         /// Creates or updates all <see cref="Thing"/> from the provided <see cref="IEnumerable{T}"/>
         /// </summary>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
         /// <param name="things">The <see cref="IEnumerable{T}"/> of <see cref="Thing"/></param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task CreateOrUpdate(IEnumerable<Thing> things, bool deep = false)
+        public async Task CreateOrUpdate<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
             foreach (var thing in things)
             {
-                await this.CreateOrUpdate(thing, deep);
+                await this.CreateOrUpdate(thing, actionOnClone, deep);
             }
         }
-        
+
         /// <summary>
         /// Creates or updates the provided <see cref="Thing"/>
         /// </summary>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
         /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task CreateOrUpdate(Thing thing, bool deep = false)
+        public async Task CreateOrUpdate<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
-            await this.ExecuteThingTransactionAction((clone, transaction) => transaction.CreateOrUpdate(clone), thing);
+            await this.Write(thing, actionOnClone, (transaction, t) => transaction.CreateOrUpdate(t), deep);
         }
 
         /// <summary>
         /// Deletes all the <see cref="Thing"/> from the provided <see cref="IEnumerable{T}"/>
         /// </summary>
-        /// <param name="things">The <see cref="Thing"/> to delete</param>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
+        /// <param name="things">The things to delete</param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
+        /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Delete(IEnumerable<Thing> things)
+        public async Task Delete<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
             foreach (var thing in things)
             {
-                await this.Delete(thing);
+                await this.Delete(thing, actionOnClone, deep);
             }
         }
-        
+
         /// <summary>
         /// Deletes a <see cref="Thing"/>
         /// </summary>
-        /// <param name="thing">The <see cref="Thing"/> to delete</param>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
+        /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Delete(Thing thing)
+        public async Task Delete<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
-            await this.ExecuteThingTransactionAction((clone, transaction) => transaction.Delete(clone, clone.Container), thing);
+            await this.Write(thing, actionOnClone, (transaction, t) => transaction.Delete(t), deep);
         }
 
         /// <summary>
-        /// Creates a <see cref="ThingTransaction"/>
+        /// Writes the transaction to the <see cref="ISession"/>
         /// </summary>
+        /// <typeparam name="TThing">The type of <see cref="Thing"/></typeparam>
+        /// <typeparam name="TContainer">The type of <see cref="Thing"/> which contains <typeparamref name="TThing"/></typeparam>
         /// <param name="thing">The <see cref="Thing"/></param>
-        /// <param name="clone">The <see cref="Thing"/> clone</param>
-        /// <param name="transaction">The new <see cref="ThingTransaction"/></param>
-        /// <param name="deep">An assert whether to clone things deep</param>
-        private void CreateTransaction(Thing thing, out Thing clone, out ThingTransaction transaction, bool deep = false)
-        {
-            clone = thing.Clone(deep);
-            transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(thing), clone);
-        }
-
-        /// <summary>
-        /// Executes the specified <see cref="ThingTransaction"/> <see cref="Action"/>
-        /// </summary>
-        /// <param name="thingTransactionAction">The <see cref="Action{T,T}"/> of types <see cref="Thing"/>, <see cref="ThingTransaction"/></param>
-        /// <param name="thing">The <see cref="Thing"/></param>
-        /// <param name="deep">An assert whether to clone things deep</param>
+        /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
+        /// <param name="actionOnTransaction">The <see cref="Action"/> to take by the transaction e.g. CreateOrUpdate/Delete</param>
+        /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        private async Task ExecuteThingTransactionAction(Action<Thing, ThingTransaction> thingTransactionAction, Thing thing, bool deep = false)
+        private async Task Write<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, Action<ThingTransaction, Thing> actionOnTransaction, bool deep = false) where TThing : Thing where TContainer : Thing
         {
             try
             {
-                this.CreateTransaction(thing, out var clone, out var transaction, deep);
-                thingTransactionAction(clone, transaction);
-                await this.Session.Write(transaction.FinalizeTransaction());
+                var clone = thing.Clone(deep);
+                var container = thing.Container.Clone(deep) as TContainer;
+                actionOnClone(container, thing);
+
+                var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(container), container);
+                actionOnTransaction(transaction, clone);
+
+                await this.Write(transaction);
             }
             catch (Exception exception)
             {
-                var errorMessage = $"The {thing.Iid} has failed to {thingTransactionAction.Method.Name}, the following exception occured: {exception.Message}";
+                var errorMessage = $"The {thing.Iid} has failed to {actionOnClone.Method.Name}, the following exception occured: {exception.Message}";
                 this.logger.Error(errorMessage);
                 throw new InvalidOperationException(errorMessage);
             }
+        }
+
+        /// <summary>
+        /// Write the transaction to the session
+        /// </summary>
+        /// <param name="transaction">The <see cref="ThingTransaction"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        public async Task Write(ThingTransaction transaction)
+        {
+            await this.Session.Write(transaction.FinalizeTransaction());
         }
 
         /// <summary>
@@ -543,5 +563,11 @@ namespace DEHPCommon.HubController
                 }
             }
         }
+        
+        /// <summary>
+        /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
+        /// </summary>
+        public IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName)
+            => this.OpenIteration.ExternalIdentifierMap.Where(x => x.ExternalToolName == toolName);
     }
 }

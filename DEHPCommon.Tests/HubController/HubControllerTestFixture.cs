@@ -27,6 +27,7 @@ namespace DEHPCommon.Tests.HubController
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Text;
     using System.Threading.Tasks;
@@ -168,19 +169,38 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public async Task VerifyCreateOrUpdate()
         {
-            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
 
-            var thingsToWrite = new List<Thing>()
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
+            var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
+            
+            var thingsToWrite = new List<Parameter>()
             {
-                parameter, elementDefinition
+                parameter, parameter2
             };
 
-            await this.hubController.CreateOrUpdate(thingsToWrite);
-            elementDefinition.Parameter.Add(parameter);
-            await this.hubController.CreateOrUpdate(elementDefinition, true);
+            await this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p));
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws<InvalidCastException>();
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
+            
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p))
+                );
+        }
 
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(3));
+        [Test]
+        public void VerifyWriteTransaction()
+        {
+
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
+            var elementClone = elementDefinition.Clone(false);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(elementClone), elementClone);
+            transaction.Create(parameter, elementClone);
+
+            elementClone.Parameter.Add(parameter);
+            Assert.DoesNotThrowAsync(async () => await this.hubController.Write(transaction));
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
         }
 
         [Test]
@@ -189,14 +209,16 @@ namespace DEHPCommon.Tests.HubController
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
 
-            var thingsToDelete = new List<Thing>()
+            var thingsToDelete = new List<Parameter>()
             {
                 parameter
             };
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await this.hubController.Delete(thingsToDelete));
+            Assert.DoesNotThrowAsync(
+                async () => await this.hubController.Delete<ElementDefinition, Parameter>(
+                    thingsToDelete, (e, p) => e.Parameter.Remove(p)));
 
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
         }
 
         [Test]
@@ -335,6 +357,23 @@ namespace DEHPCommon.Tests.HubController
             this.session.Verify(x => x.ReadFile(It.IsAny<FileRevision>()), Times.Exactly(2));
 
             this.fileDialogService.Verify(this.saveFileDialogExpression, Times.Exactly(2));
+        }
+
+        [Test]
+        public void VerifyExternalIdentifierMap()
+        {
+            var toolName = "tool";
+
+            this.iteration.ExternalIdentifierMap.AddRange(new List<ExternalIdentifierMap>()
+            {
+                new ExternalIdentifierMap() { ExternalToolName = toolName},
+                new ExternalIdentifierMap() { ExternalToolName = string.Empty}
+            });
+
+            this.hubController.OpenIteration = this.iteration;
+
+            Assert.AreEqual(1, this.hubController.AvailableExternalIdentifierMap(toolName).Count());
+            Assert.Zero(this.hubController.AvailableExternalIdentifierMap(null).Count());
         }
     }
 }
