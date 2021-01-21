@@ -29,6 +29,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
 
@@ -61,7 +62,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         }
 
         /// <summary>
-        /// Gets the string representation of <see cref="DomainOfExpertiese"/>s that are owners of of one or more publishedParameter(s)
+        /// Gets the string representation of <see cref="DomainOfExpertise"/>s that are owners of of one or more publishedParameter(s)
         /// </summary>
         public string OwnerShortName
         {

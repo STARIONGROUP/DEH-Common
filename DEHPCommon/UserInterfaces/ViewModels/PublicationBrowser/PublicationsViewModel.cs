@@ -65,11 +65,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         private int currentIteration;
 
         /// <summary>
-        /// The Panel Caption
-        /// </summary>
-        private const string PanelCaption = "Publications";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PublicationsViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
@@ -356,15 +351,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
 
             this.Publications.Add(row);
             row.ContainedRows.AddRange(listOfParams.OrderBy(r => r.Thing.ParameterType.Name));
-        }
-
-        /// <summary>
-        /// Gets the list of <see cref="ParameterOrOverrideBase"/> to be published.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable{T}"/> of to be published <see cref="ParameterOrOverrideBase"/>s</returns>
-        private IEnumerable<ParameterOrOverrideBase> GetListOfParametersOrOverridesToPublish()
-        {
-            return this.Parameters.Select(r => r.Thing).Where(p => p.ToBePublished);
         }
 
         /// <summary>

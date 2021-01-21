@@ -88,7 +88,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
-            this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri) { IterationNumber = 1 };
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "DMN" };
             this.otherDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "otherDomain", ShortName = "ODMN" };
@@ -193,10 +193,12 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
+            Assert.AreEqual(1, viewmodel.CurrentIteration);
 
             var publicationRowViewModel = viewmodel.Publications.Single();
             Assert.That(publicationRowViewModel.OwnerShortName, Is.Not.Null.Or.Empty);
             Assert.That(publicationRowViewModel.Name, Is.Not.Null.Or.Empty);
+            Assert.That(publicationRowViewModel.ModelCode, Is.Empty);
         }
 
         [Test]
