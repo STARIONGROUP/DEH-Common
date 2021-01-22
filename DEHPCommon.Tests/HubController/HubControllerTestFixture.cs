@@ -211,14 +211,18 @@ namespace DEHPCommon.Tests.HubController
 
             var thingsToDelete = new List<Parameter>()
             {
-                parameter
+                parameter, parameter
             };
 
             Assert.DoesNotThrowAsync(
                 async () => await this.hubController.Delete<ElementDefinition, Parameter>(
                     thingsToDelete, (e, p) => e.Parameter.Remove(p)));
 
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.DoesNotThrowAsync(
+                async () => await this.hubController.Delete<ElementDefinition, Parameter>(
+                    new List<Parameter>(), null));
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
         }
 
         [Test]

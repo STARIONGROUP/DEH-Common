@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NetChangePreviewViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="ObjectBrowser.xaml.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2020 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,21 +22,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels
+namespace DEHPCommon.UserInterfaces.Views.ObjectBrowser
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.Rows.Interfaces;
-
-    using ReactiveUI;
-
     /// <summary>
-    /// View model for the preview net change pane allowing the user to preview the change that will be transfered to either the Dst of the Hub
+    /// Interaction logic for ObjectBrowser.xaml
     /// </summary>
-    public abstract class NetChangePreviewViewModel : INetChangePreviewViewModel
+    public partial class ObjectBrowser
     {
         /// <summary>
-        /// Gets or sets the rows that this view model represents
+        /// Initializes a new <see cref="ObjectBrowser"/>
         /// </summary>
-        private ReactiveList<INetChangePreviewRowViewModel> Things { get; } = new ReactiveList<INetChangePreviewRowViewModel>();
+        public ObjectBrowser()
+        {
+            this.InitializeComponent();
+        }
     }
 }

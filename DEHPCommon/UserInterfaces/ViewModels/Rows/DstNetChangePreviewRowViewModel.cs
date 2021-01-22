@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NetChangePreviewViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DstBaseNetChangePreviewRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,21 +22,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels
+namespace DEHPCommon.UserInterfaces.ViewModels.Rows
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.Rows.Interfaces;
-
-    using ReactiveUI;
-
     /// <summary>
-    /// View model for the preview net change pane allowing the user to preview the change that will be transfered to either the Dst of the Hub
+    /// View model that represents a row of mapped dst object
     /// </summary>
-    public abstract class NetChangePreviewViewModel : INetChangePreviewViewModel
+    public abstract class DstBaseNetChangePreviewRowViewModel<TThing> : BaseNetChangePreviewRowViewModel<TThing>
     {
-        /// <summary>
-        /// Gets or sets the rows that this view model represents
-        /// </summary>
-        private ReactiveList<INetChangePreviewRowViewModel> Things { get; } = new ReactiveList<INetChangePreviewRowViewModel>();
     }
 }

@@ -64,6 +64,8 @@
     <None Remove="Resources\Images\Warning_16x16.png" />
     <None Remove="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml" />
     <None Remove="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml" />
+    <None Remove="UserInterfaces\Views\NetChangePreview\ObjectBrowser.xaml" />
+    <None Remove="UserInterfaces\Views\NetChangePreview\ObjectBrowserDataTemplates.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -108,6 +110,13 @@
     </Page>
     <Page Include="UserInterfaces\Views\HubBrowserHeader.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\NetChangePreview\ObjectBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\NetChangePreview\ObjectBrowserDataTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\ObjectBrowser\ObjectBrowser.xaml">
