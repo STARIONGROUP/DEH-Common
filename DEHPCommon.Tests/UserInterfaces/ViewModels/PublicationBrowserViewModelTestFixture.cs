@@ -37,8 +37,6 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using CDP4Dal.Permission;
 
     using DEHPCommon.HubController.Interfaces;
-    using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
-    using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser;
 
     using Moq;
@@ -51,7 +49,6 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     public class PublicationBrowserViewModelTestFixture
     {
         private PublicationBrowserViewModel viewModel;
-        private PublicationsViewModel publicationsViewModel;
 
         private Iteration iteration;
         private DomainOfExpertise domain;

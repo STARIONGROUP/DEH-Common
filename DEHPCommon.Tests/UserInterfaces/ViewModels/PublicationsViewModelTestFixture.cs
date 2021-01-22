@@ -315,5 +315,13 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             vm = new PublicationsViewModel(this.iteration, this.session.Object);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
+
+        [Test]
+        public void VerifyDispose()
+        {
+            var viewmodel = new PublicationsViewModel(this.iteration, this.session.Object);
+
+            Assert.DoesNotThrow(() => viewmodel.Dispose());
+        }
     }
 }
