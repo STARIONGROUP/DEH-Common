@@ -33,6 +33,7 @@ namespace DEHPCommon
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+    using DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser;
     using DEHPCommon.UserPreferenceHandler;
     using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
@@ -71,6 +72,7 @@ namespace DEHPCommon
         {
             containerBuilder.RegisterType<LoginViewModel>().As<ILoginViewModel>();
             containerBuilder.RegisterType<ObjectBrowserViewModel>().As<IObjectBrowserViewModel>();
+            containerBuilder.RegisterType<PublicationBrowserViewModel>().As<IPublicationBrowserViewModel>();
             containerBuilder.RegisterType<HubBrowserHeaderViewModel>().As<IHubBrowserHeaderViewModel>();
             containerBuilder.RegisterType<StatusBarControlViewModel>().As<IStatusBarControlViewModel>().SingleInstance();
             containerBuilder.RegisterType<NetChangePreviewViewModel>().As<INetChangePreviewViewModel>();

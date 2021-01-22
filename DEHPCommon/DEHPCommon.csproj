@@ -63,6 +63,7 @@
     <None Remove="Resources\Images\Thing\siteRdl_32x32.png" />
     <None Remove="Resources\Images\Warning_16x16.png" />
     <None Remove="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml" />
+    <None Remove="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -114,6 +115,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\ObjectBrowser\ObjectBrowserDataTemplates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\SplashScreen.xaml">
