@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ThingBaseNetChangePreviewRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ThingNetChangePreviewRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,16 +22,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels.Rows
+namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Rows
 {
     using CDP4Common.CommonData;
-
-    using ReactiveUI;
 
     /// <summary>
     /// View model that represents a row in the <see cref="NetChangePreviewViewModel"/>
     /// </summary>
-    public abstract class ThingBaseNetChangePreviewRowViewModel<TThing> : BaseNetChangePreviewRowViewModel<TThing>
+    public class ThingNetChangePreviewRowViewModel : BaseNetChangePreviewRowViewModel<Thing>
     {
+        /// <summary>
+        /// Gets or sets this represented thing
+        /// </summary>
+        public override Thing Thing { get; set; }
     }
 }

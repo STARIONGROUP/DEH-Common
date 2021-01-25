@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DstBaseNetChangePreviewRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="NetChangePreview.xaml.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2020 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,12 +22,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels.Rows
+namespace DEHPCommon.UserInterfaces.Views.NetChangePreview
 {
     /// <summary>
-    /// View model that represents a row of mapped dst object
+    /// Interaction logic for NetChangePreviewr.xaml
     /// </summary>
-    public abstract class DstBaseNetChangePreviewRowViewModel<TThing> : BaseNetChangePreviewRowViewModel<TThing>
+    public partial class NetChangePreview
     {
+        /// <summary>
+        /// Initializes a new <see cref="NetChangePreview"/>
+        /// </summary>
+        public NetChangePreview()
+        {
+            this.InitializeComponent();
+        }
     }
 }

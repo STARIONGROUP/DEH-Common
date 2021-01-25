@@ -22,21 +22,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels.Rows
+namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Rows
 {
     using CDP4Common.CommonData;
 
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.Rows.Interfaces;
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
 
     using ReactiveUI;
 
     /// <summary>
-    /// Base Row view model for <see cref="ThingBaseNetChangePreviewRowViewModel{T}"/> and <see cref="DstBaseNetChangePreviewRowViewModel{T}"/>
+    /// Base Row view model for <see cref="ThingNetChangePreviewRowViewModel"/> and <see cref="DstBaseNetChangePreviewRowViewModel"/>
     /// </summary>
-    /// <typeparam name="TThing">The type of object represented by one of the inheriting row view model</typeparam>
+    /// <typeparam name="TThing">The type of the object this row represents</typeparam>
     public abstract class BaseNetChangePreviewRowViewModel<TThing> : ReactiveObject, INetChangePreviewRowViewModel
     {
+        /// <summary>
+        /// Gets or sets this represented thing
+        /// </summary>
+        public abstract TThing Thing { get; set; }
+
         /// <summary>
         /// Backing field for <see cref="ThingKind"/>
         /// </summary>
@@ -52,11 +57,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
             set => this.RaiseAndSetIfChanged(ref this.thingKind, value);
         }
 
-        /// <summary>
-        /// Gets or sets this represented thing
-        /// </summary>
-        public TThing Thing { get; set; }
-        
         /// <summary>
         /// Backing field for <see cref="NewValue"/>
         /// </summary>
@@ -79,7 +79,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         /// <summary>
         /// Gets or sets this row new values
         /// </summary>
-        public string OldValues
+        public string OldValue
         {
             get => this.oldValue;
             set => this.RaiseAndSetIfChanged(ref this.oldValue, value);

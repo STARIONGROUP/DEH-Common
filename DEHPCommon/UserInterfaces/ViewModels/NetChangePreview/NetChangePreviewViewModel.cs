@@ -22,21 +22,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels
+namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.Rows.Interfaces;
-
-    using ReactiveUI;
+    using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
 
     /// <summary>
     /// View model for the preview net change pane allowing the user to preview the change that will be transfered to either the Dst of the Hub
     /// </summary>
-    public abstract class NetChangePreviewViewModel : INetChangePreviewViewModel
+    public abstract class NetChangePreviewViewModel : ObjectBrowserViewModel, INetChangePreviewViewModel
     {
         /// <summary>
-        /// Gets or sets the rows that this view model represents
+        /// Initializes a new instance of the <see cref="ObjectBrowserViewModel"/> class.
         /// </summary>
-        private ReactiveList<INetChangePreviewRowViewModel> Things { get; } = new ReactiveList<INetChangePreviewRowViewModel>();
+        /// <param name="hubController">The <see cref="IHubController"/></param>
+        /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
+        protected NetChangePreviewViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService) : base(hubController, objectBrowserTreeSelectorService)
+        {
+        }
+
+        /// <summary>
+        /// Computes the old values for each <see cref="ObjectBrowserViewModel.Things"/>
+        /// </summary>
+        public abstract void ComputeValues();
     }
 }

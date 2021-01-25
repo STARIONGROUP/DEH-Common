@@ -63,9 +63,9 @@
     <None Remove="Resources\Images\Thing\siteRdl_32x32.png" />
     <None Remove="Resources\Images\Warning_16x16.png" />
     <None Remove="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml" />
+    <None Remove="UserInterfaces\Views\NetChangePreview\NetChangePreview.xaml" />
+    <None Remove="UserInterfaces\Views\NetChangePreview\NetChangePreviewDataTemplates.xaml" />
     <None Remove="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml" />
-    <None Remove="UserInterfaces\Views\NetChangePreview\ObjectBrowser.xaml" />
-    <None Remove="UserInterfaces\Views\NetChangePreview\ObjectBrowserDataTemplates.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -112,11 +112,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserInterfaces\Views\NetChangePreview\ObjectBrowser.xaml">
+    <Page Include="UserInterfaces\Views\NetChangePreview\NetChangePreview.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserInterfaces\Views\NetChangePreview\ObjectBrowserDataTemplates.xaml">
+    <Page Include="UserInterfaces\Views\NetChangePreview\NetChangePreviewDataTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\ObjectBrowser\ObjectBrowser.xaml">

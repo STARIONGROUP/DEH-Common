@@ -22,12 +22,44 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels.Rows.Interfaces
+namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces
 {
+    using CDP4Common.CommonData;
+
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Rows;
+
+    using ReactiveUI;
+
     /// <summary>
-    /// Interface definition for the <see cref="BaseNetChangePreviewRowViewModel{TThing}"/>
+    /// Interface definition for the <see cref="BaseNetChangePreviewRowViewModel{T}"/>
     /// </summary>
-    public interface INetChangePreviewRowViewModel 
+    public interface INetChangePreviewRowViewModel
     {
+        /// <summary>
+        /// Gets or sets this row <see cref="ClassKind"/>
+        /// </summary>
+        /// <remarks>If this view model represents a dst object <see cref="ThingKind"/> = <see cref="ClassKind.NotThing"/> which is the default value</remarks>
+        ClassKind ThingKind { get; set; }
+
+        /// <summary>
+        /// Gets or sets this row new values
+        /// </summary>
+        string NewValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets this row new values
+        /// </summary>
+        string OldValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets this row new values
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets this row contained rows
+        /// </summary>
+        ReactiveList<INetChangePreviewViewModel> ContainedRows { get; set; }
     }
 }

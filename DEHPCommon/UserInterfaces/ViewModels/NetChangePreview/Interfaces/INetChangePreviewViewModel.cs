@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ObjectBrowser.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="INetChangePreviewViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -22,19 +22,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.Views.ObjectBrowser
+namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces
 {
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview;
+
+    using ReactiveUI;
+
     /// <summary>
-    /// Interaction logic for ObjectBrowser.xaml
+    /// Interface definition for the <see cref="NetChangePreviewViewModel"/>
     /// </summary>
-    public partial class ObjectBrowser
+    public interface INetChangePreviewViewModel
     {
         /// <summary>
-        /// Initializes a new <see cref="ObjectBrowser"/>
+        /// Computes the old values for each <see cref="ObjectBrowserViewModel.Things"/>
         /// </summary>
-        public ObjectBrowser()
-        {
-            this.InitializeComponent();
-        }
+        void ComputeValues();
     }
 }

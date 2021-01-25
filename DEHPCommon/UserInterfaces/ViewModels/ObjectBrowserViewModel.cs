@@ -50,7 +50,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// The <see cref="IHubController"/>
         /// </summary>
-        private readonly IHubController hubController;
+        protected readonly IHubController HubController;
 
         /// <summary>
         /// The <see cref="IObjectBrowserTreeSelectorService"/>
@@ -118,7 +118,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
         public ObjectBrowserViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService)
         {
-            this.hubController = hubController;
+            this.HubController = hubController;
             this.objectBrowserTreeSelectorService = objectBrowserTreeSelectorService;
             this.Caption = "Hub Object Browser";
             this.InitializesCommandsAndObservables();
@@ -129,14 +129,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private void InitializesCommandsAndObservables()
         {
-            this.WhenAnyValue(x => x.hubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
+            this.WhenAnyValue(x => x.HubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
                     this.IsBusy = true;
 
-                    if (this.hubController.IsSessionOpen && this.hubController.OpenIteration != null)
+                    if (this.HubController.IsSessionOpen && this.HubController.OpenIteration != null)
                     {
-                        this.ToolTip = $"{this.hubController.Session.DataSourceUri}\n{this.hubController.Session.ActivePerson.Name}";
+                        this.ToolTip = $"{this.HubController.Session.DataSourceUri}\n{this.HubController.Session.ActivePerson.Name}";
                         this.BuildTrees();
                     }
                     else
@@ -150,7 +150,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.CanMap = this.WhenAny(
                 vm => vm.SelectedThing,
                 vm => vm.SelectedThings.CountChanged,
-                vm => vm.hubController.OpenIteration,
+                vm => vm.HubController.OpenIteration,
                 (selected, selection, iteration) =>
                     iteration.Value != null && (selected.Value != null || this.SelectedThings.Any()));
         }
@@ -158,14 +158,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Adds to the <see cref="Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
         /// </summary>
-        public void BuildTrees()
+        public virtual void BuildTrees()
         {
             foreach (var thingKind in this.objectBrowserTreeSelectorService.ThingKinds)
             {
                 if (thingKind == typeof(ElementDefinition) && 
-                    this.Things.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.hubController.OpenIteration.Iid))
+                    this.Things.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.HubController.OpenIteration.Iid))
                 {
-                    this.Things.Add(new ElementDefinitionsBrowserViewModel(this.hubController.OpenIteration, this.hubController.Session));
+                    this.Things.Add(new ElementDefinitionsBrowserViewModel(this.HubController.OpenIteration, this.HubController.Session));
                 }
             }
         }
