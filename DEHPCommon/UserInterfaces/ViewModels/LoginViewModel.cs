@@ -294,7 +294,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 x => x.SelectedEngineeringModel,
                 x => x.SelectedDomainOfExpertise,
                 (loginSuccess, iteration, engineeringModel, domain) =>
-                    loginSuccess && iteration != null && engineeringModel != null && domain != null).Where(x => x is true);
+                    loginSuccess && iteration != null && engineeringModel != null && domain != null);
 
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, async _ => await this.ExecuteLogin());
             this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose, async _ => await this.CloseCommandExecute());
@@ -385,11 +385,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
             if (activeParticipant.Domain.Count != 0)
             {
-                this.DomainsOfExpertise.AddRange(activeParticipant.Domain.OrderBy(x => x.Name).Select(x => new DomainOfExpertiseRowViewModel(x)));
+                foreach (var vm in activeParticipant.Domain.OrderBy(x => x.Name).Select(x => new DomainOfExpertiseRowViewModel(x)))
+                {
+                    this.DomainsOfExpertise.Add(vm);
+                }
 
-                this.SelectedDomainOfExpertise = this.DomainsOfExpertise.Any(x => x.Thing == activeParticipant.Person.DefaultDomain)
-                    ? new DomainOfExpertiseRowViewModel(activeParticipant.Person.DefaultDomain)
-                    : this.DomainsOfExpertise.First();
+                this.SelectedDomainOfExpertise = this.DomainsOfExpertise.FirstOrDefault(x => x.Thing == activeParticipant.Person.DefaultDomain);
             }
         }
 
@@ -399,7 +400,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void PopulateIterations()
         {
             this.Iterations.Clear();
-            this.Iterations.AddRange(this.SelectedEngineeringModel.Thing.IterationSetup.OrderBy(x => x.IterationNumber).Select(x => new IterationRowViewModel(x)));
+
+            foreach (var vm in this.SelectedEngineeringModel.Thing.IterationSetup.OrderBy(i => i.IterationNumber).Select(i => new IterationRowViewModel(i)))
+            {
+                this.Iterations.Add(vm);
+            }
         }
 
         /// <summary>
@@ -409,10 +414,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.EngineeringModels.Clear();
 
-            this.EngineeringModels.AddRange(
-                this.hubController.GetEngineeringModels()
-                    .OrderBy(m => m.Name)
-                    .Select(x => new EngineeringModelRowViewModel(x)));
+            foreach (var vm in this.hubController.GetEngineeringModels().OrderBy(m => m.Name).Select(m => new EngineeringModelRowViewModel(m)))
+            {
+                this.EngineeringModels.Add(vm);
+            }
         }
     }
 }
