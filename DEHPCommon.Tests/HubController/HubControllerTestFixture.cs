@@ -319,6 +319,16 @@ namespace DEHPCommon.Tests.HubController
         }
 
         [Test]
+        public void VerifyUploadFromPath()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.hubController.Upload(this.uploadTestFilePath));
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()), Times.Once);
+
+            this.fileDialogService.Verify(this.openFileDialogExpression, Times.Never);
+        }
+
+        [Test]
         public void VerifyDownload()
         {
             this.session.Setup(x => x.ReadFile(It.IsAny<FileRevision>())).ReturnsAsync(Encoding.ASCII.GetBytes(FileContent));
@@ -357,6 +367,56 @@ namespace DEHPCommon.Tests.HubController
             this.session.Verify(x => x.ReadFile(It.IsAny<FileRevision>()), Times.Exactly(2));
 
             this.fileDialogService.Verify(this.saveFileDialogExpression, Times.Exactly(2));
+        }
+
+        [Test]
+        public void VerifyDownloadFileStream()
+        {
+            this.session.Setup(x => x.ReadFile(It.IsAny<FileRevision>())).ReturnsAsync(Encoding.ASCII.GetBytes(FileContent));
+
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Name = "file.tar.gz",
+                Creator = new Participant(),
+                ContainingFolder = new Folder(),
+                CreatedOn = DateTime.UtcNow.AddHours(-1),
+                ContentHash = "contenthash"
+            };
+
+            fileRevision.FileType.Add(new FileType());
+
+            var file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                FileRevision = { fileRevision }
+            };
+
+            var destinationFile = new FileStream(this.downloadTestFilePath, FileMode.Create);
+
+            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(default(File), destinationFile));
+            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(default(FileRevision), destinationFile));
+
+            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(file, destinationFile));
+            destinationFile.Close();
+
+            var result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
+            System.IO.File.Delete(this.downloadTestFilePath);
+
+            Assert.AreEqual(FileContent, Encoding.ASCII.GetString(result));
+            Assert.IsFalse(System.IO.File.Exists(this.downloadTestFilePath));
+
+            destinationFile = new FileStream(this.downloadTestFilePath, FileMode.Create);
+            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(fileRevision, destinationFile));
+            destinationFile.Close();
+
+            result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
+            System.IO.File.Delete(this.downloadTestFilePath);
+
+            Assert.AreEqual(FileContent, Encoding.ASCII.GetString(result));
+            Assert.IsFalse(System.IO.File.Exists(this.downloadTestFilePath));
+
+            this.session.Verify(x => x.ReadFile(It.IsAny<FileRevision>()), Times.Exactly(2));
+
+            this.fileDialogService.Verify(this.saveFileDialogExpression, Times.Never);
         }
 
         [Test]
