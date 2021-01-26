@@ -428,6 +428,69 @@ namespace DEHPCommon.HubController
         }
 
         /// <summary>
+        /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="file"></param>
+        /// <param name="iteration"></param>
+        /// <param name="domain"></param>
+        public async Task Upload(string filePath, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
+        {
+            iteration ??= this.GetIteration().Keys.First();
+            domain ??= this.Session.QueryCurrentDomainOfExpertise();
+            var iDalUri = new Uri(this.Session.DataSourceUri);
+
+            var fileStore = iteration.DomainFileStore.FirstOrDefault(x => x.Owner.Iid == domain.Iid);
+
+            if (fileStore is null)
+            {
+                return;
+            }
+
+            var fileName = Path.GetFileName(filePath);
+            var fileExtension = Path.GetExtension(filePath);
+
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
+            {
+                CreatedOn = DateTime.UtcNow,
+                Name = fileName,
+                ContentHash = this.CalculateContentHash(filePath),
+                LocalPath = filePath
+            };
+
+            // When extension is defined, it will contains "." prefix,
+            // remove to use in ComputeFileTypes()
+            if (fileExtension.StartsWith("."))
+            {
+                fileExtension = fileExtension.Substring(1);
+            }
+
+            string fname = ""; // ComputeFileTypes() seems not to work for 1 extension
+            var extensions = new[] { fileExtension };
+            var fileTypes = this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fname);
+            foreach (var item in fileTypes)
+            {
+                fileRevision.FileType.Add(item);
+            }
+
+            var clone = fileStore.Clone(true);
+
+            if (file is null)
+            {
+                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri);
+                clone.File.Add(file);
+            }
+
+            file.FileRevision.Add(fileRevision);
+
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), clone);
+            transaction.CreateOrUpdate(fileRevision);
+            transaction.CreateOrUpdate(file);
+
+            await this.Session.Write(transaction.FinalizeTransaction(), new[] { fileName });
+        }
+
+        /// <summary>
         /// Computes all the <see cref="FileType"/> of the file that is to be uploaded
         /// </summary>
         /// <param name="extensions">The file extensions</param>
@@ -569,5 +632,39 @@ namespace DEHPCommon.HubController
         /// </summary>
         public IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName)
             => this.OpenIteration.ExternalIdentifierMap.Where(x => x.ExternalToolName == toolName);
+
+        /// <summary>
+        /// Downloads a <see cref="File.CurrentFileRevision"/> into <see cref="System.IO.FileStream"/>
+        /// </summary>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(File file, FileStream destination)
+        {
+            if (file is null)
+            {
+                return;
+            }
+
+            await this.Download(file.CurrentFileRevision, destination);
+        }
+
+        /// <summary>
+        /// Downloads a specific <see cref="FileRevision"/>
+        /// </summary>
+        /// <param name="fileRevision">The <see cref="FileRevision"/></param>
+        /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(FileRevision fileRevision, FileStream destination)
+        {
+            if (fileRevision is null || destination is null)
+            {
+                return;
+            }
+
+            var fileContent = await this.Session.ReadFile(fileRevision);
+
+            destination.Write(fileContent, 0, fileContent.Length);
+        }
     }
 }
