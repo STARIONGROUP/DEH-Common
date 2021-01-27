@@ -26,8 +26,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces
 {
     using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview;
 
-    using ReactiveUI;
-
     /// <summary>
     /// Interface definition for the <see cref="NetChangePreviewViewModel"/>
     /// </summary>

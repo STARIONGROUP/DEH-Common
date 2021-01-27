@@ -229,7 +229,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
-        /// Updates this represented <see cref="ViewModelBase.Thing"/>
+        /// Updates this represented <see cref="Thing"/>
         /// </summary>
         /// <param name="thing">The new reference to an updated <see cref="Thing"/></param>
         public void UpdateThing(T thing)

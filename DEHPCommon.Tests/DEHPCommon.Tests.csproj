@@ -36,4 +36,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UserInterfaces\ViewModels\NetChangePreviewViewModel\" />
+  </ItemGroup>
+
 </Project>

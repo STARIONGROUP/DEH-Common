@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ThingNetChangePreviewRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="TransferControlViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,18 +22,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Rows
-{
-    using CDP4Common.CommonData;
+using NUnit.Framework;
 
-    /// <summary>
-    /// View model that represents a row in the <see cref="NetChangePreviewViewModel"/>
-    /// </summary>
-    public class ThingNetChangePreviewRowViewModel : BaseNetChangePreviewRowViewModel<Thing>
+namespace DEHPCommon.Tests.UserInterfaces.ViewModels
+{
+    using DEHPCommon.UserInterfaces.ViewModels;
+
+    [TestFixture]
+    public class TransferControlViewModelTestFixture
     {
-        /// <summary>
-        /// Gets or sets this represented thing
-        /// </summary>
-        public override Thing Thing { get; set; }
+        private class TestTransferControlViewModel : TransferControlViewModel
+        {
+        }
+
+        [Test]
+        public void VerifyProperties()
+        {
+            var vm = new TestTransferControlViewModel();
+            Assert.IsFalse(vm.IsIndeterminate);
+            Assert.IsNull(vm.TransferCommand);
+            Assert.IsNull(vm.CancelCommand);
+            Assert.Zero(vm.Progress);
+        }
     }
 }

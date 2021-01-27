@@ -34,7 +34,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
     public abstract class NetChangePreviewViewModel : ObjectBrowserViewModel, INetChangePreviewViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObjectBrowserViewModel"/> class.
+        /// Initializes a new instance of the <see cref="NetChangePreviewViewModel"/> class.
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
