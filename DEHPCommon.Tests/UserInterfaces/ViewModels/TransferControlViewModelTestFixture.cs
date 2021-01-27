@@ -38,7 +38,11 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         [Test]
         public void VerifyProperties()
         {
-            var vm = new TestTransferControlViewModel();
+            var vm = new TestTransferControlViewModel
+            {
+                Progress = 0, IsIndeterminate = false
+            };
+
             Assert.IsFalse(vm.IsIndeterminate);
             Assert.IsNull(vm.TransferCommand);
             Assert.IsNull(vm.CancelCommand);
