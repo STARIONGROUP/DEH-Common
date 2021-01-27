@@ -393,6 +393,7 @@ namespace DEHPCommon.HubController
         /// <param name="domain"></param>
         public async Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
         {
+            //TODO: remove duplicated code --> call Upload(filePath)
             iteration ??= this.GetIteration().Keys.First();
             domain ??= this.Session.QueryCurrentDomainOfExpertise();
             var iDalUri = new Uri(this.Session.DataSourceUri);
@@ -438,27 +439,31 @@ namespace DEHPCommon.HubController
         {
             iteration ??= this.GetIteration().Keys.First();
             domain ??= this.Session.QueryCurrentDomainOfExpertise();
-            var iDalUri = new Uri(this.Session.DataSourceUri);
 
             var fileStore = iteration.DomainFileStore.FirstOrDefault(x => x.Owner.Iid == domain.Iid);
 
             if (fileStore is null)
             {
+                this.logger.Error("No DomainFileStore found");
                 return;
             }
 
-            var fileName = Path.GetFileName(filePath);
+            var iDalUri = new Uri(this.Session.DataSourceUri);
+            var currentParticipant = this.OpenIteration.GetContainerOfType<EngineeringModel>().GetActiveParticipant(this.Session.ActivePerson);
+
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
             var fileExtension = Path.GetExtension(filePath);
 
             var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
             {
+                Creator = currentParticipant,
                 CreatedOn = DateTime.UtcNow,
                 Name = fileName,
                 ContentHash = this.CalculateContentHash(filePath),
                 LocalPath = filePath
             };
 
-            // When extension is defined, it will contains "." prefix,
+            // When extension is defined, it will contain "." prefix,
             // remove to use in ComputeFileTypes()
             if (fileExtension.StartsWith("."))
             {
@@ -468,26 +473,30 @@ namespace DEHPCommon.HubController
             string fname = ""; // ComputeFileTypes() seems not to work for 1 extension
             var extensions = new[] { fileExtension };
             var fileTypes = this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fname);
+            
             foreach (var item in fileTypes)
             {
                 fileRevision.FileType.Add(item);
             }
 
-            var clone = fileStore.Clone(true);
-
             if (file is null)
             {
                 file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri);
-                clone.File.Add(file);
+                file.Owner = this.CurrentDomainOfExpertise;
             }
 
-            file.FileRevision.Add(fileRevision);
+            var fileClone = file.Clone(false);
+            fileClone.FileRevision.Add(fileRevision);
 
-            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), clone);
+            var fileStoreClone = fileStore.Clone(true);
+            fileStoreClone.File.Add(fileClone);
+
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), fileStoreClone);
+            transaction.CreateOrUpdate(fileStoreClone);
+            transaction.CreateOrUpdate(fileClone);
             transaction.CreateOrUpdate(fileRevision);
-            transaction.CreateOrUpdate(file);
 
-            await this.Session.Write(transaction.FinalizeTransaction(), new[] { fileName });
+            await this.Session.Write(transaction.FinalizeTransaction(), new[] { filePath });
         }
 
         /// <summary>
