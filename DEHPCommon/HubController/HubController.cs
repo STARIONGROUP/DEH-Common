@@ -388,22 +388,16 @@ namespace DEHPCommon.HubController
         /// <summary>
         /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
         /// </summary>
-        /// <param name="file"></param>
-        /// <param name="iteration"></param>
-        /// <param name="domain"></param>
-        public async Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
-        {
-            await Upload(null, file, iteration, domain);
-        }
-
-        /// <summary>
-        /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="file"></param>
-        /// <param name="iteration"></param>
-        /// <param name="domain"></param>
-        public async Task Upload(string filePath, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
+        /// <param name="filePath">The full path to a local file to be uploaded</param>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
+        /// <remarks>
+        /// If <paramref name="filePath"/> is null, the user will be asked to select one
+        /// from a dialog box <see cref="GetFile"/>
+        /// </remarks>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
         {
             iteration ??= this.GetIteration().Keys.First();
             domain ??= this.Session.QueryCurrentDomainOfExpertise();
@@ -422,7 +416,7 @@ namespace DEHPCommon.HubController
             string fileName;
             string[] extensions;
 
-            if (String.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath))
             {
                 if (!this.GetFile(out var fPath, out var fName, out var fext))
                 {
@@ -618,12 +612,6 @@ namespace DEHPCommon.HubController
         }
         
         /// <summary>
-        /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
-        /// </summary>
-        public IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName)
-            => this.OpenIteration.ExternalIdentifierMap.Where(x => x.ExternalToolName == toolName);
-
-        /// <summary>
         /// Downloads a <see cref="File.CurrentFileRevision"/> into <see cref="System.IO.FileStream"/>
         /// </summary>
         /// <param name="file">The <see cref="File"/></param>
@@ -640,7 +628,7 @@ namespace DEHPCommon.HubController
         }
 
         /// <summary>
-        /// Downloads a specific <see cref="FileRevision"/>
+        /// Downloads a specific <see cref="FileRevision"/> into <see cref="System.IO.FileStream"/>
         /// </summary>
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
@@ -656,5 +644,11 @@ namespace DEHPCommon.HubController
 
             destination.Write(fileContent, 0, fileContent.Length);
         }
+
+        /// <summary>
+        /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
+        /// </summary>
+        public IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName)
+            => this.OpenIteration.ExternalIdentifierMap.Where(x => x.ExternalToolName == toolName);
     }
 }

@@ -182,20 +182,12 @@ namespace DEHPCommon.HubController.Interfaces
         /// <summary>
         /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
         /// </summary>
-        /// <param name="file"></param>
-        /// <param name="iteration"></param>
-        /// <param name="domain"></param>
-        Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
-
-        /// <summary>
-        /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
-        /// </summary>
         /// <param name="filePath">The full path to a local file to be uploaded</param>
         /// <param name="file">The <see cref="File"/></param>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
-        /// <returns></returns>
-        Task Upload(string filePath, File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
+        /// <returns>A <see cref="Task"/></returns>
+        Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
 
         /// <summary>
         /// Computes all the <see cref="FileType"/> of the file that is to be uploaded
@@ -229,7 +221,7 @@ namespace DEHPCommon.HubController.Interfaces
         Task Download(File file, System.IO.FileStream destination);
 
         /// <summary>
-        /// Downloads a specific <see cref="FileRevision"/>
+        /// Downloads a specific <see cref="FileRevision"/> into <see cref="System.IO.FileStream"/>
         /// </summary>
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
