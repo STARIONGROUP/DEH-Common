@@ -393,39 +393,7 @@ namespace DEHPCommon.HubController
         /// <param name="domain"></param>
         public async Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
         {
-            //TODO: remove duplicated code --> call Upload(filePath)
-            iteration ??= this.GetIteration().Keys.First();
-            domain ??= this.Session.QueryCurrentDomainOfExpertise();
-            var iDalUri = new Uri(this.Session.DataSourceUri);
-
-            var fileStore = iteration.DomainFileStore.FirstOrDefault(x => x.Owner.Iid == domain.Iid);
-
-            if (fileStore is null || !this.GetFile(out var filePath, out var fileName, out var extensions))
-            {
-                return;
-            }
-            
-            var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
-            {
-                CreatedOn = DateTime.UtcNow, Name = fileName, ContentHash = this.CalculateContentHash(filePath), LocalPath = filePath
-            };
-
-            fileRevision.FileType.AddRange(this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fileName));
-            
-            if (file is null)
-            {
-                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri);
-                fileStore.File.Add(file);
-            }
-
-            file.FileRevision.Add(fileRevision);
-            
-            var clone = fileStore.Clone(true);
-            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), clone);
-            transaction.CreateOrUpdate(fileRevision);
-            transaction.CreateOrUpdate(file);
-
-            await this.Session.Write(transaction.FinalizeTransaction(), new[] { fileName });
+            await Upload(null, file, iteration, domain);
         }
 
         /// <summary>
@@ -447,12 +415,31 @@ namespace DEHPCommon.HubController
                 this.logger.Error("No DomainFileStore found");
                 return;
             }
-
+            
             var iDalUri = new Uri(this.Session.DataSourceUri);
             var currentParticipant = this.OpenIteration.GetContainerOfType<EngineeringModel>().GetActiveParticipant(this.Session.ActivePerson);
 
-            var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var fileExtension = Path.GetExtension(filePath);
+            string fileName;
+            string[] extensions;
+
+            if (String.IsNullOrEmpty(filePath))
+            {
+                if (!this.GetFile(out var fPath, out var fName, out var fext))
+                {
+                    return;
+                }
+
+                filePath = fPath;
+                fileName = fName;
+                extensions = fext;
+            }
+            else
+            {
+                fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+                // Note: System.IO.Path.GetExtension() returns only the last extension including '.' prefix (not desired behavior)
+                extensions = System.IO.Path.GetFileName(filePath).Split(new[] { "." }, StringSplitOptions.None).Skip(1).ToArray();
+            }
 
             var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
             {
@@ -463,17 +450,9 @@ namespace DEHPCommon.HubController
                 LocalPath = filePath
             };
 
-            // When extension is defined, it will contain "." prefix,
-            // remove to use in ComputeFileTypes()
-            if (fileExtension.StartsWith("."))
-            {
-                fileExtension = fileExtension.Substring(1);
-            }
-
-            string fname = ""; // ComputeFileTypes() seems not to work for 1 extension
-            var extensions = new[] { fileExtension };
+            string fname = ""; // see issue: https://github.com/RHEAGROUP/DEHP-Common/issues/38
             var fileTypes = this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fname);
-            
+
             foreach (var item in fileTypes)
             {
                 fileRevision.FileType.Add(item);
@@ -481,8 +460,10 @@ namespace DEHPCommon.HubController
 
             if (file is null)
             {
-                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri);
-                file.Owner = this.CurrentDomainOfExpertise;
+                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
+                {
+                    Owner = this.CurrentDomainOfExpertise
+                };
             }
 
             var fileClone = file.Clone(false);

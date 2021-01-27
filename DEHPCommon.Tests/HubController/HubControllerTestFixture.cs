@@ -61,6 +61,7 @@ namespace DEHPCommon.Tests.HubController
 
         private Mock<ISession> session;
         private Participant participant;
+        private Person person;
         private DomainOfExpertise domain;
         private Iteration iteration;
         private Assembler assembler;
@@ -79,6 +80,13 @@ namespace DEHPCommon.Tests.HubController
         {
             this.assembler = new Assembler(this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
+            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            
+            this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Person = this.person
+            };
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -97,7 +105,8 @@ namespace DEHPCommon.Tests.HubController
                                     new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Extension = "zip" }
                                 }
                             }
-                        }
+                        },
+                        Participant = { this.participant }
                     },
                 },
                 DomainFileStore =
@@ -105,8 +114,6 @@ namespace DEHPCommon.Tests.HubController
                     new DomainFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain }
                 }
             };
-
-            this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.session = new Mock<ISession>();
 
@@ -119,6 +126,8 @@ namespace DEHPCommon.Tests.HubController
                 });
 
             this.session.Setup(x => x.OpenIterations).Returns(this.openIteration);
+
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
 
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>())).Returns(Task.CompletedTask);
@@ -311,6 +320,8 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public void VerifyUpload()
         {
+            this.hubController.OpenIteration = this.iteration;
+
             Assert.DoesNotThrowAsync(async () => await this.hubController.Upload());
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()), Times.Once);
@@ -321,6 +332,8 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public void VerifyUploadFromPath()
         {
+            this.hubController.OpenIteration = this.iteration;
+
             Assert.DoesNotThrowAsync(async () => await this.hubController.Upload(this.uploadTestFilePath));
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()), Times.Once);
