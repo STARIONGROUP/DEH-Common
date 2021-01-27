@@ -66,6 +66,7 @@
     <None Remove="UserInterfaces\Views\NetChangePreview\NetChangePreview.xaml" />
     <None Remove="UserInterfaces\Views\NetChangePreview\NetChangePreviewDataTemplates.xaml" />
     <None Remove="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml" />
+    <None Remove="UserInterfaces\Views\TransferControl.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -130,6 +131,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\SplashScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\TransferControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

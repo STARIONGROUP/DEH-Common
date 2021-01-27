@@ -89,6 +89,12 @@ namespace DEHPCommon.HubController.Interfaces
         /// <returns>An assert whether the session is open</returns>
         Task<bool> Open(Credentials credentials, ServerType serverType);
 
+        /// <inheritdoc cref="ISession.Reload"/>
+        Task Reload();
+
+        /// <inheritdoc cref="ISession.Refresh"/>
+        Task Refresh();
+
         /// <summary>
         /// Closes connection to the data-source and end the execution of this app
         /// </summary>

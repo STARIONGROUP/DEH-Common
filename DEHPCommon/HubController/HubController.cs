@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HubController.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -212,6 +212,18 @@ namespace DEHPCommon.HubController
             await this.Session.Open();
             this.IsSessionOpen = this.Session?.RetrieveSiteDirectory() != null;
             return this.IsSessionOpen;
+        }
+
+        /// <inheritdoc cref="ISession.Reload"/>
+        public async Task Reload()
+        {
+            await this.Session.Reload();
+        }
+
+        /// <inheritdoc cref="ISession.Refresh"/>
+        public async Task Refresh()
+        {
+            await this.Session.Refresh();
         }
 
         /// <summary>

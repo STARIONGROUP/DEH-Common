@@ -28,7 +28,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -130,22 +129,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private void InitializesCommandsAndObservables()
         {
             this.WhenAnyValue(x => x.HubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ =>
-                {
-                    this.IsBusy = true;
-
-                    if (this.HubController.IsSessionOpen && this.HubController.OpenIteration != null)
-                    {
-                        this.ToolTip = $"{this.HubController.Session.DataSourceUri}\n{this.HubController.Session.ActivePerson.Name}";
-                        this.BuildTrees();
-                    }
-                    else
-                    {
-                        this.Things.Clear();
-                    }
-
-                    this.IsBusy = false;
-                });
+                .Subscribe(_ => this.Reload());
             
             this.CanMap = this.WhenAny(
                 vm => vm.SelectedThing,
@@ -154,7 +138,31 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 (selected, selection, iteration) =>
                     iteration.Value != null && (selected.Value != null || this.SelectedThings.Any()));
         }
-        
+
+        /// <summary>
+        /// Reloads the the trees elements
+        /// </summary>
+        /// <param name="shouldReloadData"></param>
+        public void Reload(bool shouldReloadData = false)
+        {
+            this.IsBusy = true;
+
+            this.Things.Clear();
+
+            if (shouldReloadData)
+            {
+                this.HubController.Reload();
+            }
+
+            if (this.HubController.IsSessionOpen && this.HubController.OpenIteration != null)
+            {
+                this.ToolTip = $"{this.HubController.Session.DataSourceUri}\n{this.HubController.Session.ActivePerson.Name}";
+                this.BuildTrees();
+            }
+
+            this.IsBusy = false;
+        }
+
         /// <summary>
         /// Adds to the <see cref="Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
         /// </summary>
@@ -173,7 +181,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Populate the context menu for the implementing view model
         /// </summary>
-        public void PopulateContextMenu()
+        public virtual void PopulateContextMenu()
         {
             this.ContextMenu.Clear();
 

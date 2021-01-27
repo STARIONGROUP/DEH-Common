@@ -286,7 +286,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     !string.IsNullOrEmpty(uri));
 
             this.WhenAnyValue(x => x.SelectedEngineeringModel).Where(x => x != null).Subscribe(_ => this.PopulateIterations());
-            this.WhenAnyValue(x => x.SelectedIteration).Where(x => x != null).ObserveOn(RxApp.MainThreadScheduler).Subscribe(_ => this.PopulateDomainOfExpertise());
+            this.WhenAnyValue(x => x.SelectedIteration).Where(x => x != null).Subscribe(_ => this.PopulateDomainOfExpertise());
 
             var canClose = this.WhenAnyValue(
                 x => x.LoginSuccessful,

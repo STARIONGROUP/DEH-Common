@@ -84,6 +84,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         string ToolTip { get; }
 
         /// <summary>
+        /// Reloads the the trees elements
+        /// </summary>
+        /// <param name="shouldReloadData"></param>
+        void Reload(bool shouldReloadData = false);
+
+        /// <summary>
         /// Adds to the <see cref="ObjectBrowserViewModel.Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
         /// </summary>
         void BuildTrees();
