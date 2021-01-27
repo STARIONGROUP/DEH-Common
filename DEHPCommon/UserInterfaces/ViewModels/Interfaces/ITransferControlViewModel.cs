@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ITransfertControlViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ITransferControlViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -32,7 +32,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
     /// <summary>
     /// Interface definition for <see cref="TransferControlViewModel"/>
     /// </summary>
-    public interface ITransfertControlViewModel
+    public interface ITransferControlViewModel
     {
         /// <summary>
         /// Gets or sets a value indicating whether the progress bar is in a indeterminate state

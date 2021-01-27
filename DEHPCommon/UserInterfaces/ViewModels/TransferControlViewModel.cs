@@ -34,7 +34,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// <summary>
     /// View model for dst adapters transfert/cancel button and progress bar 
     /// </summary>
-    public abstract class TransferControlViewModel : ReactiveObject, ITransfertControlViewModel
+    public abstract class TransferControlViewModel : ReactiveObject, ITransferControlViewModel
     {
         /// <summary>
         /// Backing field for <see cref="IsIndeterminate"/>
