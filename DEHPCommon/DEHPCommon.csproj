@@ -64,6 +64,7 @@
     <None Remove="Resources\Images\Warning_16x16.png" />
     <None Remove="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml" />
     <None Remove="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml" />
+    <None Remove="UserInterfaces\Views\TransferControl.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -86,14 +87,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="6.0.0" />
-    <PackageReference Include="CDP4Common-CE" Version="6.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="6.2.0" />
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.2.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.2.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.4.0" />
-    <PackageReference Include="CDP4ServicesDal-CE" Version="6.2.0" />
-    <PackageReference Include="CDP4WspDal-CE" Version="6.2.0" />
+    <PackageReference Include="Autofac" Version="6.1.0" />
+    <PackageReference Include="CDP4Common-CE" Version="7.2.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.2.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="7.2.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.2.0" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.5.1" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="7.2.1" />
+    <PackageReference Include="CDP4WspDal-CE" Version="7.2.0" />
     <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />
@@ -121,6 +122,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\SplashScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\TransferControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -227,5 +227,17 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.RevisionNumber = objectChange.ChangedThing.RevisionNumber;
         }
+
+        /// <summary>
+        /// Updates this represented <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The new reference to an updated <see cref="Thing"/></param>
+        public void UpdateThing(T thing)
+        {
+            if (this.Thing.Iid == thing.Iid)
+            {
+                this.Thing = thing;
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NetChangePreviewViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ITransferControlViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,14 +22,36 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels
+namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    
+    using System.Reactive;
+    using System.Windows.Input;
+
+    using ReactiveUI;
+
     /// <summary>
-    /// View model for the preview net change pane allowing the user to preview the change that will be transfered to either the Dst of the Hub
+    /// Interface definition for <see cref="TransferControlViewModel"/>
     /// </summary>
-    public class NetChangePreviewViewModel : INetChangePreviewViewModel
+    public interface ITransferControlViewModel
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether the progress bar is in a indeterminate state
+        /// </summary>
+        bool IsIndeterminate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current progress value displayed in the pogress bar
+        /// </summary>
+        int Progress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ICommand"/> that triggers the transfer
+        /// </summary>
+        ReactiveCommand<Unit> TransferCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ICommand"/> that cancels the transfer command
+        /// </summary>
+        ReactiveCommand<Unit> CancelCommand { get; set; }
     }
 }

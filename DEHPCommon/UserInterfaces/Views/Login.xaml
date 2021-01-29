@@ -88,7 +88,7 @@
             <!--  Password  -->
             <dxlc:LayoutItemLabel Grid.Row="3" Grid.Column="0" Height="Auto" Margin="5" Content="Password" FontSize="12" />
             <dxe:PasswordBoxEdit Style="{StaticResource IsReadOnlyStyle}" Name="PasswordBoxEdit" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Height="Auto" Margin="5" FontSize="12"
-                                 Text="{Binding Path=Password, Mode=TwoWay}" />
+                                 Text="{Binding Path=Password, UpdateSourceTrigger=PropertyChanged}" />
             <Separator Background="Black" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3"/>
 
             <!--  HubConnection  -->

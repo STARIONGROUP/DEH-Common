@@ -22,12 +22,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
+namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces
 {
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview;
+
     /// <summary>
     /// Interface definition for the <see cref="NetChangePreviewViewModel"/>
     /// </summary>
     public interface INetChangePreviewViewModel
     {
+        /// <summary>
+        /// Computes the old values for each <see cref="ObjectBrowserViewModel.Things"/>
+        /// </summary>
+        void ComputeValues();
     }
 }
