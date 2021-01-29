@@ -28,6 +28,9 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.NetChangePreviewViewModel
 {
     using System;
 
+    using CDP4Dal;
+
+    using DEHPCommon.Events;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels;
@@ -47,12 +50,28 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.NetChangePreviewViewModel
         private class TestNetChangePreviewViewModel : NetChangePreviewViewModel
         {
             /// <summary>
+            /// Gets a value indicating a <see cref="ComputeValues"/> has been called
+            /// </summary>
+            public bool? HasComputed { get; private set; }
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="TestNetChangePreviewViewModel"/> class.
             /// </summary>
             /// <param name="hubController">The <see cref="IHubController"/></param>
             /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
             public TestNetChangePreviewViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService) : base(hubController, objectBrowserTreeSelectorService)
             {
+                CDPMessageBus.Current.Listen<UpdateObjectBrowserTreeEvent>().Subscribe(x =>
+                {
+                    if (x.Reset)
+                    {
+                        this.HasComputed = false;
+                    }
+                    else
+                    {
+                        this.ComputeValues();
+                    }
+                });
             }
 
             /// <summary>
@@ -60,7 +79,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.NetChangePreviewViewModel
             /// </summary>
             public override void ComputeValues()
             {
-                throw new System.NotImplementedException();
+                this.HasComputed = true;
             }
         }
 
@@ -75,7 +94,11 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.NetChangePreviewViewModel
         [Test]
         public void VerifyComputeValues()
         {
-            Assert.Throws<NotImplementedException>(() => this.viewModel.ComputeValues());
+            Assert.IsNull(this.viewModel.HasComputed);
+            CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
+            Assert.IsFalse(this.viewModel.HasComputed);
+            CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(false));
+            Assert.IsTrue(this.viewModel.HasComputed);
         }
     }
 }

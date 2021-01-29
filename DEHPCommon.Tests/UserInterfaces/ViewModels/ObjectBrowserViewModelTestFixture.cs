@@ -167,8 +167,10 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         [Test]
         public void VerifyReload()
         {
-            Assert.DoesNotThrow(() => this.viewModel.Reload(true));
-            this.hubController.Verify(x => x.Reload(), Times.Once);
+            this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
+            Assert.DoesNotThrow(() => this.viewModel.Reload());
+            this.hubController.Verify(x => x.IsSessionOpen, Times.Exactly(2));
+            this.hubController.Verify(x => x.OpenIteration, Times.Exactly(4));
         }
     }
 }

@@ -33,7 +33,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Dal;
+
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Events;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -130,6 +133,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.WhenAnyValue(x => x.HubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.Reload());
+
+            CDPMessageBus.Current.Listen<UpdateObjectBrowserTreeEvent>()
+                .Where(x => x.Reset)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.Reload());
             
             this.CanMap = this.WhenAny(
                 vm => vm.SelectedThing,
@@ -142,17 +150,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Reloads the the trees elements
         /// </summary>
-        /// <param name="shouldReloadData"></param>
-        public void Reload(bool shouldReloadData = false)
+        public void Reload()
         {
             this.IsBusy = true;
 
             this.Things.Clear();
-
-            if (shouldReloadData)
-            {
-                this.HubController.Reload();
-            }
 
             if (this.HubController.IsSessionOpen && this.HubController.OpenIteration != null)
             {

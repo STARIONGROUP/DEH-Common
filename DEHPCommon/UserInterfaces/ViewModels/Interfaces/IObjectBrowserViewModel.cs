@@ -86,8 +86,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Reloads the the trees elements
         /// </summary>
-        /// <param name="shouldReloadData"></param>
-        void Reload(bool shouldReloadData = false);
+        void Reload();
 
         /// <summary>
         /// Adds to the <see cref="ObjectBrowserViewModel.Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees

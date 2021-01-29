@@ -400,43 +400,90 @@ namespace DEHPCommon.HubController
         /// <summary>
         /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
         /// </summary>
-        /// <param name="file"></param>
-        /// <param name="iteration"></param>
-        /// <param name="domain"></param>
-        public async Task Upload(File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
+        /// <param name="filePath">The full path to a local file to be uploaded</param>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
+        /// <remarks>
+        /// If <paramref name="filePath"/> is null, the user will be asked to select one
+        /// from a dialog box <see cref="GetFile"/>
+        /// </remarks>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
         {
             iteration ??= this.GetIteration().Keys.First();
-            domain ??= this.Session.QueryCurrentDomainOfExpertise();
-            var iDalUri = new Uri(this.Session.DataSourceUri);
+            domain ??= this.CurrentDomainOfExpertise;
 
             var fileStore = iteration.DomainFileStore.FirstOrDefault(x => x.Owner.Iid == domain.Iid);
 
-            if (fileStore is null || !this.GetFile(out var filePath, out var fileName, out var extensions))
+            if (fileStore is null)
             {
+                this.logger.Error("No DomainFileStore found");
                 return;
             }
             
-            var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
-            {
-                CreatedOn = DateTime.UtcNow, Name = fileName, ContentHash = this.CalculateContentHash(filePath), LocalPath = filePath
-            };
+            var iDalUri = new Uri(this.Session.DataSourceUri);
+            var currentParticipant = this.OpenIteration.GetContainerOfType<EngineeringModel>().GetActiveParticipant(this.Session.ActivePerson);
 
-            fileRevision.FileType.AddRange(this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fileName));
-            
-            if (file is null)
+            string fileName;
+            string[] extensions;
+
+            if (string.IsNullOrEmpty(filePath))
             {
-                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri);
-                fileStore.File.Add(file);
+                if (!this.GetFile(out var fPath, out var fName, out var fext))
+                {
+                    return;
+                }
+
+                filePath = fPath;
+                fileName = fName;
+                extensions = fext;
+            }
+            else
+            {
+                fileName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+                // Note: System.IO.Path.GetExtension() returns only the last extension including '.' prefix (not desired behavior)
+                extensions = System.IO.Path.GetFileName(filePath).Split(new[] { "." }, StringSplitOptions.None).Skip(1).ToArray();
             }
 
-            file.FileRevision.Add(fileRevision);
-            
-            var clone = fileStore.Clone(true);
-            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), clone);
-            transaction.CreateOrUpdate(fileRevision);
-            transaction.CreateOrUpdate(file);
+            var fileRevision = new FileRevision(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
+            {
+                Creator = currentParticipant,
+                CreatedOn = DateTime.UtcNow,
+                Name = fileName,
+                ContentHash = this.CalculateContentHash(filePath),
+                LocalPath = filePath
+            };
 
-            await this.Session.Write(transaction.FinalizeTransaction(), new[] { fileName });
+            string fname = ""; // see issue: https://github.com/RHEAGROUP/DEHP-Common/issues/38
+            var fileTypes = this.ComputeFileTypes(extensions, this.GetAllowedFileType(iteration), ref fname);
+
+            foreach (var item in fileTypes)
+            {
+                fileRevision.FileType.Add(item);
+            }
+
+            if (file is null)
+            {
+                file = new File(Guid.NewGuid(), this.Session.Assembler.Cache, iDalUri)
+                {
+                    Owner = this.CurrentDomainOfExpertise
+                };
+            }
+
+            var fileClone = file.Clone(false);
+            fileClone.FileRevision.Add(fileRevision);
+
+            var fileStoreClone = fileStore.Clone(true);
+            fileStoreClone.File.Add(fileClone);
+
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(fileStore), fileStoreClone);
+            transaction.CreateOrUpdate(fileStoreClone);
+            transaction.CreateOrUpdate(fileClone);
+            transaction.CreateOrUpdate(fileRevision);
+
+            await this.Session.Write(transaction.FinalizeTransaction(), new[] { filePath });
         }
 
         /// <summary>
@@ -576,6 +623,40 @@ namespace DEHPCommon.HubController
             }
         }
         
+        /// <summary>
+        /// Downloads a <see cref="File.CurrentFileRevision"/> into <see cref="System.IO.FileStream"/>
+        /// </summary>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(File file, FileStream destination)
+        {
+            if (file is null)
+            {
+                return;
+            }
+
+            await this.Download(file.CurrentFileRevision, destination);
+        }
+
+        /// <summary>
+        /// Downloads a specific <see cref="FileRevision"/> into <see cref="System.IO.FileStream"/>
+        /// </summary>
+        /// <param name="fileRevision">The <see cref="FileRevision"/></param>
+        /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task Download(FileRevision fileRevision, FileStream destination)
+        {
+            if (fileRevision is null || destination is null)
+            {
+                return;
+            }
+
+            var fileContent = await this.Session.ReadFile(fileRevision);
+
+            destination.Write(fileContent, 0, fileContent.Length);
+        }
+
         /// <summary>
         /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
         /// </summary>
