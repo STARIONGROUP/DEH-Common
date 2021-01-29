@@ -508,5 +508,21 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             var paramRow = vm.ContainedRows.Single();
             Assert.AreSame(this.parameter5ForSubscription, paramRow.Thing);
         }
+
+        [Test]
+        public void VerifyUpdateThing()
+        {
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            var newElementDefinition = this.elementDefinition.Clone(true);
+            newElementDefinition.Iid = Guid.NewGuid();
+
+            Assert.DoesNotThrow(() => vm.UpdateThing(newElementDefinition));
+            Assert.AreNotSame(vm.Thing, newElementDefinition);
+
+            vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            newElementDefinition = this.elementDefinition.Clone(true);
+            Assert.DoesNotThrow(() => vm.UpdateThing(newElementDefinition));
+            Assert.AreSame(vm.Thing, newElementDefinition);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AppContainer.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2020 RHEA System S.A.
 // 
@@ -75,7 +75,6 @@ namespace DEHPCommon
             containerBuilder.RegisterType<PublicationBrowserViewModel>().As<IPublicationBrowserViewModel>();
             containerBuilder.RegisterType<HubBrowserHeaderViewModel>().As<IHubBrowserHeaderViewModel>();
             containerBuilder.RegisterType<StatusBarControlViewModel>().As<IStatusBarControlViewModel>().SingleInstance();
-            containerBuilder.RegisterType<NetChangePreviewViewModel>().As<INetChangePreviewViewModel>();
         }
     }
 }

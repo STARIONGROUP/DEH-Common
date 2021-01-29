@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HubController.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
@@ -214,6 +214,18 @@ namespace DEHPCommon.HubController
             return this.IsSessionOpen;
         }
 
+        /// <inheritdoc cref="ISession.Reload"/>
+        public async Task Reload()
+        {
+            await this.Session.Reload();
+        }
+
+        /// <inheritdoc cref="ISession.Refresh"/>
+        public async Task Refresh()
+        {
+            await this.Session.Refresh();
+        }
+
         /// <summary>
         /// Closes connection to the data-source and end the execution of this app
         /// </summary>
@@ -400,7 +412,7 @@ namespace DEHPCommon.HubController
         public async Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
         {
             iteration ??= this.GetIteration().Keys.First();
-            domain ??= this.Session.QueryCurrentDomainOfExpertise();
+            domain ??= this.CurrentDomainOfExpertise;
 
             var fileStore = iteration.DomainFileStore.FirstOrDefault(x => x.Owner.Iid == domain.Iid);
 

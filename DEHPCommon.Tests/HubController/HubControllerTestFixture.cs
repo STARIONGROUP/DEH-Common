@@ -137,8 +137,9 @@ namespace DEHPCommon.Tests.HubController
 
             this.session.Setup(x => x.Open()).Returns(Task.CompletedTask);
 
-            this.session.Setup(x => x.QueryCurrentDomainOfExpertise()).Returns(this.domain);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.AbsoluteUri);
+            this.session.Setup(x => x.Reload()).Returns(Task.CompletedTask);
+            this.session.Setup(x => x.Refresh()).Returns(Task.CompletedTask);
 
             this.relationship = new BinaryRelationship(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
@@ -200,7 +201,6 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public void VerifyWriteTransaction()
         {
-
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
             var elementClone = elementDefinition.Clone(false);
@@ -220,14 +220,18 @@ namespace DEHPCommon.Tests.HubController
 
             var thingsToDelete = new List<Parameter>()
             {
-                parameter
+                parameter, parameter
             };
 
             Assert.DoesNotThrowAsync(
                 async () => await this.hubController.Delete<ElementDefinition, Parameter>(
                     thingsToDelete, (e, p) => e.Parameter.Remove(p)));
 
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.DoesNotThrowAsync(
+                async () => await this.hubController.Delete<ElementDefinition, Parameter>(
+                    new List<Parameter>(), null));
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
         }
 
         [Test]
@@ -299,11 +303,13 @@ namespace DEHPCommon.Tests.HubController
             this.session.Setup(x => x.OpenIterations).Returns(default(IReadOnlyDictionary<Iteration, Tuple<DomainOfExpertise, Participant>>));
             Assert.IsNull(this.hubController.GetIteration());
             this.session.Setup(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>())).Returns(Task.CompletedTask);
+            
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>()
             {
                 { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)}
 
             });
+            
             Assert.DoesNotThrowAsync(async () => await this.hubController.GetIteration(this.iteration, this.domain));
         }
 
@@ -321,6 +327,7 @@ namespace DEHPCommon.Tests.HubController
         public void VerifyUpload()
         {
             this.hubController.OpenIteration = this.iteration;
+            this.hubController.CurrentDomainOfExpertise = this.domain;
 
             Assert.DoesNotThrowAsync(async () => await this.hubController.Upload());
 
@@ -333,6 +340,7 @@ namespace DEHPCommon.Tests.HubController
         public void VerifyUploadFromPath()
         {
             this.hubController.OpenIteration = this.iteration;
+            this.hubController.CurrentDomainOfExpertise = this.domain;
 
             Assert.DoesNotThrowAsync(async () => await this.hubController.Upload(this.uploadTestFilePath));
 
@@ -447,6 +455,15 @@ namespace DEHPCommon.Tests.HubController
 
             Assert.AreEqual(1, this.hubController.AvailableExternalIdentifierMap(toolName).Count());
             Assert.Zero(this.hubController.AvailableExternalIdentifierMap(null).Count());
+        }
+
+        [Test]
+        public void VerifyReloadRefresh()
+        {
+            Assert.DoesNotThrowAsync(() => this.hubController.Refresh());
+            Assert.DoesNotThrowAsync(() => this.hubController.Reload());
+            this.session.Verify(x => x.Reload(), Times.Once);
+            this.session.Verify(x => x.Refresh(), Times.Once);
         }
     }
 }

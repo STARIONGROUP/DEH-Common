@@ -28,6 +28,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -102,8 +103,11 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             this.hubController = new Mock<IHubController>();
             this.hubController.Setup(x => x.GetIteration()).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>() { { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) } });
+
+            this.hubController.Setup(x => x.Reload()).Returns(Task.CompletedTask);
             this.objectBrowserTreeSelectorService = new Mock<IObjectBrowserTreeSelectorService>();
             this.objectBrowserTreeSelectorService.Setup(x => x.ThingKinds).Returns(new List<Type>() { typeof(ElementDefinition) });
+            
             this.viewModel = new ObjectBrowserViewModel(this.hubController.Object, this.objectBrowserTreeSelectorService.Object);
             AppContainer.BuildContainer();
         }
@@ -158,6 +162,15 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.viewModel.SelectedThing = string.Empty;
             this.viewModel.PopulateContextMenu();
             Assert.IsNotEmpty(this.viewModel.ContextMenu);
+        }
+
+        [Test]
+        public void VerifyReload()
+        {
+            this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
+            Assert.DoesNotThrow(() => this.viewModel.Reload());
+            this.hubController.Verify(x => x.IsSessionOpen, Times.Exactly(2));
+            this.hubController.Verify(x => x.OpenIteration, Times.Exactly(4));
         }
     }
 }
