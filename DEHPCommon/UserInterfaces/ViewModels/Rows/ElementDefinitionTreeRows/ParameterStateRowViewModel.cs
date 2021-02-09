@@ -29,6 +29,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -81,6 +82,36 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             get => this.isDefault;
             set => this.RaiseAndSetIfChanged(ref this.isDefault, value);
+        }
+        
+        /// <summary>
+        /// Set the value of this row in case of the <see cref="ParameterType"/> is a <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        public void SetSampledFunctionValue()
+        {
+            var valueSet = (ParameterValueSetBase)this.Thing.QueryParameterBaseValueSet(this.Option, this.ActualState);
+
+            // perform checks to see if this is indeed a scalar value
+            if (valueSet.Published.Count < 2)
+            {
+                this.Logger.Warn("The value set of Parameter or override {0} is marked as SampledFunction, yet has less than 2 values.", this.Thing.Iid);
+            }
+
+            this.Switch = valueSet.ValueSwitch;
+
+            var samplesFunctionParameterType = this.Thing.ParameterType as SampledFunctionParameterType;
+
+            if (samplesFunctionParameterType == null)
+            {
+                this.Logger.Warn("ParameterType mismatch, in {0} is marked as SampledFunction, yet cannot be converted.", this.Thing.Iid);
+                this.Value = "-";
+
+                return;
+            }
+
+            var cols = samplesFunctionParameterType.NumberOfValues;
+
+            this.Value = $"[{valueSet.Published.Count / cols}x{cols}]";
         }
     }
 }

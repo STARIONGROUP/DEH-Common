@@ -292,6 +292,36 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         }
         
         /// <summary>
+        /// Set the value of this row in case of the <see cref="ParameterType"/> is a <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        private void SetSampledFunctionValue()
+        {
+            var valueSet = (ParameterValueSetBase)this.Thing.QueryParameterBaseValueSet(this.Option, null);
+            
+            // perform checks to see if this is indeed a scalar value
+            if (valueSet.Published.Count < 2)
+            {
+                this.Logger.Warn("The value set of Parameter or override {0} is marked as SampledFunction, yet has less than 2 values.", this.Thing.Iid);
+            }
+
+            this.Switch = valueSet.ValueSwitch;
+
+            var samplesFunctionParameterType = this.Thing.ParameterType as SampledFunctionParameterType;
+
+            if (samplesFunctionParameterType == null)
+            {
+                this.Logger.Warn("ParameterType mismatch, in {0} is marked as SampledFunction, yet cannot be converted.", this.Thing.Iid);
+                this.Value = "-";
+
+                return;
+            }
+
+            var cols = samplesFunctionParameterType.NumberOfValues;
+
+            this.Value = $"[{valueSet.Published.Count / cols}x{cols}]";
+        }
+
+        /// <summary>
         /// Sets the option dependent rows contained in this row.
         /// </summary>
         private void SetOptionProperties()
@@ -360,6 +390,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             {
                 this.SetComponentProperties(stateRow, actualOption, actualState);
             }
+            else if (this.Thing.ParameterType is SampledFunctionParameterType)
+            {
+                stateRow.SetSampledFunctionValue();
+            }
             else
             {
                 stateRow.SetValues();
@@ -367,7 +401,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             row.ContainedRows.Add(stateRow);
         }
-
+        
         /// <summary>
         /// Initialize the listeners and process the state-dependency of this <see cref="ParameterBase"/>
         /// </summary>
