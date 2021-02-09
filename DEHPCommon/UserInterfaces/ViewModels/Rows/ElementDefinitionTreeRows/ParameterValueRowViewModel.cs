@@ -245,16 +245,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             this.AddValueSetListener(valueSet);
 
-            if (this.Thing.ParameterType is SampledFunctionParameterType samplesFunctionParameterType)
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
-                var cols = samplesFunctionParameterType.NumberOfValues;
-
-                this.Computed = $"[{valueSet.Computed.Count / cols}x{cols}]";
-                this.Manual = $"[{valueSet.Manual.Count / cols}x{cols}]";
-                this.Reference = $"[{valueSet.Reference.Count / cols}x{cols}]";
-                this.Value = $"[{valueSet.ActualValue.Count / cols}x{cols}]";
-                this.Formula = $"[{valueSet.Formula.Count / cols}x{cols}]";
-                this.Published = $"[{valueSet.Published.Count / cols}x{cols}]";
+                this.SetSampledFunctionParameterProperties(valueSet);
             }
             else
             {

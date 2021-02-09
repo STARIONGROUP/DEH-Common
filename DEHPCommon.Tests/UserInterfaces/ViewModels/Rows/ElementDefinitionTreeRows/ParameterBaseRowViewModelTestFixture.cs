@@ -77,7 +77,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         private BooleanParameterType boolPt;
 
         private Assembler assembler;
-
+        private Parameter parameterSampledFunction;
 
         [SetUp]
         public void SetUp()
@@ -208,6 +208,29 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
                 Owner = this.activeDomain
             };
 
+            this.parameterSampledFunction = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ParameterType = new SampledFunctionParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    Name = "SampledFunctionType",
+                    IndependentParameterType =
+                    {
+                        new IndependentParameterTypeAssignment(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                        {
+                            ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                        }
+                    },
+                    DependentParameterType =
+                    {
+                        new DependentParameterTypeAssignment(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                        {
+                            ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                        }
+                    }
+                },
+                Owner = this.activeDomain
+            };
+
             this.parameter5ForSubscription = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.qqParamType,
@@ -237,6 +260,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.iteration.Element.Add(this.elementDefinitionForUsage2);
 
             this.elementDefinition.Parameter.Add(this.parameter1);
+            this.elementDefinition.Parameter.Add(this.parameterSampledFunction);
             this.elementDefinition.Parameter.Add(this.parameterCompound);
             this.elementDefinition.Parameter.Add(this.parameter5ForSubscription);
 
@@ -408,6 +432,23 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         }
 
         [Test]
+        public void VerifyThatSampledFunctionParameterAreSet()
+        {
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.SetSampledFunctionValueSet(valueSet);
+
+            this.parameterSampledFunction.ValueSet.Add(valueSet);
+
+            var row = new ParameterRowViewModel(this.parameterSampledFunction, this.session.Object, null);
+
+            Assert.AreEqual("SampledFunctionType", row.Name);
+
+            Assert.AreEqual(0, row.ContainedRows.Count);
+            Assert.AreEqual("[1x2]", row.Reference);
+            Assert.AreEqual("[3x2]", row.Manual);
+        }
+
+        [Test]
         public void VerifyThatOptionAndStateDependentParameterIsSet()
         {
             var valueSeto1s1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -549,7 +590,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             Assert.AreEqual("ref", row.Reference);
             Assert.That(row.ScaleName, Is.Null.Or.Empty);
         }
-
+        
         [Test]
         public void VerifyThatParameterComponentRowsUpdateOnParameterTypeUpdate()
         {
@@ -629,6 +670,35 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             var computedSet = new ValueArray<string>(new List<string> { "computed1", "computed2" });
             var publishedSet = new ValueArray<string>(new List<string> { "published1", "published2" });
             var formulaSet = new ValueArray<string>(new List<string> { "formula1", "formula2" });
+
+            valueset.Manual = manualSet;
+            valueset.Reference = referenceSet;
+            valueset.Computed = computedSet;
+            valueset.Published = publishedSet;
+            valueset.Formula = formulaSet;
+            valueset.ValueSwitch = ParameterSwitchKind.REFERENCE;
+        }
+        
+        /// <summary>
+        /// Set a ValueSet for SampledFunctionParameterType
+        /// </summary>
+        /// <param name="valueset">The <see cref="ParameterValueSetBase"/> to set</param>
+        private void SetSampledFunctionValueSet(ParameterValueSetBase valueset)
+        {
+            var manualSet = new ValueArray<string>(new List<string> 
+                { "manual10", "manual20", "manual11", "manual21", "manual12", "manual22" });
+
+            var referenceSet = new ValueArray<string>(new List<string> 
+                { "ref1", "ref2" });
+
+            var computedSet = new ValueArray<string>(new List<string> 
+                { "computed1", "computed2" });
+
+            var publishedSet = new ValueArray<string>(new List<string> 
+                { "published1", "published2" });
+
+            var formulaSet = new ValueArray<string>(new List<string> 
+                { "formula1", "formula2" });
 
             valueset.Manual = manualSet;
             valueset.Reference = referenceSet;

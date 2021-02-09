@@ -100,6 +100,58 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         private string ownerName;
 
         /// <summary>
+        /// Backing field for <see cref="Formula"/>
+        /// </summary>
+        private string formula;
+
+
+        /// <summary>
+        /// The <see cref="Option"/> being used
+        /// </summary>
+        private Option option;
+
+        /// <summary>
+        /// The backing field for the <see cref="Value"/> property.
+        /// </summary>
+        private string value;
+
+        /// <summary>
+        /// The backing field for the <see cref="Published"/> property.
+        /// </summary>
+        private string published;
+
+        /// <summary>
+        /// The backing field for the <see cref="State"/> property.
+        /// </summary>
+        private string state;
+
+        /// <summary>
+        /// The backing field for the <see cref="Computed"/> property.
+        /// </summary>
+        private string computed;
+
+        /// <summary>
+        /// The backing field for the <see cref="Manual"/> property.
+        /// </summary>
+        private object manual;
+
+        /// <summary>
+        /// The backing field for the <see cref="Reference"/> property.
+        /// </summary>
+        private object reference;
+
+        /// <summary>
+        /// The backing field for the <see cref="Switch"/> property.
+        /// </summary>
+        private ParameterSwitchKind? switchValue;
+
+        /// <summary>
+        /// The backing field for the <see cref="Name"/> property
+        /// </summary>
+        private string name;
+
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class
         /// </summary>
         /// <param name="parameterBase">The <see cref="ParameterBase"/> associated with this row</param>
@@ -218,51 +270,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         }
 
         /// <summary>
-        /// The <see cref="Option"/> being used
-        /// </summary>
-        private Option option;
-
-        /// <summary>
-        /// The backing field for the <see cref="Value"/> property.
-        /// </summary>
-        private string value;
-
-        /// <summary>
-        /// The backing field for the <see cref="Published"/> property.
-        /// </summary>
-        private string published;
-
-        /// <summary>
-        /// The backing field for the <see cref="State"/> property.
-        /// </summary>
-        private string state;
-        
-        /// <summary>
-        /// The backing field for the <see cref="Computed"/> property.
-        /// </summary>
-        private string computed;
-
-        /// <summary>
-        /// The backing field for the <see cref="Manual"/> property.
-        /// </summary>
-        private object manual;
-
-        /// <summary>
-        /// The backing field for the <see cref="Reference"/> property.
-        /// </summary>
-        private object reference;
-
-        /// <summary>
-        /// The backing field for the <see cref="Switch"/> property.
-        /// </summary>
-        private ParameterSwitchKind? switchValue;
-
-        /// <summary>
-        /// The backing field for the <see cref="Name"/> property
-        /// </summary>
-        private string name;
-
-        /// <summary>
         /// Gets or sets the Name
         /// </summary>
         public string Name
@@ -349,9 +356,18 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         }
 
         /// <summary>
+        /// Gets or sets the Formula column value
+        /// </summary>
+        public string Formula
+        {
+            get => this.formula;
+            set => this.RaiseAndSetIfChanged(ref this.formula, value);
+        }
+
+        /// <summary>
         /// Updates the properties of this row
         /// </summary>
-        protected  virtual void UpdateProperties()
+        protected virtual void UpdateProperties()
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
 
@@ -382,6 +398,28 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 this.OwnerShortName = this.Thing.Owner.ShortName;
                 this.OwnerName = this.Thing.Owner.Name;
             }
+        }
+        
+        /// <summary>
+        /// Set the properties when <see cref="ParameterType"/> is <see cref="SampledFunctionParameterType"/>
+        /// </summary>
+        /// <param name="valueSet">The <see cref="ParameterValueSetBase"/></param>
+        protected void SetSampledFunctionParameterProperties(IValueSet valueSet)
+        {
+            var cols = this.ParameterType.NumberOfValues;
+
+            this.Computed = $"[{valueSet.Computed.Count / cols}x{cols}]";
+            this.Manual = $"[{valueSet.Manual.Count / cols}x{cols}]";
+            this.Reference = $"[{valueSet.Reference.Count / cols}x{cols}]";
+            this.Value = $"[{valueSet.ActualValue.Count / cols}x{cols}]";
+            this.Formula = $"[{valueSet.Formula.Count / cols}x{cols}]";
+
+            this.Published = valueSet switch
+            {
+                ParameterValueSetBase parameterValueSetBase => $"[{parameterValueSetBase.Published.Count / cols}x{cols}]",
+                ParameterSubscriptionValueSet parameterSubscriptionValueSet => $"[{parameterSubscriptionValueSet.Computed.Count / cols}x{cols}]",
+                _ => $"[{valueSet.Computed.Count / cols}x{cols}]"
+            };
         }
     }
 }

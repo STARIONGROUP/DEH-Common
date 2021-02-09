@@ -131,16 +131,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 this.ScaleShortName = this.Thing.Scale == null ? "-" : this.Thing.Scale.ShortName;
             }
 
-            if (this.Thing.ParameterType is SampledFunctionParameterType samplesFunctionParameterType)
+            if (this.Thing.ParameterType is SampledFunctionParameterType)
             {
-                var cols = samplesFunctionParameterType.NumberOfValues;
-
-                this.Computed = $"[{valueset.Computed.Count / cols}x{cols}]";
-                this.Manual = $"[{valueset.Manual.Count / cols}x{cols}]";
-                this.Reference = $"[{valueset.Reference.Count / cols}x{cols}]";
-                this.Value = $"[{valueset.ActualValue.Count / cols}x{cols}]";
-                this.Formula = $"[{valueset.Formula.Count / cols}x{cols}]";
-                this.Published = $"[{valueset.Computed.Count / cols}x{cols}]";
+                this.SetSampledFunctionParameterProperties(valueset);
             }
             else
             {
