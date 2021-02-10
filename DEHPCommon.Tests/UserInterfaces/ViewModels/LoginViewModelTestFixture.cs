@@ -26,6 +26,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using System.Reactive.Concurrency;
     using System.Threading;
     using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using CDP4Dal.DAL;
 
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.UserInterfaces.Behaviors;
     using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Tabs;
     using DEHPCommon.UserPreferenceHandler;
@@ -69,11 +71,20 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         private DomainOfExpertise domain;
         private Person person;
         private Participant participant;
+        private Mock<ICloseWindowBehavior> closeBehavior;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.uri = "http://localhost:4000";
+            this.serverType = new KeyValuePair<ServerType, string>(ServerType.Cdp4WebServices, "CDP4 WebServices");
+            this.userName = "DEHP-UserNew";
+            this.password = "1234";
+
+            this.closeBehavior = new Mock<ICloseWindowBehavior>();
+            this.closeBehavior.Setup(x => x.Close());
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), null, null);
 
@@ -91,6 +102,8 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(new SiteDirectory());
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.Assembler).Returns(new Assembler(new Uri(this.uri)));
+            this.session.Setup(x => x.Credentials).Returns(new Credentials(this.userName, this.password, new Uri(this.uri)));
             this.hubController = new Mock<IHubController>();
             this.hubController.Setup(x => x.Session).Returns(this.session.Object);
             this.hubController.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(Task.FromResult(true));
@@ -125,11 +138,6 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
             this.loginViewModel = new LoginViewModel(this.hubController.Object, this.userPreferenceService.Object);
             this.loginLayoutGroupViewModel = new LoginLayoutGroupViewModel { LoginViewModel = this.loginViewModel };
-
-            this.serverType = new KeyValuePair<ServerType, string>(ServerType.Cdp4WebServices, "CDP4 WebServices");
-            this.uri = "http://localhost:4000";
-            this.userName = "DEHP-UserNew";
-            this.password = "1234";
         }
 
         [Test]
@@ -192,6 +200,8 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.loginViewModel.Uri = this.uri;
             this.loginViewModel.UserName = this.userName;
             this.loginViewModel.Password = this.password;
+            Assert.IsNull(this.loginViewModel.CloseWindowBehavior);
+            this.loginViewModel.CloseWindowBehavior = this.closeBehavior.Object;
 
             await this.loginViewModel.LoginCommand.ExecuteAsyncTask();
 
@@ -206,6 +216,11 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             
             this.loginViewModel.SelectedDomainOfExpertise = this.loginViewModel.DomainsOfExpertise.FirstOrDefault();
             Assert.IsTrue(this.loginViewModel.CloseCommand.CanExecute(null));
+
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.CloseCommand.ExecuteAsyncTask());
+            this.session.Setup(x => x.Credentials).Returns(default(Credentials));
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.CloseCommand.ExecuteAsyncTask());
+            this.closeBehavior.Verify(x => x.Close(), Times.Once());
         }
 
         [Test]

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LoginViewModel.cs"company="RHEA System S.A.">
 //    Copyright(c) 2020 RHEA System S.A.
 // 
@@ -296,8 +296,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 (loginSuccess, iteration, engineeringModel, domain) =>
                     loginSuccess && iteration != null && engineeringModel != null && domain != null);
 
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, async _ => await this.ExecuteLogin());
-            this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose, async _ => await this.CloseCommandExecute());
+            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, 
+                _ => this.ExecuteLogin(), RxApp.MainThreadScheduler);
+            
+            this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose,
+                _ => this.CloseCommandExecute(), RxApp.MainThreadScheduler);
 
             this.LoginSuccessful = false;
             this.LoginFailed = false;

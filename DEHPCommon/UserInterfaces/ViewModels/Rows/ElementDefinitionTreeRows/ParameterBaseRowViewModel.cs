@@ -52,12 +52,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// The current <see cref="ParameterGroup"/>
         /// </summary>IsMultiSelect
         private ParameterGroup currentGroup;
-
-        /// <summary>
-        /// Backing field for <see cref="Formula"/>
-        /// </summary>
-        private string formula;
-
+        
         /// <summary>
         /// The value-set listeners cache
         /// </summary>
@@ -145,15 +140,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
                 return enumValues;
             }
-        }
-
-        /// <summary>
-        /// Gets or sets the Formula column value
-        /// </summary>
-        public string Formula
-        {
-            get => this.formula;
-            set => this.RaiseAndSetIfChanged(ref this.formula, value);
         }
 
         /// <summary>
@@ -290,7 +276,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 }
             }
         }
-        
+
         /// <summary>
         /// Sets the option dependent rows contained in this row.
         /// </summary>
@@ -360,6 +346,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             {
                 this.SetComponentProperties(stateRow, actualOption, actualState);
             }
+            else if (this.Thing.ParameterType is SampledFunctionParameterType)
+            {
+                stateRow.SetSampledFunctionValue();
+                stateRow.SetValues();
+            }
             else
             {
                 stateRow.SetValues();
@@ -367,7 +358,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             row.ContainedRows.Add(stateRow);
         }
-
+        
         /// <summary>
         /// Initialize the listeners and process the state-dependency of this <see cref="ParameterBase"/>
         /// </summary>
@@ -412,7 +403,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 row.ContainedRows.Add(componentRow);
             }
         }
-
+        
         /// <summary>
         /// Clear the values
         /// </summary>

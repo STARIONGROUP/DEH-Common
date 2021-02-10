@@ -236,6 +236,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 this.State = string.Empty;
                 this.Option = null;
             }
+            else if (this.Thing.ParameterType is SampledFunctionParameterType)
+            {
+                this.SetSampledFunctionParameterProperties(valueSet);
+            }
             else
             {
                 this.Value = this.GetStringDisplayFromValueSet(valueSet.ActualValue, true);
