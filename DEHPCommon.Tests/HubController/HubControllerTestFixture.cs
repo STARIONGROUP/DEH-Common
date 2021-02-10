@@ -45,7 +45,7 @@ namespace DEHPCommon.Tests.HubController
     using DEHPCommon.HubController;
     using DEHPCommon.Services.FileDialogService;
     using DEHPCommon.UserPreferenceHandler.Enums;
-    
+
     using Moq;
 
     using Newtonsoft.Json;
@@ -464,6 +464,36 @@ namespace DEHPCommon.Tests.HubController
             Assert.DoesNotThrowAsync(() => this.hubController.Reload());
             this.session.Verify(x => x.Reload(), Times.Once);
             this.session.Verify(x => x.Refresh(), Times.Once);
+        }
+
+        [Test]
+        public void VerifyRegisterNewLogEntryToTransaction()
+        {
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+
+            var model = (EngineeringModel) this.iteration.Container;
+            this.assembler.Cache.TryAdd(new CacheKey(model.Iid, null), new Lazy<Thing>(() => this.iteration.Container));
+
+            var iterationClone = this.iteration.Clone(false);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(iterationClone), iterationClone);
+
+            this.hubController.OpenIteration = this.iteration;
+            this.hubController.CurrentDomainOfExpertise = this.domain;
+
+            Assert.Throws<ArgumentNullException>(() => this.hubController.RegisterNewLogEntryToTransaction(null, transaction));
+            Assert.Throws<ArgumentNullException>(() => this.hubController.RegisterNewLogEntryToTransaction("Dummy justification", null));
+
+            Assert.DoesNotThrow(() => this.hubController.RegisterNewLogEntryToTransaction("Dummy justification", transaction));
+
+            Assert.AreEqual(1, transaction.AddedThing.Count());
+            Assert.AreEqual(2, transaction.UpdatedThing.Count);
+
+            var addedModelLogEntry = (ModelLogEntry)transaction.AddedThing.SingleOrDefault();
+            Assert.NotNull(addedModelLogEntry);
+            Assert.AreEqual("en-GB", addedModelLogEntry.LanguageCode);
+            Assert.AreEqual("Dummy justification", addedModelLogEntry.Content);
+            Assert.AreEqual(LogLevelKind.USER, addedModelLogEntry.Level);
+            Assert.AreEqual(this.person, addedModelLogEntry.Author);
         }
     }
 }

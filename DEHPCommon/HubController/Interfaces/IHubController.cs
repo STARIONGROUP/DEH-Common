@@ -238,5 +238,12 @@ namespace DEHPCommon.HubController.Interfaces
         /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
         /// </summary>
         IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName);
+
+        /// <summary>
+        /// Adds a new <see cref="ModelLogEntry"/> record to the <see cref="EngineeringModel.LogEntry"/> list of the current <see cref="OpenIteration"/> and registers the change to a <see cref="ThingTransaction"/>
+        /// </summary>
+        /// <param name="content">The value that will be set to the <see cref="ModelLogEntry.Content"/></param>
+        /// <param name="transaction">The <see cref="ThingTransaction"/> that will get the changes registered to</param>
+        public void RegisterNewLogEntryToTransaction(string content, ThingTransaction transaction);
     }
 }

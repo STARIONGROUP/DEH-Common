@@ -32,7 +32,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// View model for dst adapters transfert/cancel button and progress bar 
+    /// View model for dst adapters transfer/cancel button and progress bar 
     /// </summary>
     public abstract class TransferControlViewModel : ReactiveObject, ITransferControlViewModel
     {
