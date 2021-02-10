@@ -45,7 +45,7 @@ namespace DEHPCommon.Tests.HubController
     using DEHPCommon.HubController;
     using DEHPCommon.Services.FileDialogService;
     using DEHPCommon.UserPreferenceHandler.Enums;
-    
+
     using Moq;
 
     using Newtonsoft.Json;
@@ -80,9 +80,9 @@ namespace DEHPCommon.Tests.HubController
         {
             this.assembler = new Assembler(this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            
+
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            
+
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person
@@ -183,7 +183,7 @@ namespace DEHPCommon.Tests.HubController
 
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
             var parameter2 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = elementDefinition };
-            
+
             var thingsToWrite = new List<Parameter>()
             {
                 parameter, parameter2
@@ -192,7 +192,7 @@ namespace DEHPCommon.Tests.HubController
             await this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p));
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws<InvalidCastException>();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
-            
+
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                     await this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p))
                 );
@@ -303,13 +303,13 @@ namespace DEHPCommon.Tests.HubController
             this.session.Setup(x => x.OpenIterations).Returns(default(IReadOnlyDictionary<Iteration, Tuple<DomainOfExpertise, Participant>>));
             Assert.IsNull(this.hubController.GetIteration());
             this.session.Setup(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>())).Returns(Task.CompletedTask);
-            
+
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>()
             {
                 { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)}
 
             });
-            
+
             Assert.DoesNotThrowAsync(async () => await this.hubController.GetIteration(this.iteration, this.domain));
         }
 
@@ -364,7 +364,7 @@ namespace DEHPCommon.Tests.HubController
             };
 
             fileRevision.FileType.Add(new FileType());
-            
+
             var file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 FileRevision = { fileRevision }
@@ -384,7 +384,7 @@ namespace DEHPCommon.Tests.HubController
             result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
             System.IO.File.Delete(this.downloadTestFilePath);
             Assert.AreEqual(FileContent, Encoding.ASCII.GetString(result));
-            
+
             this.session.Verify(x => x.ReadFile(It.IsAny<FileRevision>()), Times.Exactly(2));
 
             this.fileDialogService.Verify(this.saveFileDialogExpression, Times.Exactly(2));
@@ -464,6 +464,38 @@ namespace DEHPCommon.Tests.HubController
             Assert.DoesNotThrowAsync(() => this.hubController.Reload());
             this.session.Verify(x => x.Reload(), Times.Once);
             this.session.Verify(x => x.Refresh(), Times.Once);
+        }
+
+        [Test]
+        public void VerifyRegisterNewLogEntryToTransaction()
+        {
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+
+            var model = (EngineeringModel)this.iteration.Container;
+            this.assembler.Cache.TryAdd(new CacheKey(model.Iid, null), new Lazy<Thing>(() => this.iteration.Container));
+
+            var iterationClone = this.iteration.Clone(false);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(iterationClone), iterationClone);
+
+            this.hubController.OpenIteration = this.iteration;
+            this.hubController.CurrentDomainOfExpertise = this.domain;
+
+            Assert.Throws<ArgumentNullException>(() => this.hubController.RegisterNewLogEntryToTransaction("Dummy justification", null));
+
+            Assert.DoesNotThrow(() => this.hubController.RegisterNewLogEntryToTransaction(null, transaction));
+            Assert.AreEqual(0, transaction.AddedThing.Count());
+
+            Assert.DoesNotThrow(() => this.hubController.RegisterNewLogEntryToTransaction("Dummy justification", transaction));
+
+            Assert.AreEqual(1, transaction.AddedThing.Count());
+            Assert.AreEqual(2, transaction.UpdatedThing.Count);
+
+            var addedModelLogEntry = (ModelLogEntry)transaction.AddedThing.SingleOrDefault();
+            Assert.NotNull(addedModelLogEntry);
+            Assert.AreEqual("en-GB", addedModelLogEntry.LanguageCode);
+            Assert.AreEqual("Dummy justification", addedModelLogEntry.Content);
+            Assert.AreEqual(LogLevelKind.USER, addedModelLogEntry.Level);
+            Assert.AreEqual(this.person, addedModelLogEntry.Author);
         }
     }
 }

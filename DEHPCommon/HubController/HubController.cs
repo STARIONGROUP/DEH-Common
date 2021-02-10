@@ -68,12 +68,12 @@ namespace DEHPCommon.HubController
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private readonly IOpenSaveFileDialogService fileDialogService;
-        
+
         /// <summary>
         /// Backing field for <see cref="IsSessionOpen"/>
         /// </summary>
         private bool isSessionOpen;
-        
+
         /// <summary>
         /// Checks whether the session is open
         /// </summary>
@@ -82,12 +82,12 @@ namespace DEHPCommon.HubController
             get => this.isSessionOpen;
             set => this.RaiseAndSetIfChanged(ref this.isSessionOpen, value);
         }
-        
+
         /// <summary>
         /// Backing field for <see cref="OpenIteration"/>
         /// </summary>
         private Iteration openIteration;
-        
+
         /// <summary>
         /// Get the single open <see cref="Iteration"/>
         /// </summary>
@@ -124,7 +124,7 @@ namespace DEHPCommon.HubController
             get => this.session;
             set => this.RaiseAndSetIfChanged(ref this.session, value);
         }
-        
+
         /// <summary>
         /// Initializes a new <see cref="HubController"/>
         /// </summary>
@@ -189,7 +189,7 @@ namespace DEHPCommon.HubController
                 return false;
             }
 
-            thing = (TThing) this.Session?.OpenReferenceDataLibraries.SelectMany(collectionSelector).FirstOrDefault(x => x.Iid == iid);
+            thing = (TThing)this.Session?.OpenReferenceDataLibraries.SelectMany(collectionSelector).FirstOrDefault(x => x.Iid == iid);
             return thing != null;
         }
 
@@ -281,7 +281,7 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <returns>A <see cref="IReadOnlyDictionary{T,T}"/> of <see cref="Iteration"/> and <see cref="Tuple{T,T}"/> of <see cref="DomainOfExpertise"/> and <see cref="Participant"/></returns>
         public IReadOnlyDictionary<Iteration, Tuple<DomainOfExpertise, Participant>> GetIteration() => this.Session.OpenIterations;
-        
+
         /// <summary>
         /// Creates or updates all <see cref="Thing"/> from the provided <see cref="IEnumerable{T}"/>
         /// </summary>
@@ -421,7 +421,7 @@ namespace DEHPCommon.HubController
                 this.logger.Error("No DomainFileStore found");
                 return;
             }
-            
+
             var iDalUri = new Uri(this.Session.DataSourceUri);
             var currentParticipant = this.OpenIteration.GetContainerOfType<EngineeringModel>().GetActiveParticipant(this.Session.ActivePerson);
 
@@ -541,7 +541,7 @@ namespace DEHPCommon.HubController
             {
                 return false;
             }
-            
+
             extensions = fileName.Split(new[] { "." }, StringSplitOptions.None);
 
             return true;
@@ -622,7 +622,7 @@ namespace DEHPCommon.HubController
                 }
             }
         }
-        
+
         /// <summary>
         /// Downloads a <see cref="File.CurrentFileRevision"/> into <see cref="System.IO.FileStream"/>
         /// </summary>
@@ -662,5 +662,38 @@ namespace DEHPCommon.HubController
         /// </summary>
         public IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName)
             => this.OpenIteration.ExternalIdentifierMap.Where(x => x.ExternalToolName == toolName);
+
+        /// <summary>
+        /// Adds a new <see cref="ModelLogEntry"/> record to the <see cref="EngineeringModel.LogEntry"/> list of the current <see cref="OpenIteration"/> and registers the change to a <see cref="ThingTransaction"/>
+        /// </summary>
+        /// <param name="content">The value that will be set to the <see cref="ModelLogEntry.Content"/></param>
+        /// <param name="transaction">The <see cref="ThingTransaction"/> that will get the changes registered to</param>
+        public void RegisterNewLogEntryToTransaction(string content, ThingTransaction transaction)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return;
+            }
+
+            if (transaction == null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            var newLogEntry = new ModelLogEntry
+            {
+                Iid = Guid.NewGuid(),
+                Content = content,
+                Author = this.session.ActivePerson,
+                Level = LogLevelKind.USER,
+                LanguageCode = "en-GB"
+            };
+
+            var clonedEngineeringModel = (EngineeringModel)this.OpenIteration.Container.Clone(false);
+            clonedEngineeringModel.LogEntry.Add(newLogEntry);
+
+            transaction.Create(newLogEntry);
+            transaction.CreateOrUpdate(clonedEngineeringModel);
+        }
     }
 }

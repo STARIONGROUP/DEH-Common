@@ -1,0 +1,33 @@
+﻿<dx:DXDialogWindow x:Class="DEHPCommon.UserInterfaces.Views.CreateLogEntryDialog" 
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+                   xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   Title="Create Log Entry"
+                   mc:Ignorable="d" Height="200" d:DesignWidth="350" MinWidth="350">
+    <Window.Resources>
+        <ResourceDictionary>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="6*" />
+        </Grid.ColumnDefinitions>
+
+        <dxlc:LayoutItemLabel Grid.Column="0" Height="Auto" Margin="5" Content="Justification" />
+        <dxe:TextEdit Grid.Column="1" Height="Auto" Margin="5" FontSize="12"
+                      TextWrapping="Wrap" 
+                      AcceptsReturn="True" 
+                      VerticalContentAlignment="Top" 
+                      Text="{Binding Path=LogEntryContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+    </Grid>
+
+    <dx:DXDialogWindow.FooterButtons>
+        <dx:DialogButton Content="OK" Command="{Binding ContinueCommand}" IsDefault="True" MinWidth="65" DialogResult="OK"/>
+        <dx:DialogButton Content="Cancel" IsCancel="True" MinWidth="65" DialogResult="Cancel"/>
+    </dx:DXDialogWindow.FooterButtons>
+</dx:DXDialogWindow>
