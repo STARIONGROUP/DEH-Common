@@ -244,6 +244,6 @@ namespace DEHPCommon.HubController.Interfaces
         /// </summary>
         /// <param name="content">The value that will be set to the <see cref="ModelLogEntry.Content"/></param>
         /// <param name="transaction">The <see cref="ThingTransaction"/> that will get the changes registered to</param>
-        public void RegisterNewLogEntryToTransaction(string content, ThingTransaction transaction);
+        void RegisterNewLogEntryToTransaction(string content, ThingTransaction transaction);
     }
 }

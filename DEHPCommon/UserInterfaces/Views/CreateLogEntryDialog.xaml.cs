@@ -30,7 +30,6 @@ namespace DEHPCommon.UserInterfaces.Views
     /// Interaction logic for CreateLogEntryDialog.xaml
     /// </summary>
     public partial class CreateLogEntryDialog : DXDialogWindow
-
     {
         /// <summary>
         /// Initializes a new <see cref="CreateLogEntryDialog"/>
