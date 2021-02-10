@@ -68,6 +68,8 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         private ElementDefinition otherElementDefinition;
         private ElementUsage elementUsage;
         private ActualFiniteStateList actualStates;
+        private ActualFiniteState actualFiniteState0;
+        private ActualFiniteState actualFiniteState1;
 
         [SetUp]
         public void SetUp()
@@ -102,23 +104,40 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             this.elementUsage.ElementDefinition = this.otherElementDefinition;
             this.elementDefinition.ContainedElement.Add(this.elementUsage);
 
-            this.actualStates = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri)
+            var possibleFiniteStateList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri)
             {
-                PossibleFiniteStateList =
+                Name = "State"
+            };
+
+            var possibleFiniteState0 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "state0" };
+            possibleFiniteStateList.PossibleState.Add(possibleFiniteState0);
+
+            var possibleFiniteState1 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "state1" };
+            possibleFiniteStateList.PossibleState.Add(possibleFiniteState1);
+
+            this.actualFiniteState0 = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri)
+            {
+                PossibleState = 
                 {
-                    new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri)
-                    {
-                        Name = "State", PossibleState = 
-                        {
-                            new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "state0" },
-                            new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "state1" }
-                        }
-                    }
+                    possibleFiniteState0
                 }
             };
+
+            this.actualFiniteState1 = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri)
+            {
+                PossibleState = 
+                {
+                    possibleFiniteState1
+                }
+            };
+
+            this.actualStates = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ActualState = { this.actualFiniteState0, this.actualFiniteState1 },
+                PossibleFiniteStateList = { possibleFiniteStateList }
+            };
             
-            this.elementDefinition.Parameter.Add(
-                new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            this.elementDefinition.Parameter.Add(new Parameter(Guid.NewGuid(), this.cache, this.uri)
                 {
                     StateDependence = this.actualStates,
                     ParameterType = new SampledFunctionParameterType(Guid.NewGuid(), this.cache, this.uri)
@@ -130,7 +149,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
                             {
                                 ParameterType = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri)
                                 {
-                                    Name = "pt"
+                                    Name = "ptb"
                                 }
                             }
                         },
@@ -140,9 +159,22 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
                             {
                                 ParameterType = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri)
                                 {
-                                    Name = "pt"
+                                    Name = "ptb"
                                 }
                             }
+                        }
+                    },
+                    ValueSet = 
+                    {
+                        new ParameterValueSet()
+                        {
+                        Computed = new ValueArray<string>(new [] {"True","False"}),
+                        ActualState = this.actualStates.ActualState.First()
+                        },
+                        new ParameterValueSet()
+                        {
+                            Computed = new ValueArray<string>(new [] {"True","False"}),
+                            ActualState = this.actualStates.ActualState.Last()
                         }
                     }
                 });
@@ -161,12 +193,23 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         }
 
         [Test]
-        public void VerifyThatThingStatusIsNotNull()
+        public void VerifyThatSampledFunctionParameteTypeThatHaveStateDependencyAreBuilt()
         {
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
 
             Assert.IsNotNull(row.ThingStatus);
             Assert.IsNotEmpty(row.ContainedRows);
+            var firstStateRow = row.ContainedRows.FirstOrDefault()?.ContainedRows[0];
+            var secondStateRow = row.ContainedRows.FirstOrDefault()?.ContainedRows[1];
+            Assert.IsNotNull(firstStateRow);
+            Assert.IsNotNull(secondStateRow);
+            Assert.IsTrue(firstStateRow is ParameterStateRowViewModel && secondStateRow is ParameterStateRowViewModel);
+            
+            Assert.AreEqual(this.actualFiniteState0.Name, 
+                ((ParameterStateRowViewModel)firstStateRow).State);
+            
+            Assert.AreEqual(this.actualFiniteState1.Name, 
+                ((ParameterStateRowViewModel)secondStateRow).State);
         }
     }
 }
