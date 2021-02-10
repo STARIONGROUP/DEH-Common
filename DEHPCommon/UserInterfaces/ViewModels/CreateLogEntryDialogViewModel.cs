@@ -44,19 +44,5 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             get => this.logEntryContent;
             set => this.RaiseAndSetIfChanged(ref this.logEntryContent, value);
         }
-
-        /// <summary>
-        /// Gets the continue command
-        /// </summary>
-        public ReactiveCommand<object> ContinueCommand { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CreateLogEntryDialogViewModel"/> class.
-        /// </summary>
-        public CreateLogEntryDialogViewModel()
-        {
-            var canContinue = this.WhenAnyValue(vm => vm.LogEntryContent, content => !string.IsNullOrWhiteSpace(content));
-            this.ContinueCommand = ReactiveCommand.Create(canContinue);
-        }
     }
 }

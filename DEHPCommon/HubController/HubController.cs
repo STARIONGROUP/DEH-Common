@@ -672,7 +672,7 @@ namespace DEHPCommon.HubController
         {
             if (string.IsNullOrWhiteSpace(content))
             {
-                throw new ArgumentNullException(nameof(content));
+                return;
             }
 
             if (transaction == null)
