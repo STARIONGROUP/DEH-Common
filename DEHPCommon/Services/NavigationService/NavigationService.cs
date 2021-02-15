@@ -59,9 +59,10 @@ namespace DEHPCommon.Services.NavigationService
         /// Brings a view to the user sight resolving its datacontext based on its name
         /// </summary>
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
-        public void ShowDialog<TView>() where TView : Window, new()
+        /// <returns>A value indicating the dialog result</returns>
+        public bool? ShowDialog<TView>() where TView : Window, new()
         {
-            this.BuildView<TView>().ShowDialog();
+            return this.BuildView<TView>().ShowDialog();
         }
 
         /// <summary>
@@ -70,9 +71,10 @@ namespace DEHPCommon.Services.NavigationService
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
         /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
         /// <param name="viewModel">The View Model instance</param>
-        public void ShowDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class
+        /// <returns>A value indicating the dialog result</returns>
+        public bool? ShowDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class
         {
-            this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
+            return this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
         }
 
         /// <summary>

@@ -297,10 +297,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     loginSuccess && iteration != null && engineeringModel != null && domain != null);
 
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, 
-                _ => this.ExecuteLogin(), RxApp.MainThreadScheduler);
+                async _ => await this.ExecuteLogin(), RxApp.MainThreadScheduler);
             
             this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose,
-                _ => this.CloseCommandExecute(), RxApp.MainThreadScheduler);
+                async _ => await this.CloseCommandExecute(), RxApp.MainThreadScheduler);
 
             this.LoginSuccessful = false;
             this.LoginFailed = false;
