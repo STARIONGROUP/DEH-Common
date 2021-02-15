@@ -24,6 +24,7 @@
 
 namespace DEHPCommon.Services.NavigationService
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using System.Windows;
@@ -39,17 +40,19 @@ namespace DEHPCommon.Services.NavigationService
         /// Brings a view to the user sight resolving its datacontext based on its name
         /// </summary>
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
+        [ExcludeFromCodeCoverage]
         public void Show<TView>() where TView : Window, new()
         {
             this.BuildView<TView>().Show();
         }
 
         /// <summary>
-        /// Brings a view to the user sight with it's associated view model of the provided type <paramref cref="TViewModel"></paramref>
+        /// Brings a view to the user sight with it's associated view model of the provided type <typeparamref name="TViewModel"></typeparamref>
         /// </summary>
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
         /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
         /// <param name="viewModel">The View Model instance</param>
+        [ExcludeFromCodeCoverage]
         public void Show<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class
         {
             this.BuildView<TView, TViewModel>(viewModel).Show();
@@ -59,27 +62,31 @@ namespace DEHPCommon.Services.NavigationService
         /// Brings a view to the user sight resolving its datacontext based on its name
         /// </summary>
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
-        public void ShowDialog<TView>() where TView : Window, new()
+        /// <returns>A value indicating the dialog result</returns>
+        [ExcludeFromCodeCoverage]
+        public bool? ShowDialog<TView>() where TView : Window, new()
         {
-            this.BuildView<TView>().ShowDialog();
+            return this.BuildView<TView>().ShowDialog();
         }
 
         /// <summary>
-        /// Brings a view to the user sight as a modal with it's associated view model of the provided type <paramref cref="TViewModel"></paramref>
+        /// Brings a view to the user sight as a modal with it's associated view model of the provided type <typeparamref name="TViewModel"/>
         /// </summary>
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
         /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
         /// <param name="viewModel">The View Model instance</param>
-        public void ShowDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class
+        /// <returns>A value indicating the dialog result</returns>
+        [ExcludeFromCodeCoverage]
+        public bool? ShowDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class
         {
-            this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
+            return this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
         }
 
         /// <summary>
         /// Builds up the view instance with it's associated view model resolved based on its name
         /// </summary>
         /// <typeparam name="TView"></typeparam>
-        /// <returns></returns>
+        /// <returns>A <typeparamref name="TView"/> instance</returns>
         public TView BuildView<TView>() where TView : Window, new()
         {
             var asembly = Assembly.GetAssembly(typeof(TView));
@@ -90,7 +97,7 @@ namespace DEHPCommon.Services.NavigationService
         }
 
         /// <summary>
-        /// Builds up the view instance with it's associated view model of the provided type <paramref cref="TViewModel"></paramref>
+        /// Builds up the view instance with it's associated view model of the provided type <typeparamref name="TViewModel"/>
         /// </summary>
         /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
         /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
