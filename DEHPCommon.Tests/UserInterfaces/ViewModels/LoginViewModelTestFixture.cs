@@ -106,7 +106,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.session.Setup(x => x.Credentials).Returns(new Credentials(this.userName, this.password, new Uri(this.uri)));
             this.hubController = new Mock<IHubController>();
             this.hubController.Setup(x => x.Session).Returns(this.session.Object);
-            this.hubController.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(Task.FromResult(true));
+            this.hubController.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<ServerType>())).Returns(true);
             
             this.hubController.Setup(x => x.GetSiteDirectory()).Returns(new SiteDirectory(Guid.NewGuid(), null, null)
             {

@@ -342,7 +342,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 var iteration = new Iteration(this.SelectedIteration.Thing.IterationIid, this.hubController.Session.Assembler.Cache, this.hubController.Session.Credentials.Uri);
 
                 model.Iteration.Add(iteration);
-                await this.hubController.GetIteration(iteration, this.SelectedDomainOfExpertise.Thing);
+                this.hubController.GetIteration(iteration, this.SelectedDomainOfExpertise.Thing);
                 this.CloseWindowBehavior?.Close();
             }
             catch (Exception exception)
@@ -365,7 +365,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             try
             {
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
-                this.LoginSuccessful = await this.hubController.Open(credentials, this.SelectedServerType.Key);
+                this.LoginSuccessful = this.hubController.Open(credentials, this.SelectedServerType.Key);
                 this.PopulateEngineeringModels();
                 this.LogMessage = "Loggin successful";
             }

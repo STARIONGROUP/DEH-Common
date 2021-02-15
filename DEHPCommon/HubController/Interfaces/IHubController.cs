@@ -87,13 +87,13 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="serverType">The selected <see cref="ServerType"/></param>
         /// <param name="credentials">The <see cref="Credentials"/></param>
         /// <returns>An assert whether the session is open</returns>
-        Task<bool> Open(Credentials credentials, ServerType serverType);
+        bool Open(Credentials credentials, ServerType serverType);
 
         /// <inheritdoc cref="ISession.Reload"/>
-        Task Reload();
+        void Reload();
 
         /// <inheritdoc cref="ISession.Refresh"/>
-        Task Refresh();
+        void Refresh();
 
         /// <summary>
         /// Closes connection to the data-source and end the execution of this app
@@ -117,7 +117,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task GetIteration(Iteration iteration, DomainOfExpertise domain);
+        void GetIteration(Iteration iteration, DomainOfExpertise domain);
 
         /// <summary>
         /// Reads an <see cref="Iteration"/> and set the active <see cref="DomainOfExpertise"/> for the Iteration
@@ -134,7 +134,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task CreateOrUpdate<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
+        void CreateOrUpdate<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Creates or updates the provided <see cref="Thing"/>
@@ -145,7 +145,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task CreateOrUpdate<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
+        void CreateOrUpdate<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Deletes all the <see cref="Thing"/> from the provided <see cref="IEnumerable{T}"/>
@@ -156,7 +156,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Delete<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
+        void Delete<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Deletes a <see cref="Thing"/>
@@ -167,14 +167,14 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Delete<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
+        void Delete<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing;
 
         /// <summary>
         /// Write the transaction to the session
         /// </summary>
         /// <param name="transaction">The <see cref="ThingTransaction"/></param>
         /// <returns>An awaitable <see cref="Task"/></returns>
-        Task Write(ThingTransaction transaction);
+        void Write(ThingTransaction transaction);
 
         /// <summary>
         /// Generates the nested element based on the provided <see cref="Option"/>
@@ -193,7 +193,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
+        void Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
 
         /// <summary>
         /// Computes all the <see cref="FileType"/> of the file that is to be uploaded
@@ -209,14 +209,14 @@ namespace DEHPCommon.HubController.Interfaces
         /// </summary>
         /// <param name="file">The <see cref="File"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Download(File file);
+        void Download(File file);
 
         /// <summary>
         /// Downloads a specific <see cref="FileRevision"/>
         /// </summary>
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Download(FileRevision fileRevision);
+        void Download(FileRevision fileRevision);
 
         /// <summary>
         /// Downloads a <see cref="File.CurrentFileRevision"/> into <see cref="System.IO.FileStream"/>
@@ -224,7 +224,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="file">The <see cref="File"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Download(File file, System.IO.FileStream destination);
+        void Download(File file, System.IO.FileStream destination);
 
         /// <summary>
         /// Downloads a specific <see cref="FileRevision"/> into <see cref="System.IO.FileStream"/>
@@ -232,7 +232,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Download(FileRevision fileRevision, System.IO.FileStream destination);
+        void Download(FileRevision fileRevision, System.IO.FileStream destination);
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool

@@ -104,7 +104,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.hubController = new Mock<IHubController>();
             this.hubController.Setup(x => x.GetIteration()).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>() { { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) } });
 
-            this.hubController.Setup(x => x.Reload()).Returns(Task.CompletedTask);
+            this.hubController.Setup(x => x.Reload());
             this.objectBrowserTreeSelectorService = new Mock<IObjectBrowserTreeSelectorService>();
             this.objectBrowserTreeSelectorService.Setup(x => x.ThingKinds).Returns(new List<Type>() { typeof(ElementDefinition) });
             

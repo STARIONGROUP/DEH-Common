@@ -189,12 +189,12 @@ namespace DEHPCommon.Tests.HubController
                 parameter, parameter2
             };
 
-            await this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p));
+            this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p));
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws<InvalidCastException>();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                    await this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p))
+            Assert.Throws<InvalidOperationException>(() =>
+                    this.hubController.CreateOrUpdate<ElementDefinition, Parameter>(thingsToWrite, (e, p) => e.Parameter.Add(p))
                 );
         }
 
@@ -208,7 +208,7 @@ namespace DEHPCommon.Tests.HubController
             transaction.Create(parameter, elementClone);
 
             elementClone.Parameter.Add(parameter);
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Write(transaction));
+            Assert.DoesNotThrow(() => this.hubController.Write(transaction));
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
         }
 
@@ -223,12 +223,12 @@ namespace DEHPCommon.Tests.HubController
                 parameter, parameter
             };
 
-            Assert.DoesNotThrowAsync(
-                async () => await this.hubController.Delete<ElementDefinition, Parameter>(
+            Assert.DoesNotThrow(
+                 () => this.hubController.Delete<ElementDefinition, Parameter>(
                     thingsToDelete, (e, p) => e.Parameter.Remove(p)));
 
-            Assert.DoesNotThrowAsync(
-                async () => await this.hubController.Delete<ElementDefinition, Parameter>(
+            Assert.DoesNotThrow(
+                () => this.hubController.Delete<ElementDefinition, Parameter>(
                     new List<Parameter>(), null));
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
@@ -238,9 +238,9 @@ namespace DEHPCommon.Tests.HubController
         public void VerifySessionOpen()
         {
             Assert.IsFalse(this.hubController.IsSessionOpen);
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await this.hubController.Open(new Credentials("admin", "pass", this.uri), (ServerType) 32));
-            Assert.ThrowsAsync<HeaderException>(async () => await this.hubController.Open(new Credentials("admin", "pass", this.uri), ServerType.Cdp4WebServices));
-            Assert.ThrowsAsync<JsonReaderException>(async () => await this.hubController.Open(new Credentials("admin", "poss", this.uri), ServerType.OcdtWspServer));
+            Assert.Throws<ArgumentOutOfRangeException>( () => this.hubController.Open(new Credentials("admin", "pass", this.uri), (ServerType) 32));
+            Assert.Throws<HeaderException>( () => this.hubController.Open(new Credentials("admin", "pass", this.uri), ServerType.Cdp4WebServices));
+            Assert.Throws<JsonReaderException>( () => this.hubController.Open(new Credentials("admin", "poss", this.uri), ServerType.OcdtWspServer));
             Assert.IsFalse(this.hubController.IsSessionOpen);
         }
 
@@ -310,7 +310,7 @@ namespace DEHPCommon.Tests.HubController
 
             });
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.GetIteration(this.iteration, this.domain));
+            Assert.DoesNotThrow(() =>  this.hubController.GetIteration(this.iteration, this.domain));
         }
 
         [Test]
@@ -329,7 +329,7 @@ namespace DEHPCommon.Tests.HubController
             this.hubController.OpenIteration = this.iteration;
             this.hubController.CurrentDomainOfExpertise = this.domain;
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Upload());
+            Assert.DoesNotThrow( () => this.hubController.Upload());
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()), Times.Once);
 
@@ -342,7 +342,7 @@ namespace DEHPCommon.Tests.HubController
             this.hubController.OpenIteration = this.iteration;
             this.hubController.CurrentDomainOfExpertise = this.domain;
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Upload(this.uploadTestFilePath));
+            Assert.DoesNotThrow(() => this.hubController.Upload(this.uploadTestFilePath));
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()), Times.Once);
 
@@ -370,17 +370,17 @@ namespace DEHPCommon.Tests.HubController
                 FileRevision = { fileRevision }
             };
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(default(File)));
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(default(FileRevision)));
+            Assert.DoesNotThrow(() => this.hubController.Download(default(File)));
+            Assert.DoesNotThrow(() => this.hubController.Download(default(FileRevision)));
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(file));
+            Assert.DoesNotThrow(() => this.hubController.Download(file));
             var result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
             System.IO.File.Delete(this.downloadTestFilePath);
             Assert.AreEqual(FileContent, Encoding.ASCII.GetString(result));
 
             Assert.IsFalse(System.IO.File.Exists(this.downloadTestFilePath));
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(fileRevision));
+            Assert.DoesNotThrow(() => this.hubController.Download(fileRevision));
             result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
             System.IO.File.Delete(this.downloadTestFilePath);
             Assert.AreEqual(FileContent, Encoding.ASCII.GetString(result));
@@ -413,10 +413,10 @@ namespace DEHPCommon.Tests.HubController
 
             var destinationFile = new FileStream(this.downloadTestFilePath, FileMode.Create);
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(default(File), destinationFile));
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(default(FileRevision), destinationFile));
+            Assert.DoesNotThrow(() => this.hubController.Download(default(File), destinationFile));
+            Assert.DoesNotThrow(() => this.hubController.Download(default(FileRevision), destinationFile));
 
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(file, destinationFile));
+            Assert.DoesNotThrow(() => this.hubController.Download(file, destinationFile));
             destinationFile.Close();
 
             var result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
@@ -426,7 +426,7 @@ namespace DEHPCommon.Tests.HubController
             Assert.IsFalse(System.IO.File.Exists(this.downloadTestFilePath));
 
             destinationFile = new FileStream(this.downloadTestFilePath, FileMode.Create);
-            Assert.DoesNotThrowAsync(async () => await this.hubController.Download(fileRevision, destinationFile));
+            Assert.DoesNotThrow(() => this.hubController.Download(fileRevision, destinationFile));
             destinationFile.Close();
 
             result = System.IO.File.ReadAllBytes(this.downloadTestFilePath);
@@ -460,8 +460,8 @@ namespace DEHPCommon.Tests.HubController
         [Test]
         public void VerifyReloadRefresh()
         {
-            Assert.DoesNotThrowAsync(() => this.hubController.Refresh());
-            Assert.DoesNotThrowAsync(() => this.hubController.Reload());
+            Assert.DoesNotThrow(() => this.hubController.Refresh());
+            Assert.DoesNotThrow(() => this.hubController.Reload());
             this.session.Verify(x => x.Reload(), Times.Once);
             this.session.Verify(x => x.Refresh(), Times.Once);
         }

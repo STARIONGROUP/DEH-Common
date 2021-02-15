@@ -199,7 +199,7 @@ namespace DEHPCommon.HubController
         /// <param name="serverType">The selected <see cref="ServerType"/></param>
         /// <param name="credentials">The <see cref="Credentials"/></param>
         /// <returns>An assert whether the session is open</returns>
-        public async Task<bool> Open(Credentials credentials, ServerType serverType)
+        public bool Open(Credentials credentials, ServerType serverType)
         {
             IDal dal = serverType switch
             {
@@ -209,21 +209,21 @@ namespace DEHPCommon.HubController
             };
 
             this.Session = new Session(dal, credentials);
-            await this.Session.Open();
+            this.Session.Open().GetAwaiter().GetResult();
             this.IsSessionOpen = this.Session?.RetrieveSiteDirectory() != null;
             return this.IsSessionOpen;
         }
 
         /// <inheritdoc cref="ISession.Reload"/>
-        public async Task Reload()
+        public void Reload()
         {
-            await this.Session.Reload();
+            this.Session.Reload().GetAwaiter().GetResult();
         }
 
         /// <inheritdoc cref="ISession.Refresh"/>
-        public async Task Refresh()
+        public void Refresh()
         {
-            await this.Session.Refresh();
+            this.Session.Refresh().GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -267,10 +267,10 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
-        /// <returns>A <see cref="Task"/></returns>
-        public async Task GetIteration(Iteration iteration, DomainOfExpertise domain)
+        public void GetIteration(Iteration iteration, DomainOfExpertise domain)
         {
-            await this.Session.Read(iteration, domain);
+            this.Session.Read(iteration, domain).GetAwaiter().GetResult();
+
             var iterationDomainAndPerson = this.GetIteration().First();
             this.OpenIteration = iterationDomainAndPerson.Key;
             this.CurrentDomainOfExpertise = iterationDomainAndPerson.Value.Item1;
@@ -290,12 +290,11 @@ namespace DEHPCommon.HubController
         /// <param name="things">The <see cref="IEnumerable{T}"/> of <see cref="Thing"/></param>
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
-        /// <returns>A <see cref="Task"/></returns>
-        public async Task CreateOrUpdate<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
+        public void CreateOrUpdate<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
             foreach (var thing in things)
             {
-                await this.CreateOrUpdate(thing, actionOnClone, deep);
+                this.CreateOrUpdate(thing, actionOnClone, deep);
             }
         }
 
@@ -307,10 +306,9 @@ namespace DEHPCommon.HubController
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
-        /// <returns>A <see cref="Task"/></returns>
-        public async Task CreateOrUpdate<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
+        public void CreateOrUpdate<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
-            await this.Write(thing, actionOnClone, (transaction, t) => transaction.CreateOrUpdate(t), deep);
+            this.Write(thing, actionOnClone, (transaction, t) => transaction.CreateOrUpdate(t), deep);
         }
 
         /// <summary>
@@ -321,12 +319,11 @@ namespace DEHPCommon.HubController
         /// <param name="things">The things to delete</param>
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
-        /// <returns>A <see cref="Task"/></returns>
-        public async Task Delete<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
+        public void Delete<TContainer, TThing>(IEnumerable<TThing> things, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
             foreach (var thing in things)
             {
-                await this.Delete(thing, actionOnClone, deep);
+                this.Delete(thing, actionOnClone, deep);
             }
         }
 
@@ -338,10 +335,9 @@ namespace DEHPCommon.HubController
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="deep">Assert whether to create nested things</param>
-        /// <returns>A <see cref="Task"/></returns>
-        public async Task Delete<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
+        public void Delete<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, bool deep = false) where TThing : Thing where TContainer : Thing
         {
-            await this.Write(thing, actionOnClone, (transaction, t) => transaction.Delete(t), deep);
+            this.Write(thing, actionOnClone, (transaction, t) => transaction.Delete(t), deep);
         }
 
         /// <summary>
@@ -353,8 +349,7 @@ namespace DEHPCommon.HubController
         /// <param name="actionOnClone">The actual <see cref="Action"/> to perform e.g. <code>Container.Collection.Add(new Parameter())</code><remarks>The first parameter is the container clone</remarks></param>
         /// <param name="actionOnTransaction">The <see cref="Action"/> to take by the transaction e.g. CreateOrUpdate/Delete</param>
         /// <param name="deep">Assert whether to create nested things</param>
-        /// <returns>A <see cref="Task"/></returns>
-        private async Task Write<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, Action<ThingTransaction, Thing> actionOnTransaction, bool deep = false) where TThing : Thing where TContainer : Thing
+        private void Write<TContainer, TThing>(TThing thing, Action<TContainer, TThing> actionOnClone, Action<ThingTransaction, Thing> actionOnTransaction, bool deep = false) where TThing : Thing where TContainer : Thing
         {
             try
             {
@@ -365,7 +360,7 @@ namespace DEHPCommon.HubController
                 var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(container), container);
                 actionOnTransaction(transaction, clone);
 
-                await this.Write(transaction);
+                this.Write(transaction);
             }
             catch (Exception exception)
             {
@@ -380,9 +375,9 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <param name="transaction">The <see cref="ThingTransaction"/></param>
         /// <returns>An awaitable <see cref="Task"/></returns>
-        public async Task Write(ThingTransaction transaction)
+        public void Write(ThingTransaction transaction)
         {
-            await this.Session.Write(transaction.FinalizeTransaction());
+            this.Session.Write(transaction.FinalizeTransaction()).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -409,7 +404,7 @@ namespace DEHPCommon.HubController
         /// from a dialog box <see cref="GetFile"/>
         /// </remarks>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
+        public void Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null)
         {
             iteration ??= this.GetIteration().Keys.First();
             domain ??= this.CurrentDomainOfExpertise;
@@ -483,7 +478,7 @@ namespace DEHPCommon.HubController
             transaction.CreateOrUpdate(fileClone);
             transaction.CreateOrUpdate(fileRevision);
 
-            await this.Session.Write(transaction.FinalizeTransaction(), new[] { filePath });
+            this.Session.Write(transaction.FinalizeTransaction(), new[] { filePath }).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -584,14 +579,14 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <param name="file">The <see cref="File"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Download(File file)
+        public void  Download(File file)
         {
             if (file is null)
             {
                 return;
             }
 
-            await this.Download(file.CurrentFileRevision);
+            this.Download(file.CurrentFileRevision);
         }
 
         /// <summary>
@@ -599,7 +594,7 @@ namespace DEHPCommon.HubController
         /// </summary>
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Download(FileRevision fileRevision)
+        public void Download(FileRevision fileRevision)
         {
             if (fileRevision is null)
             {
@@ -614,7 +609,7 @@ namespace DEHPCommon.HubController
 
             if (!string.IsNullOrWhiteSpace(destinationPath))
             {
-                var fileContent = await this.Session.ReadFile(fileRevision);
+                var fileContent = this.Session.ReadFile(fileRevision).GetAwaiter().GetResult();
 
                 if (fileContent != null)
                 {
@@ -629,14 +624,14 @@ namespace DEHPCommon.HubController
         /// <param name="file">The <see cref="File"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Download(File file, FileStream destination)
+        public void Download(File file, FileStream destination)
         {
             if (file is null)
             {
                 return;
             }
 
-            await this.Download(file.CurrentFileRevision, destination);
+            this.Download(file.CurrentFileRevision, destination);
         }
 
         /// <summary>
@@ -645,14 +640,14 @@ namespace DEHPCommon.HubController
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        public async Task Download(FileRevision fileRevision, FileStream destination)
+        public void Download(FileRevision fileRevision, FileStream destination)
         {
             if (fileRevision is null || destination is null)
             {
                 return;
             }
 
-            var fileContent = await this.Session.ReadFile(fileRevision);
+            var fileContent = this.Session.ReadFile(fileRevision).GetAwaiter().GetResult();
 
             destination.Write(fileContent, 0, fileContent.Length);
         }
