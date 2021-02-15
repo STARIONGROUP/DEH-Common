@@ -297,10 +297,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     loginSuccess && iteration != null && engineeringModel != null && domain != null);
 
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, 
-                async _ => await this.ExecuteLogin(), RxApp.MainThreadScheduler);
+                _ => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             
             this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose,
-                async _ => await this.CloseCommandExecute(), RxApp.MainThreadScheduler);
+                _ => this.CloseCommandExecute(), RxApp.MainThreadScheduler);
 
             this.LoginSuccessful = false;
             this.LoginFailed = false;
@@ -331,7 +331,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Executes the <see cref="CloseCommand"/>
         /// </summary>
         private async Task CloseCommandExecute()
-            {
+        {
             try
             {
                 var model = new EngineeringModel(this.SelectedEngineeringModel.Thing.EngineeringModelIid, this.hubController.Session.Assembler.Cache, this.hubController.Session.Credentials.Uri)
