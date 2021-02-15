@@ -331,7 +331,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Executes the <see cref="CloseCommand"/>
         /// </summary>
         private async Task CloseCommandExecute()
-        {
+            {
             try
             {
                 var model = new EngineeringModel(this.SelectedEngineeringModel.Thing.EngineeringModelIid, this.hubController.Session.Assembler.Cache, this.hubController.Session.Credentials.Uri)
