@@ -27,7 +27,7 @@
     </Grid>
 
     <dx:DXDialogWindow.FooterButtons>
-        <dx:DialogButton Content="OK" Command="{Binding ContinueCommand}" IsDefault="True" MinWidth="65" DialogResult="OK"/>
+        <dx:DialogButton Content="OK" IsDefault="True" MinWidth="65" DialogResult="OK"/>
         <dx:DialogButton Content="Cancel" IsCancel="True" MinWidth="65" DialogResult="Cancel"/>
     </dx:DXDialogWindow.FooterButtons>
 </dx:DXDialogWindow>

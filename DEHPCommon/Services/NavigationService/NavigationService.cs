@@ -31,6 +31,8 @@ namespace DEHPCommon.Services.NavigationService
 
     using Autofac;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// The <see cref="NavigationService"/> provides abstraction for dealing with showing and closing views
     /// </summary>
@@ -78,6 +80,19 @@ namespace DEHPCommon.Services.NavigationService
         /// <returns>A value indicating the dialog result</returns>
         [ExcludeFromCodeCoverage]
         public bool? ShowDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class
+        {
+            return this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
+        }
+
+        /// <summary>
+        /// Brings a <see cref="DXDialogWindow"/> to the user sight as a modal with it's associated view model of the provided type <typeparamref name="TViewModel"/>
+        /// </summary>
+        /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
+        /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
+        /// <param name="viewModel">The View Model instance</param>
+        /// <returns>A value indicating the dialog result</returns>
+        [ExcludeFromCodeCoverage]
+        public bool? ShowDxDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : DXDialogWindow, new() where TViewModel : class
         {
             return this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
         }

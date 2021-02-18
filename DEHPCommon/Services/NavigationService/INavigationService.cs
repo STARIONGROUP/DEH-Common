@@ -26,6 +26,8 @@ namespace DEHPCommon.Services.NavigationService
 {
     using System.Windows;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interface definition for the <see cref="NavigationService"/>
     /// </summary>
@@ -60,5 +62,29 @@ namespace DEHPCommon.Services.NavigationService
         /// <param name="viewModel">The View Model instance</param>
         /// <returns>A value indicating the dialog result</returns>
         bool? ShowDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : Window, new() where TViewModel : class;
+
+        /// <summary>
+        /// Brings a <see cref="DXDialogWindow"/> to the user sight as a modal with it's associated view model of the provided type <typeparamref name="TViewModel"/>
+        /// </summary>
+        /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
+        /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
+        /// <param name="viewModel">The View Model instance</param>
+        /// <returns>A value indicating the dialog result</returns>
+        bool? ShowDxDialog<TView, TViewModel>(TViewModel viewModel = null) where TView : DXDialogWindow, new() where TViewModel : class;
+
+        /// <summary>
+        /// Builds up the view instance with it's associated view model resolved based on its name
+        /// </summary>
+        /// <typeparam name="TView"></typeparam>
+        /// <returns>A <typeparamref name="TView"/> instance</returns>
+        TView BuildView<TView>() where TView : Window, new();
+
+        /// <summary>
+        /// Builds up the view instance with it's associated view model of the provided type <typeparamref name="TViewModel"/>
+        /// </summary>
+        /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
+        /// <typeparam name="TViewModel">The View Model <see cref="System.Type"/> to associate with the view</typeparam>
+        /// <param name="viewModel">The View Model instance</param>
+        TView BuildView<TView, TViewModel>(TViewModel viewModel) where TView : Window, new() where TViewModel : class;
     }
 }
