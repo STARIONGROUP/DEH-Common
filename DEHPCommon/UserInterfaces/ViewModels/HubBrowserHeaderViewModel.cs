@@ -164,7 +164,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 this.Iteration = this.hubController.OpenIteration.IterationSetup.IterationNumber.ToString();
                 this.Person = this.hubController.Session.ActivePerson.Name;
                 this.Domain = this.hubController.CurrentDomainOfExpertise.Name;
-                this.Option = this.hubController.OpenIteration.DefaultOption.Name;
+                this.Option = this.hubController.OpenIteration.DefaultOption?.Name;
             }
         }
     }

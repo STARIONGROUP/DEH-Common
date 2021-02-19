@@ -78,6 +78,9 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             Assert.IsNotEmpty(viewModel.Domain);
             Assert.IsNotEmpty(viewModel.Option);
             Assert.AreEqual("42", viewModel.Iteration);
+            this.iteration.DefaultOption = null;
+            viewModel = new HubBrowserHeaderViewModel(this.hubController.Object);
+            Assert.IsNull(viewModel.Option);
         }
     }
 }
