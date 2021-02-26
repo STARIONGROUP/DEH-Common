@@ -73,8 +73,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         protected ParameterOrOverrideBaseRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(parameterOrOverrideBase, session, containerViewModel)
         {
-            var engineeringModel = (EngineeringModel)this.Thing.TopContainer;
-            this.ActiveParticipant = engineeringModel.GetActiveParticipant(this.Session.ActivePerson);
+            if (this.Thing.Iid != Guid.Empty)
+            {
+                var engineeringModel = (EngineeringModel)this.Thing.TopContainer;
+                this.ActiveParticipant = engineeringModel.GetActiveParticipant(this.Session.ActivePerson);
+            }
+            
             this.SetOwnerValue();
         }
         
@@ -157,11 +161,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             this.SetOwnerValue();
 
             // refresh the container row if this is replaced by a subscription
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
+            var iteration = this.Thing.GetContainerOfType<Iteration>();
 
-            if (this.Thing.ParameterSubscription.Any(x => x.Owner == tuple.Item1))
+            if (iteration is { })
             {
-                this.RefreshContainerRows();
+                this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
+
+                if (this.Thing.ParameterSubscription.Any(x => x.Owner == tuple.Item1))
+                {
+                    this.RefreshContainerRows();
+                }
             }
         }
 

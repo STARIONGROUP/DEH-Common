@@ -25,14 +25,14 @@
         </ItemsPanelTemplate>
     </StatusBar.ItemsPanel>
     <StatusBarItem Grid.Column="0">
-        <Image Margin="10,0,0,0" Height="18" Source="{Binding Severity, Converter={StaticResource StatusBarMessageSeverityToIconConverter}}" />
+        <Image ToolTip="Message severity" Margin="10,0,0,0" Height="18" Source="{Binding Severity, Converter={StaticResource StatusBarMessageSeverityToIconConverter}}" />
     </StatusBarItem>
     <Separator Grid.Column="1" />
     <StatusBarItem Grid.Column="2">
-        <TextBlock x:Name="Message" Foreground="Black" HorizontalAlignment="Left" TextAlignment="Center" Background="Transparent" Text="{Binding Message}" FontSize="18" Height="25"/>
+        <TextBlock ToolTip="{Binding Message}" x:Name="Message" Foreground="Black" HorizontalAlignment="Left" TextAlignment="Center" Background="Transparent" Text="{Binding Message}" FontSize="18" Height="25"/>
     </StatusBarItem>
     <Separator Grid.Column="3" />
     <StatusBarItem Grid.Column="4">
-        <Button Content="⚙" Foreground="Black" Command="{Binding UserSettingCommand}" FontSize="18" BorderThickness="0" Background="Transparent"></Button>
+        <Button ToolTip="Open the settings" Content="⚙" Foreground="Black" Command="{Binding UserSettingCommand}" FontSize="18" BorderThickness="0" Background="Transparent"></Button>
     </StatusBarItem>
 </StatusBar>

@@ -22,12 +22,13 @@
         <dxe:TextEdit Grid.Column="1" Height="Auto" Margin="5" FontSize="12"
                       TextWrapping="Wrap" 
                       AcceptsReturn="True" 
-                      VerticalContentAlignment="Top" 
+                      VerticalContentAlignment="Top"
+                      ToolTip="Enter a justification text. If left blank: no LogEntry will be created"
                       Text="{Binding Path=LogEntryContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 
     <dx:DXDialogWindow.FooterButtons>
-        <dx:DialogButton Content="OK" IsDefault="True" MinWidth="65" DialogResult="OK"/>
-        <dx:DialogButton Content="Cancel" IsCancel="True" MinWidth="65" DialogResult="Cancel"/>
+        <dx:DialogButton ToolTip="Save a LogEntry with the specified justification text" Content="OK" IsDefault="True" MinWidth="65" DialogResult="OK"/>
+        <dx:DialogButton ToolTip="Cancel the pending transactions" Content="Cancel" IsCancel="True" MinWidth="65" DialogResult="Cancel"/>
     </dx:DXDialogWindow.FooterButtons>
 </dx:DXDialogWindow>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateObjectBrowserTreeEvent.cs" company="RHEA System S.A.">
+// <copyright file="UpdateTreeBaseEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,20 +24,23 @@
 
 namespace DEHPCommon.Events
 {
-    using DEHPCommon.UserInterfaces.ViewModels;
-
     /// <summary>
-    /// The purpose of the <see cref="UpdateObjectBrowserTreeEvent"/> is to notify
-    /// an <see cref="ObjectBrowserViewModel"/> about whether it should updates its trees
+    /// Base event class for events that affect tree views in dst adapters
     /// </summary>
-    public class UpdateObjectBrowserTreeEvent : UpdateTreeBaseEvent
+    public abstract class UpdateTreeBaseEvent
     {
         /// <summary>
-        /// Initializes a new <see cref="UpdateObjectBrowserTreeEvent"/>
+        /// Gets or sets a value indicating whether the listener should reset its tree
+        /// </summary>
+        public bool Reset { get; }
+
+        /// <summary>
+        /// Initializes a new <see cref="UpdateTreeBaseEvent"/>
         /// </summary>
         /// <param name="reset">a value indicating whether the listener should reset its tree</param>
-        public UpdateObjectBrowserTreeEvent(bool reset = false) : base(reset)
+        protected UpdateTreeBaseEvent(bool reset = false)
         {
+            this.Reset = reset;
         }
     }
 }

@@ -26,13 +26,21 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
 {
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
+
+    using ReactiveUI;
 
     /// <summary>
     /// View model for the preview net change pane allowing the user to preview the change that will be transfered to either the Dst of the Hub
     /// </summary>
-    public abstract class NetChangePreviewViewModel : ObjectBrowserViewModel, INetChangePreviewViewModel
+    public abstract class NetChangePreviewViewModel : ObjectBrowserBaseViewModel, INetChangePreviewViewModel
     {
+        /// <summary>
+        /// Gets the collection of <see cref="IRowViewModelBase{T}"/> to be displayed in the tree
+        /// </summary>
+        protected ReactiveList<BrowserViewModelBase> ThingsAtPreviousState { get; } = new ReactiveList<BrowserViewModelBase>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NetChangePreviewViewModel"/> class.
         /// </summary>
@@ -43,7 +51,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
         }
 
         /// <summary>
-        /// Computes the old values for each <see cref="ObjectBrowserViewModel.Things"/>
+        /// Computes the old values for each <see cref="ObjectBrowserBaseViewModel.Things"/>
         /// </summary>
         public abstract void ComputeValues();
     }

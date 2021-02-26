@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UpdateObjectBrowserTreeEvent.cs" company="RHEA System S.A.">
+// <copyright file="UpdatePreviewBasedOnSelectionBaseEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,20 +24,38 @@
 
 namespace DEHPCommon.Events
 {
-    using DEHPCommon.UserInterfaces.ViewModels;
+    using System.Collections.Generic;
+
+    using CDP4Dal;
 
     /// <summary>
-    /// The purpose of the <see cref="UpdateObjectBrowserTreeEvent"/> is to notify
-    /// an <see cref="ObjectBrowserViewModel"/> about whether it should updates its trees
+    /// An event for <see cref="CDPMessageBus"/> that will tell the target net change preview to update
+    /// its children based on the things passed
     /// </summary>
-    public class UpdateObjectBrowserTreeEvent : UpdateTreeBaseEvent
+    /// <typeparam name="TThing">The <see cref="System.Type"/> of things in the collection</typeparam>
+    /// <typeparam name="TTarget">The target <see cref="System.Type"/></typeparam>
+    public abstract class UpdatePreviewBasedOnSelectionBaseEvent<TThing, TTarget> : UpdateTreeBaseEvent
     {
         /// <summary>
-        /// Initializes a new <see cref="UpdateObjectBrowserTreeEvent"/>
+        /// Gets the collection of object that reflects the selection
         /// </summary>
+        public IEnumerable<TThing> Selection { get; }
+
+        /// <summary>
+        /// Gets the target type
+        /// </summary>
+        public TTarget Target { get; }
+
+        /// <summary>
+        /// Initializes a new <see cref="UpdatePreviewBasedOnSelectionBaseEvent{T,T}"/>
+        /// </summary>
+        /// <param name="things">The collection of <typeparamref name="TThing"/> selection</param>
+        /// <param name="target">The target <see cref="System.Type"/></param>
         /// <param name="reset">a value indicating whether the listener should reset its tree</param>
-        public UpdateObjectBrowserTreeEvent(bool reset = false) : base(reset)
+        protected UpdatePreviewBasedOnSelectionBaseEvent(IEnumerable<TThing> things, TTarget target, bool reset) : base(reset)
         {
+            this.Selection = things;
+            this.Target = target;
         }
     }
 }
