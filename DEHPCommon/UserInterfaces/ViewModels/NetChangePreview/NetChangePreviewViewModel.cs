@@ -24,6 +24,8 @@
 
 namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
 {
+    using CDP4Common.CommonData;
+
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -37,9 +39,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
     public abstract class NetChangePreviewViewModel : ObjectBrowserBaseViewModel, INetChangePreviewViewModel
     {
         /// <summary>
-        /// Gets the collection of <see cref="IRowViewModelBase{T}"/> to be displayed in the tree
+        /// Gets the collection of <see cref="Thing"/>s at their previous state
         /// </summary>
-        protected ReactiveList<BrowserViewModelBase> ThingsAtPreviousState { get; } = new ReactiveList<BrowserViewModelBase>();
+        protected ReactiveList<Thing> ThingsAtPreviousState { get; } = new ReactiveList<Thing>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NetChangePreviewViewModel"/> class.

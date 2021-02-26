@@ -165,6 +165,19 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         }
 
         [Test]
+        public void VerifyRowExpansion()
+        {
+            this.iteration.Element.Add(this.elementDef);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object);
+            vm.ExpandAllRows();
+            Assert.IsTrue(vm.IsExpanded);
+            Assert.IsTrue(vm.ContainedRows.FirstOrDefault()?.IsExpanded);
+            vm.CollapseAllRows();
+            Assert.IsFalse(vm.IsExpanded);
+            Assert.IsFalse(vm.ContainedRows.FirstOrDefault()?.IsExpanded);
+        }
+
+        [Test]
         public void VerifyThatElementDefArePopulatedFromEvent()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object);
