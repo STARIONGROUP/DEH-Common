@@ -96,6 +96,17 @@ namespace DEHPCommon.Services.NavigationService
         {
             return this.BuildView<TView, TViewModel>(viewModel).ShowDialog();
         }
+        
+        /// <summary>
+        /// Brings a <see cref="DXDialogWindow"/> to the user sight as a modal without any view model
+        /// </summary>
+        /// <typeparam name="TView">The view <see cref="System.Type"/> to show</typeparam>
+        /// <returns>A value indicating the dialog result</returns>
+        [ExcludeFromCodeCoverage]
+        public bool? ShowDxDialog<TView>() where TView : DXDialogWindow, new()
+        {
+            return new TView().ShowDialog();
+        }
 
         /// <summary>
         /// Builds up the view instance with it's associated view model resolved based on its name
