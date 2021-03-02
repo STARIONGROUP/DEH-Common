@@ -46,7 +46,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// <summary>
     /// Base viewmodel for Net change preview view models and the object browser
     /// </summary>
-    public abstract class ObjectBrowserBaseViewModel : ReactiveObject, IObjectBrowserBaseViewModel, IDisposable, IHaveContextMenuViewModel
+    public abstract class ObjectBrowserBaseViewModel : ReactiveObject, IObjectBrowserViewModel, IDisposable, IHaveContextMenuViewModel
     {
         /// <summary>
         /// The <see cref="IHubController"/>
