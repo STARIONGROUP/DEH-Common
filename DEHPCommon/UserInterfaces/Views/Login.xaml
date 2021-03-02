@@ -54,6 +54,7 @@
             <ComboBox Style="{StaticResource IsReadOnlyStyle}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="ServerType" Margin="5" DisplayMemberPath="Value" FontSize="12"
                               ItemsSource="{Binding DataSourceList, Mode=OneTime}"
                               SelectedItem="{Binding Path=SelectedServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ToolTip="Please select the server type &#x0a;Currently supported type: &#x0a;- CDP4 &#x0a;- WSP"
                               SelectedValuePath="Key" />
 
             <!--  Server Address  -->
@@ -65,6 +66,7 @@
                               AutoComplete="True"
                               AllowRejectUnknownValues="False"
                               IncrementalFiltering="True"
+                              ToolTip="Select or enter a new server address"
                               EditValue="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ItemsSource="{Binding SavedUris}"
                               Style="{StaticResource IsReadOnlyStyle}">
@@ -75,6 +77,7 @@
                     MaxWidth="40"
                     Margin="5"
                     FontSize="12"
+                    ToolTip="Save the entered address"
                     Command="{Binding SaveCurrentUriCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{dx:DXImage Image=Save_16x16.png}" Stretch="Uniform" />
@@ -83,12 +86,17 @@
 
             <!--  Username  -->
             <dxlc:LayoutItemLabel Grid.Row="2" Grid.Column="0" Height="Auto" Margin="5" Content="Username" FontSize="12" />
-            <dxe:TextEdit Style="{StaticResource IsReadOnlyStyle}" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Height="Auto" Margin="5" FontSize="12" Text="{Binding Path=UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <dxe:TextEdit Style="{StaticResource IsReadOnlyStyle}" 
+                          Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" 
+                          Height="Auto" Margin="5" FontSize="12"
+                          ToolTip="The username"
+                          Text="{Binding Path=UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Password  -->
             <dxlc:LayoutItemLabel Grid.Row="3" Grid.Column="0" Height="Auto" Margin="5" Content="Password" FontSize="12" />
             <dxe:PasswordBoxEdit Style="{StaticResource IsReadOnlyStyle}" Name="PasswordBoxEdit" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Height="Auto" Margin="5" FontSize="12"
-                                 Text="{Binding Path=Password, UpdateSourceTrigger=PropertyChanged}" />
+                                 Text="{Binding Path=Password, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="The password"/>
             <Separator Background="Black" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3"/>
 
             <!--  HubConnection  -->
@@ -96,12 +104,14 @@
             <dxlc:LayoutItemLabel Grid.Row="5" Grid.Column="0" Height="Auto" Margin="5" Content="Engineering Model" FontSize="12" />
             <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Name="EngineeringModel" Margin="5" DisplayMemberPath="Name" FontSize="12"
                           ItemsSource="{Binding EngineeringModels, Mode=OneTime}"
+                          ToolTip="Select an Engineering Model to open"
                           SelectedItem="{Binding Path=SelectedEngineeringModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!--  Domain  -->
             <dxlc:LayoutItemLabel Grid.Row="6" Grid.Column="0" Height="Auto" Margin="5" Content="Iteration" FontSize="12" />
             <ComboBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Name="Iteration" Margin="5" FontSize="12"
                       ItemsSource="{Binding Iterations}"
+                      ToolTip="Select an Iteration to open"
                       SelectedItem="{Binding Path=SelectedIteration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -122,6 +132,7 @@
             <dxlc:LayoutItemLabel Grid.Row="7" Grid.Column="0" Height="Auto" Margin="5" Content="Domain of expertise" FontSize="12" />
             <ComboBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Name="Domain" Margin="5" DisplayMemberPath="Name" FontSize="12"
                       ItemsSource="{Binding DomainsOfExpertise}"
+                      ToolTip="Select your domain of expertise"
                       SelectedItem="{Binding Path=SelectedDomainOfExpertise, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 
@@ -137,6 +148,7 @@
 
             <Button Grid.Column="2" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right"
                     Command="{Binding LoginCommand}" Width="117" IsDefault="True"
+                    ToolTip="Authenticate the user and open the session"
                     Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter Inverse=True}, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" Text="Login" />
@@ -146,6 +158,7 @@
 
             <Button Grid.Column="2" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right" IsDefault="True"
                     Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"  
+                    ToolTip="Open the selected Iteration with the selected Domain"
                     Command="{Binding CloseCommand}" Width="117" Content="Continue"/>
         </Grid>
     </Grid>

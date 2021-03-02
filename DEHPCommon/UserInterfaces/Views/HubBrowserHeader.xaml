@@ -62,13 +62,13 @@
         <TextBlock Grid.Row="1" Grid.Column="2" Height="Auto" Margin="6,3,3,3" FontSize="10" FontWeight="Bold" Text="Person: " />
         <TextBlock Grid.Row="1" Grid.Column="3" Height="Auto" Margin="3" FontSize="10" Text="{Binding Person}" TextTrimming="CharacterEllipsis" />
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Option:"
+        <!--<TextBlock Grid.Row="2" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Option:"
                        Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, 
-                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views1:HubBrowserHeader}}, Path=IsOptionDependant}" />
+                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views1:HubBrowserHeader}}, Path=IsOptionDependant}" />-->
 
-        <TextBlock Grid.Row="2" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" Text="{Binding Option}" TextTrimming="CharacterEllipsis"
+        <!--<TextBlock Grid.Row="2" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" Text="{Binding Option}" TextTrimming="CharacterEllipsis"
                        Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, 
-                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views1:HubBrowserHeader}}, Path=IsOptionDependant}" />
+                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type views1:HubBrowserHeader}}, Path=IsOptionDependant}" />-->
 
         <TextBlock Grid.Row="2" Grid.Column="2" Height="Auto" Margin="6,3,3,3" FontSize="10" FontWeight="Bold" Text="Domain Of Expertise:" />
         <TextBlock Grid.Row="2" Grid.Column="3" Height="Auto" Margin="3" FontSize="10" Text="{Binding Domain}" TextTrimming="CharacterEllipsis" />

@@ -646,5 +646,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             disposable.Dispose();
             this.ParameterBaseListener.Remove(parameterSubscription);
         }
+
+        /// <summary>
+        /// Updates the overriding row properties
+        /// </summary>
+        public abstract void UpdateChildren();
     }
 }

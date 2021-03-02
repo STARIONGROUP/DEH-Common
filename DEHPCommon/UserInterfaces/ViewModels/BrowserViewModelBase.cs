@@ -52,6 +52,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// The NLog logger
         /// </summary>
         protected Logger Logger;
+        
+        /// <summary>
+        /// Backing field for <see cref="IsExpanded"/>
+        /// </summary>
+        private bool isExpanded;
 
         /// <summary>
         /// a value indicating whether the instance is disposed
@@ -135,7 +140,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class
         /// </summary>
         protected List<IDisposable> Disposables { get; private set; }
-        
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this row should be expanded or collapsed
+        /// </summary>
+        public bool IsExpanded
+        {
+            get => this.isExpanded;
+            set => this.RaiseAndSetIfChanged(ref this.isExpanded, value);
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase{T}"/> class.
         /// </summary>
@@ -147,6 +161,32 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.PermissionService = session.PermissionService;
             this.Disposables = new List<IDisposable>();
             this.Session = session;
+        }
+        
+        /// <summary>
+        /// Expands the current row and all contained rows along the containment hierarchy
+        /// </summary>
+        public void ExpandAllRows()
+        {
+            this.IsExpanded = true;
+
+            foreach (var row in this.ContainedRows)
+            {
+                row.ExpandAllRows();
+            }
+        }
+
+        /// <summary>
+        /// Collapses the current row and all contained rows along the containment hierarchy
+        /// </summary>
+        public void CollapseAllRows()
+        {
+            this.IsExpanded = false;
+
+            foreach (var row in this.ContainedRows)
+            {
+                row.CollapseAllRows();
+            }
         }
 
         /// <summary>

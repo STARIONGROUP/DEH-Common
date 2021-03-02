@@ -181,7 +181,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// Update the children rows of the current row
         /// </summary>
-        public void UpdateChildren()
+        public override void UpdateChildren()
         {
             this.UpdateProperties();
         }
