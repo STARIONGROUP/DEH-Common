@@ -57,7 +57,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// The <see cref="NLog"/> logger
         /// </summary>
-        private readonly Logger logger = LogManager.GetCurrentClassLogger(typeof(LoginViewModel));
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The <see cref="IHubController"/> instance

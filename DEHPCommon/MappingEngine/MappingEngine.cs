@@ -46,7 +46,7 @@ namespace DEHPCommon.MappingEngine
         /// <summary>
         /// The <see cref="NLog"/> logger
         /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger(typeof(MappingEngine));
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey,TValue}"/> that contains all the available <see cref="IMappingRule"/> based on the provided assembly

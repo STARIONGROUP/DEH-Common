@@ -1,15 +1,15 @@
-﻿<Window x:Class="DEHPCommon.UserInterfaces.Views.Login" 
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
-        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-        xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
-        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors" 
-        Title="Connections"
-        mc:Ignorable="d" Height="422" d:DesignWidth="409" MinWidth="600"  Width="400">
+﻿<dx:DXDialogWindow x:Class="DEHPCommon.UserInterfaces.Views.Login" 
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+                   xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
+                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors" 
+                   Title="Connections"
+                   mc:Ignorable="d" Height="422" d:DesignWidth="409" MinWidth="600"  Width="400">
     <dxmvvm:Interaction.Behaviors>
         <behaviors:CloseWindowBehavior/>
     </dxmvvm:Interaction.Behaviors>
@@ -162,4 +162,4 @@
                     Command="{Binding CloseCommand}" Width="117" Content="Continue"/>
         </Grid>
     </Grid>
-</Window>
+</dx:DXDialogWindow>

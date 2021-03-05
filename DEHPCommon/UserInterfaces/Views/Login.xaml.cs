@@ -24,12 +24,12 @@
 
 namespace DEHPCommon.UserInterfaces.Views
 {
-    using System.Windows;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for Login.xaml
     /// </summary>
-    public partial class Login : Window
+    public partial class Login : DXDialogWindow
     {
         /// <summary>
         /// Initializes a new <see cref="Login"/>
