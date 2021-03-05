@@ -29,6 +29,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
+    using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -36,6 +38,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// </summary>
     public class StatusBarControlViewModel : ReactiveObject, IStatusBarControlViewModel
     {
+        /// <summary>
+        /// The <see cref="NLog"/> logger
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Backing field for <see cref="Message"/>
         /// </summary>
@@ -87,6 +94,24 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.Message = $"{DateTime.Now:g} - {textMessage}";
             this.Severity = messageSeverity;
+
+            switch (messageSeverity)
+            {
+                case StatusBarMessageSeverity.None:
+                    this.logger.Info(textMessage);
+                    break;
+                case StatusBarMessageSeverity.Info:
+                    this.logger.Info(textMessage);
+                    break;
+                case StatusBarMessageSeverity.Warning:
+                    this.logger.Warn(textMessage);
+                    break;
+                case StatusBarMessageSeverity.Error:
+                    this.logger.Error(textMessage);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(messageSeverity), messageSeverity, null);
+            }
         }
 
         /// <summary>
