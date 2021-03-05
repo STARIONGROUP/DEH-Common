@@ -24,6 +24,7 @@
 
 namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 {
+    using System;
     using System.Linq;
 
     using NUnit.Framework;
@@ -56,6 +57,17 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             viewModel.Append(errorMessage, StatusBarMessageSeverity.Error);
             Assert.AreEqual(errorMessage, viewModel.Message.Split(' ').Last());
             Assert.AreEqual(StatusBarMessageSeverity.Error, viewModel.Severity);
+
+            viewModel.Append(errorMessage, StatusBarMessageSeverity.None);
+            Assert.AreEqual(errorMessage, viewModel.Message.Split(' ').Last());
+            Assert.AreEqual(StatusBarMessageSeverity.None, viewModel.Severity);
+
+            viewModel.Append(errorMessage, StatusBarMessageSeverity.Warning);
+            Assert.AreEqual(errorMessage, viewModel.Message.Split(' ').Last());
+            Assert.AreEqual(StatusBarMessageSeverity.Warning, viewModel.Severity);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                viewModel.Append(errorMessage, (StatusBarMessageSeverity)42));
         }
     }
 }
