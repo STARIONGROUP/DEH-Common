@@ -162,8 +162,7 @@ namespace DEHPCommon.Services.ExchangeHistory
             {
                 Message = message,
                 Person = this.hubController.Session.ActivePerson.Name,
-                Domain = this.hubController.CurrentDomainOfExpertise.ShortName,
-                Timestamp = DateTime.Now
+                Domain = this.hubController.CurrentDomainOfExpertise.ShortName
             });
         }
 
@@ -195,10 +194,13 @@ namespace DEHPCommon.Services.ExchangeHistory
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
+                var timestamp = DateTime.Now;
+                this.PendingEntries.ForEach(x => x.Timestamp = timestamp);
+
                 var entries = this.Read() ?? new List<ExchangeHistoryEntryViewModel>();
 
                 entries.AddRange(this.PendingEntries);
-
+                
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entries));
 
                 using var fileStream = new FileStream(Path, FileMode.OpenOrCreate);

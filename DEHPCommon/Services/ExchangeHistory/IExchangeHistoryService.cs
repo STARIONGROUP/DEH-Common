@@ -57,7 +57,7 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <param name="changeKind">The <see cref="ChangeKind"/></param>
         void Append(Thing thing, ChangeKind changeKind);
-        
+
         /// <summary>
         /// Append to the history an entry that relates of a <see cref="ChangeKind"/> on the <paramref name="parameter"/>
         /// </summary>

@@ -34,14 +34,9 @@
                     </dxg:TableView>
                 </dxg:GridControl.View>
                 <dxg:GridControl.Columns>
-                    <dxg:GridColumn AllowEditing="False" GroupInterval="Date" GroupIndex="0" FieldName="Timestamp" Header="Date">
+                    <dxg:GridColumn AllowEditing="False" GroupIndex="0" FieldName="Timestamp" Header="Time of Transfer">
                         <dxg:GridColumn.EditSettings>
-                            <dxe:DateEditSettings Mask="D" MaskUseAsDisplayFormat="True" />
-                        </dxg:GridColumn.EditSettings>
-                    </dxg:GridColumn>
-                    <dxg:GridColumn AllowEditing="False" FieldName="Timestamp" Header="Time">
-                        <dxg:GridColumn.EditSettings>
-                            <dxe:DateEditSettings Mask="HH:mm:ss.fff" MaskUseAsDisplayFormat="True"/>
+                            <dxe:DateEditSettings Mask="G" MaskUseAsDisplayFormat="True"/>
                         </dxg:GridColumn.EditSettings>
                     </dxg:GridColumn>
                     <dxg:GridColumn AllowEditing="False" FieldName="Person" />
