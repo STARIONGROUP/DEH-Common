@@ -137,7 +137,7 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// </summary>
         /// <param name="thing">The <see cref="INamedThing"/></param>
         /// <param name="changeKind">The <see cref="ChangeKind"/></param>
-        public void Append(INamedThing thing, ChangeKind changeKind)
+        private void Append(INamedThing thing, ChangeKind changeKind)
         {
             this.Append($"{(thing as Thing)?.ClassKind} {thing.Name} has been {changeKind}d");
         }
