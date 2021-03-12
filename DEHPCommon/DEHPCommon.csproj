@@ -20,7 +20,7 @@
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
     <PackageTags>DEHP DEHPCommon ECSS-E-TM-10-25</PackageTags>
-    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>  
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/RHEAGROUP/DEHP-Common</PackageProjectUrl>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -147,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\Rows\Mapping1025ThingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\ExchangeHistory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

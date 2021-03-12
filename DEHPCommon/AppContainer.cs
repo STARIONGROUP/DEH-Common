@@ -27,11 +27,14 @@ namespace DEHPCommon
     using Autofac;
 
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.ExchangeHistory;
     using DEHPCommon.Services.FileDialogService;
     using DEHPCommon.Services.IconCacheService;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels;
+    using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory;
+    using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser;
     using DEHPCommon.UserPreferenceHandler;
@@ -61,6 +64,8 @@ namespace DEHPCommon
             containerBuilder.RegisterType<OpenSaveFileDialogService>().As<IOpenSaveFileDialogService>().SingleInstance();
             containerBuilder.RegisterType<ObjectBrowserTreeSelectorService>().As<IObjectBrowserTreeSelectorService>().SingleInstance();
             containerBuilder.RegisterType<UserPreferenceService<UserPreference>>().As<IUserPreferenceService<UserPreference>>().SingleInstance();
+            containerBuilder.RegisterType<ExchangeHistoryService>().As<IExchangeHistoryService>().SingleInstance();
+
             Container = containerBuilder.Build();
         }
 
@@ -75,6 +80,7 @@ namespace DEHPCommon
             containerBuilder.RegisterType<PublicationBrowserViewModel>().As<IPublicationBrowserViewModel>();
             containerBuilder.RegisterType<HubBrowserHeaderViewModel>().As<IHubBrowserHeaderViewModel>();
             containerBuilder.RegisterType<StatusBarControlViewModel>().As<IStatusBarControlViewModel>().SingleInstance();
+            containerBuilder.RegisterType<ExchangeHistoryViewModel>().As<IExchangeHistoryViewModel>();
         }
     }
 }
