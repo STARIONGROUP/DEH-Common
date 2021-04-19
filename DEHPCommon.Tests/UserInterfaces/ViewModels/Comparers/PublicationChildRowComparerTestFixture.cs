@@ -115,13 +115,25 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Comparers
         [Test]
         public void VerifyThatUnexpectedTypesThrowsNotSupportedException()
         {
-            Assert.Throws<NotSupportedException>(() => this.comparer.Compare(this.x1Thing, this.yThing));
+            Assert.Throws<NotSupportedException>(() => _ = this.comparer.Compare(this.x1Thing, this.yThing));
+
+            var parameter = new Parameter() { ParameterType = new SimpleQuantityKind() };
+            _ = new ElementDefinition() { Parameter = { parameter}};
+            var unsupportedRow = new ParameterRowViewModel(parameter, this.session.Object, null);
+
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                _ = this.comparer.Compare(unsupportedRow, this.yThing);
+            });
+            
+            Assert.Throws<NotSupportedException>(() => _ = this.comparer.Compare(this.x1Thing, unsupportedRow));
         }
 
         [Test]
         public void VerifyThatOnProvidingNullValuesThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => this.comparer.Compare(null, this.yThing));
+            Assert.Throws<ArgumentNullException>(() => _ = this.comparer.Compare(null, this.yThing));
+            Assert.Throws<ArgumentNullException>(() => _ = this.comparer.Compare(this.yThing, null));
         }
     }
 }

@@ -49,17 +49,24 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Comparers
         /// Zero: x "equals" y. 
         /// Greater than zero: x is "greater" than y.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when either <paramref name="x"/> or <paramref name="y"/> is null
+        /// </exception>
         public int Compare(IRowViewModelBase<Thing> x, IRowViewModelBase<Thing> y)
         {
-            if (x == null || y == null)
+            if (x == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(x), "The items that are to be compared may not be null");
+            }
+
+            if (y == null)
+            {
+                throw new ArgumentNullException(nameof(y), "The items that are to be compared may not be null");
             }
 
             if (!(x is PublicationParameterOrOverrideRowViewModel) || !(y is PublicationParameterOrOverrideRowViewModel))
             {
                 throw new NotSupportedException("The list contains other types of row than the specified ones.");
-
             }
 
             var comparer = new ParameterBaseComparer();

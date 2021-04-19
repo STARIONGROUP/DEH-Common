@@ -2,7 +2,7 @@
 // <copyright file="IObjectBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -33,7 +33,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
     /// <summary>
     /// Interface definition for <see cref="ObjectBrowserBaseViewModel"/>
     /// </summary>
-    public interface IObjectBrowserViewModel
+    public interface IObjectBrowserViewModel : IDisposable
     {
         /// <summary>
         /// Gets or sets a value indicating whether the browser is busy
@@ -101,10 +101,5 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// Populate the context menu for the implementing view model
         /// </summary>
         void PopulateContextMenu();
-
-        /// <summary>
-        /// Dispose of this <see cref="ObjectBrowserBaseViewModel"/>
-        /// </summary>
-        void Dispose();
     }
 }

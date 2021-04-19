@@ -2,7 +2,7 @@
 // <copyright file="ObjectBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2020 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -24,30 +24,16 @@
 
 namespace DEHPCommon.UserInterfaces.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Windows.Input;
-
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
-
-    using CDP4Dal;
-
-    using DEHPCommon.Enumerators;
-    using DEHPCommon.Events;
+    
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-
-    using ReactiveUI;
-
+    
     /// <summary>
     /// The <see cref="ObjectBrowserViewModel"/> is a View Model that is responsible for managing the data and interactions with that data for a view
     /// that shows all the <see cref="Thing"/>s contained by a data-source following the containment tree that is modelled in 10-25 and the CDP4 extensions.
     /// </summary>
-    public class ObjectBrowserViewModel : ObjectBrowserBaseViewModel, IObjectBrowserViewModel
+    public class ObjectBrowserViewModel : ObjectBrowserBaseViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectBrowserViewModel"/> class.

@@ -2,7 +2,7 @@
 // <copyright file="ObjectBrowserBaseViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
 // 
@@ -46,7 +46,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     /// <summary>
     /// Base viewmodel for Net change preview view models and the object browser
     /// </summary>
-    public abstract class ObjectBrowserBaseViewModel : ReactiveObject, IObjectBrowserViewModel, IDisposable, IHaveContextMenuViewModel
+    public abstract class ObjectBrowserBaseViewModel : ReactiveObject, IObjectBrowserViewModel, IHaveContextMenuViewModel
     {
         /// <summary>
         /// The <see cref="IHubController"/>

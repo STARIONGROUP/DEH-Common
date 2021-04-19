@@ -38,6 +38,9 @@ namespace DEHPCommon.MappingRules.Core
         TOutput Transform(TInput input);
     }
 
+    /// <summary>
+    /// Definition of the <see cref="IMappingRule"/> interface
+    /// </summary>
     public interface IMappingRule
     {
     }
