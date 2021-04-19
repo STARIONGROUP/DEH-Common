@@ -57,7 +57,6 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         private Participant participant;
         private Person person;
         private DomainOfExpertise activeDomain;
-        private DomainOfExpertise someotherDomain;
         private EngineeringModel model;
         private EngineeringModelSetup modelsetup;
         private QuantityKind qqParamType;
@@ -90,8 +89,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
         private ParameterValueSet valueset4;
 
         private Assembler assembler;
-
-
+        
         [SetUp]
         public void Setup()
         {
@@ -162,7 +160,6 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             });
 
             this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "active", ShortName = "active" };
-            this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "other", ShortName = "other" };
 
             this.parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {

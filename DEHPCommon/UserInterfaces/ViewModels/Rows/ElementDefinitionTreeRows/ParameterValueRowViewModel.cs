@@ -79,11 +79,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         private string modelCode;
 
         /// <summary>
-        /// Backing field for <see cref="Formula"/>
-        /// </summary>
-        private string formula;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterValueRowViewModel"/> class
         /// </summary>
         /// <param name="parameterBase">
@@ -146,16 +141,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> represented by this <see cref="IValueSetRow"/>
         /// </summary>
         public ClassKind ParameterTypeClassKind { get; protected set; }
-
-        /// <summary>
-        /// Gets or sets the Formula column value
-        /// </summary>
-        public string Formula
-        {
-            get => this.formula;
-            set => this.RaiseAndSetIfChanged(ref this.formula, value);
-        }
-
+        
         /// <summary>
         /// Set the Values of this row
         /// </summary>

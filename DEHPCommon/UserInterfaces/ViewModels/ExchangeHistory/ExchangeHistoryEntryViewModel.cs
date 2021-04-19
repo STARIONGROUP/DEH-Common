@@ -94,5 +94,21 @@ namespace DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory
             get => this.timestamp;
             set => this.RaiseAndSetIfChanged(ref this.timestamp, value);
         }
+
+        /// <summary>
+        /// Backing field for <see cref="AdapterVersion"/>
+        /// </summary>
+        private Version adapterVersion;
+
+        /// <summary>
+        /// Gets or sets the dst adapter version
+        /// </summary>
+        [JsonProperty]
+
+        public Version AdapterVersion
+        {
+            get => this.adapterVersion;
+            set => this.RaiseAndSetIfChanged(ref this.adapterVersion, value);
+        }
     }
 }

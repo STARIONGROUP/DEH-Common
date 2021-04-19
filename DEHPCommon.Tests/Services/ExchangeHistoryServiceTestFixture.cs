@@ -71,7 +71,7 @@ namespace DEHPCommon.Tests.Services
 
             this.service = new ExchangeHistoryService(this.hubController.Object, this.statusBar.Object);
 
-            this.element = new ElementDefinition();
+            this.element = new ElementDefinition() {Name = "element", ShortName = "el"};
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace DEHPCommon.Tests.Services
             this.element.Parameter.Add(parameter);
             var clone = parameter.Clone(true);
             clone.ValueSet.First().Computed = new ValueArray<string>(new List<string>() { "false", "true", "true", "false" });
-
+            
             Assert.DoesNotThrow(() => this.service.Append(parameter.ValueSet.First(), clone.ValueSet.First()));
             Assert.IsTrue(this.service.PendingEntries.LastOrDefault()?.Message.Contains(parameter.ModelCode()));
             
@@ -130,7 +130,7 @@ namespace DEHPCommon.Tests.Services
 
             var sampledParameter = new Parameter()
             {
-                ParameterType = sampledParameterType, Scale = measurementScale,
+                ParameterType = sampledParameterType, Scale = measurementScale, IsOptionDependent = false,
                 ValueSet =
                 {
                     new ParameterValueSet()
@@ -141,8 +141,8 @@ namespace DEHPCommon.Tests.Services
                         Published = new ValueArray<string>(new List<string>() {"-", "-"}),
                     }
                 }
-
             };
+
             this.element.Parameter.Add(sampledParameter);
 
             var sampledClone = sampledParameter.Clone(true);
@@ -150,6 +150,35 @@ namespace DEHPCommon.Tests.Services
 
             Assert.DoesNotThrow(() => this.service.Append(sampledParameter.ValueSet.First(), sampledClone.ValueSet.First()));
             Assert.IsTrue(this.service.PendingEntries.LastOrDefault()?.Message.Contains(parameter.ModelCode()));
+
+            var parameterOverride = new ParameterOverride()
+            {
+                Parameter = sampledParameter,
+                ValueSet =
+                {
+                    new ParameterOverrideValueSet()
+                    {
+                        ParameterValueSet = sampledParameter.ValueSet.FirstOrDefault(),
+                        Computed = new ValueArray<string>(new List<string>() {"-", "-"}),
+                        Manual = new ValueArray<string>(new List<string>() {"-", "-"}),
+                        Reference = new ValueArray<string>(new List<string>() {"-", "-"}),
+                        Published = new ValueArray<string>(new List<string>() {"-", "-"}),
+                    }
+                }
+            };
+
+            var elementUsage = new ElementUsage()
+            {
+                ParameterOverride = { parameterOverride}
+            };
+
+            this.element.ContainedElement.Add(elementUsage);
+
+            var parameterOverrideclone = parameterOverride.Clone(true);
+            parameterOverride.ValueSet.First().Computed = new ValueArray<string>(new List<string>() { "false", "true", "true", "false" });
+
+            Assert.DoesNotThrow(() => this.service.Append(parameterOverride.ValueSet.First(), parameterOverrideclone.ValueSet.First()));
+            Assert.IsTrue(this.service.PendingEntries.LastOrDefault()?.Message.Contains(parameterOverride.ModelCode()));
         }
 
         [Test]
