@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="DEHPCommon.UserInterfaces.Views.HubSessionControl" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:converters="clr-namespace:DEHPCommon.Converters" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             d:DesignHeight="60" d:DesignWidth="500" mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+        <Button Width="40" Height="40" Margin="10,0,10,0" Padding="8" HorizontalAlignment="Left" Command="{Binding ReloadCommand}" ToolTip="Reload All Data">
+            <Image Source="{dx:DXImage 'Images/Actions/Refresh_32x32.png'}" />
+        </Button>
+
+        <Button Width="40" Height="40" Margin="0,0,10,0" Padding="8" HorizontalAlignment="Left" Command="{Binding RefreshCommand}" ToolTip="Refresh the session">
+            <Image Source="{dx:DXImage 'Images/Actions/Refresh2_32x32.png'}" />
+        </Button>
+        <Grid Height="40" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Height="20" Orientation="Horizontal">
+                <dxe:CheckEdit Padding="0" Content="Auto Refresh every " IsChecked="{Binding IsAutoRefreshEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsSessionOpen}" />
+                <dxe:SpinEdit MaxHeight="20" EditValue="60" IsEnabled="{Binding IsSessionOpen}" MaxValue="300" MinValue="5" Value="{Binding AutoRefreshInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock VerticalAlignment="Center" IsEnabled="{Binding IsSessionOpen}" Text=" sec." />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Margin="0,1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Orientation="Horizontal">
+                <dxe:ProgressBarEdit Width="190" Height="16" HorizontalAlignment="Stretch" VerticalContentAlignment="Center"
+                                     Maximum="{Binding AutoRefreshInterval}"
+                                     Minimum="0"
+                                     Visibility="{Binding IsAutoRefreshEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                     Value="{Binding AutoRefreshSecondsLeft}" />
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>

@@ -64,6 +64,7 @@
     <None Remove="Resources\Images\Warning_16x16.png" />
     <None Remove="UserInterfaces\Views\ContextMenu\ContextMenuStyle.xaml" />
     <None Remove="UserInterfaces\Views\CreateLogEntryDialog.xaml" />
+    <None Remove="UserInterfaces\Views\HubSessionControl.xaml" />
     <None Remove="UserInterfaces\Views\PublicationBrowser\PublicationBrowser.xaml" />
     <None Remove="UserInterfaces\Views\TransferControl.xaml" />
   </ItemGroup>
@@ -109,6 +110,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserInterfaces\Views\HubBrowserHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterfaces\Views\HubSessionControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
