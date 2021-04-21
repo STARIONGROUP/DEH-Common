@@ -42,6 +42,7 @@
                     <dxg:GridColumn AllowEditing="False" FieldName="Person" />
                     <dxg:GridColumn AllowEditing="False" FieldName="Domain" />
                     <dxg:GridColumn AllowEditing="False" FieldName="Message" Width="*"/>
+                    <dxg:GridColumn AllowEditing="False" FieldName="AdapterVersion" />
                 </dxg:GridControl.Columns>
 
             </dxg:GridControl>

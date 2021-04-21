@@ -29,6 +29,7 @@ namespace DEHPCommon.Services.ExchangeHistory
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -95,7 +96,7 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// <param name="newValue">The <see cref="IValueSet"/> of reference</param>
         public void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue)
         {
-            var parameter = valueToUpdate.GetContainerOfType<Parameter>();
+            var parameter = valueToUpdate.GetContainerOfType<ParameterOrOverrideBase>();
             var scale = parameter.Scale is null ? "-" : parameter.Scale.ShortName;
 
             var prefix = $"{(valueToUpdate.ActualOption is null ? string.Empty : $" Option: {valueToUpdate.ActualOption.Name}")}" +
@@ -196,6 +197,7 @@ namespace DEHPCommon.Services.ExchangeHistory
 
                 var timestamp = DateTime.Now;
                 this.PendingEntries.ForEach(x => x.Timestamp = timestamp);
+                this.PendingEntries.ForEach(x => x.AdapterVersion = Assembly.GetEntryAssembly()?.GetName().Version);
 
                 var entries = this.Read() ?? new List<ExchangeHistoryEntryViewModel>();
 

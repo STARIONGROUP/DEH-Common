@@ -358,7 +358,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteLogin()
         {
-            this.LogMessage = "Loggin in...";
+            this.LogMessage = "Login in...";
             this.LoginSuccessful = false;
             this.LoginFailed = false;
 
@@ -367,13 +367,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
                 this.LoginSuccessful = await this.hubController.Open(credentials, this.SelectedServerType.Key);
                 this.PopulateEngineeringModels();
-                this.LogMessage = "Loggin successful";
+                this.LogMessage = "Login successful";
             }
             catch (Exception exception)
             {
                 this.LoginFailed = true;
-                this.logger.Error($"Loggin failed: {exception}");
-                this.LogMessage = $"Loggin failed: {exception.Message}";
+                this.logger.Error($"Login failed: {exception}");
+                this.LogMessage = $"Login failed: {exception.Message}";
             }
         }
 
