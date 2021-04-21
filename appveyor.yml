@@ -79,7 +79,7 @@ after_test:
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
         SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
         if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
-          nuget setApiKey $env:GITHUB_TOKEN -Source "github"
+          nuget setApiKey $env:GITHUB_TOKEN -Source "github" -Verbosity quiet
           nuget push "DEHPCommon\bin\Debug\DEHPCommon.$env:APPVEYOR_BUILD_VERSION.nupkg" -Source "github"
         }
       }
