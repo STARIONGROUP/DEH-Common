@@ -47,6 +47,23 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             Assert.IsNull(vm.TransferCommand);
             Assert.IsNull(vm.CancelCommand);
             Assert.Zero(vm.Progress);
+            Assert.Zero(vm.NumberOfThing);
+            Assert.IsNotNull(vm.TransferButtonText);
+        }
+
+        [Test]
+        public void VerifyTransferButtonText()
+        {
+            var vm = new TestTransferControlViewModel();
+
+            const string transferText = "Transfer";
+            Assert.AreEqual(transferText, vm.TransferButtonText);
+            vm.NumberOfThing = 1;
+            Assert.AreEqual("Transfer 1 thing", vm.TransferButtonText);
+            vm.NumberOfThing = 42;
+            Assert.AreEqual("Transfer 42 things", vm.TransferButtonText);
+            vm.NumberOfThing = 0;
+            Assert.AreEqual(transferText, vm.TransferButtonText);
         }
     }
 }
