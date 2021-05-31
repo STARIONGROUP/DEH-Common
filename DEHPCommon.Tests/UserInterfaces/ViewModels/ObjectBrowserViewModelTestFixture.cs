@@ -27,6 +27,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
 
@@ -146,6 +147,14 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.viewModel.BuildTrees();
             Assert.IsNotEmpty(this.viewModel.Things);
             Assert.AreEqual(1, this.viewModel.Things.Count);
+            Assert.AreEqual(4, this.viewModel.Things.First().ContainedRows.Count);
+
+            this.viewModel.Things.Clear();
+            var iterationClone = this.iteration.Clone(false);
+            iterationClone.Element.Clear();
+            this.viewModel.BuildTrees(iterationClone);
+            Assert.IsNotEmpty(this.viewModel.Things);
+            Assert.AreEqual(1, this.viewModel.Things.Count);Assert.IsEmpty(this.viewModel.Things.First().ContainedRows);
         }
 
         [Test]

@@ -37,6 +37,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using DEHPCommon.Events;
     using DEHPCommon.Extensions;
     using DEHPCommon.UserInterfaces.ViewModels.Comparers;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -288,6 +289,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
+
+            var selectSubscription = CDPMessageBus.Current.Listen<SelectEvent>()
+                .Where(x => x.SelectedThing.ShortName == this.Thing.ShortName && x.SelectedThing.Iid == this.Thing.Iid && (this.Thing.Original != null || this.Thing.Iid == Guid.Empty))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.IsSelectedForTransfer = !x.CancelSelection);
+
+            this.Disposables.Add(selectSubscription);
 
             var ownerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)

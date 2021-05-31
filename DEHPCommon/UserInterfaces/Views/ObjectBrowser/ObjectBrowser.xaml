@@ -12,6 +12,7 @@
              xmlns:viewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows"
              xmlns:converters="clr-namespace:DEHPCommon.Converters"
              xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors"
+             xmlns:services="clr-namespace:DEHPCommon.Services"
              MinWidth="400" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -29,10 +30,14 @@
                          BorderEffect="Default"
                          BorderEffectColor="Blue">
         <Grid>
+
             <dxg:TreeListControl ItemsSource="{Binding Things}"
                                  SelectedItem="{Binding SelectedThing}"
                                  SelectedItems="{Binding SelectedThings}"
-                                 SelectionMode="MultipleRow">
+                                 SelectionMode="MultipleRow"
+                                 services:GridUpdateService.UpdateStarted="{Binding IsBusy,
+                                                                            Mode=OneWay,
+                                                                            UpdateSourceTrigger=PropertyChanged}">
                 <dxmvvm:Interaction.Behaviors>
                     <behaviors:ContextMenuBehavior/>
                 </dxmvvm:Interaction.Behaviors>
@@ -63,6 +68,9 @@
                                     <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
                                         <Setter Property="Background" Value="Yellow"/>
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Row.IsSelectedForTransfer}" Value="True">
+                                        <Setter Property="Background" Value="LightGreen"/>
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
                                         <Setter Property="FontWeight" Value="Bold" />
                                     </DataTrigger>
@@ -73,9 +81,6 @@
                                 <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
                             </Style>
                         </dxg:TreeListView.RowStyle>
-                        <dxg:TreeListView.FocusedRow>
-                            <dynamic:ExpandoObject />
-                        </dxg:TreeListView.FocusedRow>
                         <dxg:TreeListView.ContextMenu>
                             <ContextMenu />
                         </dxg:TreeListView.ContextMenu>

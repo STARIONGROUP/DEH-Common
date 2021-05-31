@@ -524,5 +524,12 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeR
             Assert.DoesNotThrow(() => vm.UpdateThing(newElementDefinition));
             Assert.AreSame(vm.Thing, newElementDefinition);
         }
+
+        [Test]
+        public void VerifyDispose()
+        {
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null);
+            Assert.DoesNotThrow(() => vm.Dispose());
+        }
     }
 }

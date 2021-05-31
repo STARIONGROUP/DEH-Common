@@ -26,6 +26,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
     using System;
 
+    using CDP4Common.EngineeringModelData;
+
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
 
     using ReactiveUI;
@@ -95,7 +97,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Adds to the <see cref="ObjectBrowserBaseViewModel.Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
         /// </summary>
-        void BuildTrees();
+        /// <param name="iteration">An optional <see cref="Iteration"/> to use for generation of the trees</param>
+        void BuildTrees(Iteration iteration = null);
 
         /// <summary>
         /// Populate the context menu for the implementing view model
