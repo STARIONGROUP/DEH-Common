@@ -28,9 +28,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -38,15 +36,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.Events;
     using DEHPCommon.Extensions;
-    using DEHPCommon.Mvvm;
     using DEHPCommon.UserInterfaces.ViewModels.Comparers;
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using ReactiveUI;
@@ -408,13 +403,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <param name="elementDef">The <see cref="ElementDefinition"/> to add</param>
         private void AddElementDefinitionRow(ElementDefinition elementDef)
         {
-            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
-
-            if (tuple != null)
-            {
-                var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this);
-                this.ContainedRows.SortedInsert(row, RowComparer);
-            }
+            var row = new ElementDefinitionRowViewModel(elementDef, this.QueryCurrentDomainOfExpertise(), this.Session, this);
+            this.ContainedRows.SortedInsert(row, RowComparer);
         }
 
         /// <summary>

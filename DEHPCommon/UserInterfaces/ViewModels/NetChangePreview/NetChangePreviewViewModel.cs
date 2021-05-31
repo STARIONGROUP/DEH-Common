@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NetChangePreviewViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
@@ -39,9 +39,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
     public abstract class NetChangePreviewViewModel : ObjectBrowserBaseViewModel, INetChangePreviewViewModel
     {
         /// <summary>
-        /// Gets the collection of <see cref="Thing"/>s at their previous state
+        /// Gets the collection of <see cref="Thing"/>s at their previous state, this property is used for updating the Net change preview based on a selection
         /// </summary>
         protected ReactiveList<Thing> ThingsAtPreviousState { get; } = new ReactiveList<Thing>();
+
+        /// <summary>
+        /// Gets the collection of <see cref="Thing"/>s to be actually transfered
+        /// </summary>
+        protected ReactiveList<object> SelectedThingsToTransfer { get; } = new ReactiveList<object>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NetChangePreviewViewModel"/> class.

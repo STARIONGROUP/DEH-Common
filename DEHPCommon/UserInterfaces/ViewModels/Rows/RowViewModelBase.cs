@@ -65,6 +65,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         private bool isHighlighted;
 
         /// <summary>
+        /// Backing property for the <see cref="IsSelectedForTransfer"/>
+        /// </summary>
+        private bool isSelectedForTransfer;
+
+        /// <summary>
         /// Backing field for <see cref="RowStatus"/>
         /// </summary>
         private RowStatusKind rowStatus;
@@ -163,6 +168,15 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         {
             get => this.isHighlighted;
             set => this.RaiseAndSetIfChanged(ref this.isHighlighted, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the row is highlighted
+        /// </summary>
+        public bool IsSelectedForTransfer
+        {
+            get => this.isSelectedForTransfer;
+            set => this.RaiseAndSetIfChanged(ref this.isSelectedForTransfer, value);
         }
 
         /// <summary>

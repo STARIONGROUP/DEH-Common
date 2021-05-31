@@ -228,6 +228,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 {
                     this.Logger.Trace("The Disposables collection of the {0} is null", this.GetType().Name);
                 }
+
+                foreach (var row in this.ContainedRows)
+                {
+                    row.Dispose();
+                }
             }
 
             // Indicate that the instance has been disposed.

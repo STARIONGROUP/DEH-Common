@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:DEHPCommon.Converters"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              mc:Ignorable="d" d:DesignHeight="100" d:DesignWidth="650">
     <UserControl.Resources>
         <ResourceDictionary>
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <dxmvvm:NumericToVisibilityConverter x:Key="NumericToVisibilityConverter"/> 
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -21,10 +21,12 @@
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="10,10,10,5" HorizontalAlignment="Stretch">
             <ProgressBar Background="AliceBlue" Height="40" Foreground="DarkGray" Maximum="100" Minimum="0" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding Progress}" />
-            <TextBlock HorizontalAlignment="Center" Visibility="{Binding IsIndeterminate, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center" FontSize="18" Text="{Binding Progress, StringFormat={}{0}%}" />
+            <TextBlock HorizontalAlignment="Center" Visibility="{Binding Progress, Converter={StaticResource NumericToVisibilityConverter}}"  VerticalAlignment="Center" FontSize="18" Text="{Binding Progress, StringFormat={}{0}%}" />
         </Grid>
         <Button ToolTip="Attempt to cancel the transfers" Grid.Row="1" Grid.Column="0" Height="40" Margin="10,5,5,10" Content="Cancel" Command="{Binding CancelCommand}"/>
-        <Button ToolTip="Transfer all mapped things from dst to hub &#x0a;and mapped things from hub to dst &#x0a; Mapping will also be persisted"
-                Grid.Row="1" Grid.Column="1" Height="40" Margin="5,5,10,10" Content="Transfer" Command="{Binding TransferCommand}"/>
+        <Button ToolTip="Transfer selected mapped things from dst to hub &#x0a;and mapped things from hub to dst &#x0a; Mapping will also be persisted"
+                Grid.Row="1" Grid.Column="1" Height="40" Margin="5,5,10,10" Command="{Binding TransferCommand}">
+            <TextBlock HorizontalAlignment="Center" Text="{Binding TransferButtonText}"/>
+        </Button>
     </Grid>
 </UserControl>

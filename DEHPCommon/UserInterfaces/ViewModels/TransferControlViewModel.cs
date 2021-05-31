@@ -24,6 +24,7 @@
 
 namespace DEHPCommon.UserInterfaces.ViewModels
 {
+    using System;
     using System.Reactive;
     using System.Windows.Input;
 
@@ -62,6 +63,49 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             get => this.progress;
             set => this.RaiseAndSetIfChanged(ref this.progress, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="NumberOfThing"/>
+        /// </summary>
+        private int numberOfThing;
+
+        /// <summary>
+        /// Gets or sets the current number of item that will be transfered
+        /// </summary>
+        public int NumberOfThing
+        {
+            get => this.numberOfThing;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.numberOfThing, value);
+
+                switch (this.numberOfThing)
+                {
+                    case > 0:
+                        var thereIsMoreThanOneThing = this.numberOfThing > 1 ? "s" : string.Empty;
+                        this.TransferButtonText = $"Transfer {this.NumberOfThing} thing{thereIsMoreThanOneThing}";
+                        break;
+
+                    default:
+                        this.TransferButtonText = "Transfer";
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="TransferButtonText"/>
+        /// </summary>
+        private string transferButtonText = "Transfer";
+
+        /// <summary>
+        /// Gets or sets the current number of item that will be transfered
+        /// </summary>
+        public string TransferButtonText
+        {
+            get => this.transferButtonText;
+            set => this.RaiseAndSetIfChanged(ref this.transferButtonText, value);
         }
         
         /// <summary>

@@ -178,14 +178,15 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Adds to the <see cref="Things"/> collection the specified by <see cref="IObjectBrowserTreeSelectorService"/> trees
         /// </summary>
-        public virtual void BuildTrees()
+        /// <param name="iteration">An optional <see cref="Iteration"/> to use for generation of the trees</param>
+        public virtual void BuildTrees(Iteration iteration = null)
         {
             foreach (var thingKind in this.objectBrowserTreeSelectorService.ThingKinds)
             {
                 if (thingKind == typeof(ElementDefinition) &&
                     this.Things.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.HubController.OpenIteration.Iid))
                 {
-                    this.Things.Add(new ElementDefinitionsBrowserViewModel(this.HubController.OpenIteration, this.HubController.Session));
+                    this.Things.Add(new ElementDefinitionsBrowserViewModel(iteration ?? this.HubController.OpenIteration, this.HubController.Session));
                 }
             }
         }
