@@ -36,7 +36,7 @@ namespace DEHPCommon.Services
     /// The service used to lock the update of a grid view when update in the view-model are occuring
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class GridUpdateService
+    public static class GridUpdateService
     {
         /// <summary>
         /// The current logger
@@ -109,6 +109,6 @@ namespace DEHPCommon.Services
             {
                 Logger.Error(exception, $"A problem occurend when UpdateStartedPropertyChanged was called");
             }
-}
+        }
     }
 }

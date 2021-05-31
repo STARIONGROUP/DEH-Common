@@ -47,6 +47,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 
     using DEHPCommon.Events;
     using DEHPCommon.UserInterfaces.ViewModels;
+    using DEHPCommon.UserInterfaces.ViewModels.Rows;
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using DevExpress.Xpf.Docking.Platform;
@@ -175,6 +176,48 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             vm.CollapseAllRows();
             Assert.IsFalse(vm.IsExpanded);
             Assert.IsFalse(vm.ContainedRows.FirstOrDefault()?.IsExpanded);
+        }
+
+        [Test]
+        public void VerifyRowSelectionForTransfer()
+        {
+            this.iteration.Element.Add(this.elementDef);
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object);
+            var elementRow = vm.ContainedRows.FirstOrDefault() as RowViewModelBase<ElementDefinition>;
+            Assert.IsNotNull(elementRow);
+            Assert.IsFalse(elementRow.IsSelectedForTransfer);
+            CDPMessageBus.Current.SendMessage(new SelectEvent(elementRow.Thing));
+            Assert.IsFalse(elementRow.IsSelectedForTransfer);
+            var clone = this.elementDef.Clone(false);
+            clone.Iid = Guid.Empty;
+            CDPMessageBus.Current.SendMessage(new SelectEvent(clone));
+            Assert.IsFalse(elementRow.IsSelectedForTransfer);
+
+            clone.Iid = this.elementDef.Iid;
+            clone.ShortName = "newShortName";
+            CDPMessageBus.Current.SendMessage(new SelectEvent(clone));
+            Assert.IsFalse(elementRow.IsSelectedForTransfer);
+
+            this.iteration.Element.Clear();
+            clone = this.elementDef.Clone(false);
+            this.iteration.Element.Add(clone);
+            this.elementDef.Iid = Guid.Empty;
+            this.iteration.Element.Add(this.elementDef);
+
+            vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object);
+            elementRow = vm.ContainedRows.FirstOrDefault() as RowViewModelBase<ElementDefinition>;
+            Assert.IsNotNull(elementRow);
+            CDPMessageBus.Current.SendMessage(new SelectEvent(elementRow.Thing));
+            Assert.IsTrue(elementRow.IsSelectedForTransfer);
+            Assert.AreEqual(2, vm.ContainedRows.Count);
+            var elementRow2 = vm.ContainedRows.LastOrDefault() as RowViewModelBase<ElementDefinition>;
+            Assert.IsNotNull(elementRow2);
+
+            CDPMessageBus.Current.SendMessage(new SelectEvent(elementRow2.Thing));
+            Assert.IsTrue(elementRow2.IsSelectedForTransfer);
+
+            CDPMessageBus.Current.SendMessage(new SelectEvent(elementRow.Thing, true));
+            Assert.IsFalse(elementRow.IsSelectedForTransfer);
         }
 
         [Test]
