@@ -26,19 +26,44 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Threading;
 
     using NUnit.Framework;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.ViewModels;
 
+    using DevExpress.Mvvm.Native;
+
     [TestFixture]
     public class StatusBarControlViewModelTestFixture
     {
+        private const string TextMessage = "Executed the user setting command";
+
+        private class StatusBarControlViewModelTestClass : StatusBarControlViewModel
+        {
+            /// <summary>
+            /// Executes the <see cref="StatusBarControlViewModel.UserSettingCommand"/>
+            /// </summary>
+            protected override void ExecuteUserSettingCommand()
+            {
+                this.Append(TextMessage);
+            }
+        }
+
+        [Test]
+        public void VerifyExecuteUserSettingCommand()
+        {
+            var viewModel = new StatusBarControlViewModelTestClass();
+
+            viewModel.UserSettingCommand.Execute(null);
+            Assert.IsTrue(viewModel.Message.Contains(TextMessage));
+        }
+
         [Test]
         public void VerifyProperties()
         {
-            var viewModel = new StatusBarControlViewModel();
+            var viewModel = new StatusBarControlViewModelTestClass();
             Assert.IsNull(viewModel.Message);
             Assert.AreEqual(StatusBarMessageSeverity.None, viewModel.Severity);
             Assert.IsNotNull(viewModel.UserSettingCommand);
@@ -49,7 +74,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         {
             const string message = "testMessage";
             const string errorMessage = "errorMessage";
-            var viewModel = new StatusBarControlViewModel();
+            var viewModel = new StatusBarControlViewModelTestClass();
             viewModel.Append(message);
             Assert.AreEqual(message,viewModel.Message.Split(' ').Last());
             Assert.AreEqual(StatusBarMessageSeverity.Info, viewModel.Severity);
