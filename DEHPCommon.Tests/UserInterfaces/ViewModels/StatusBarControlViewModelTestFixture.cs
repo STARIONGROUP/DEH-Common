@@ -26,18 +26,19 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 {
     using System;
     using System.Linq;
-    using System.Threading;
 
     using NUnit.Framework;
 
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels;
 
-    using DevExpress.Mvvm.Native;
+    using Moq;
 
     [TestFixture]
     public class StatusBarControlViewModelTestFixture
     {
+        private StatusBarControlViewModelTestClass viewModel;
         private const string TextMessage = "Executed the user setting command";
 
         private class StatusBarControlViewModelTestClass : StatusBarControlViewModel
@@ -49,24 +50,35 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             {
                 this.Append(TextMessage);
             }
+
+            /// <summary>
+            /// Initializes a new <see cref="StatusBarControlViewModel"/>
+            /// </summary>
+            /// <param name="navigationService">The <see cref="NavigationService"/></param>
+            public StatusBarControlViewModelTestClass(INavigationService navigationService) : base(navigationService)
+            {
+            }
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            this.viewModel = new StatusBarControlViewModelTestClass(new Mock<INavigationService>().Object);
         }
 
         [Test]
         public void VerifyExecuteUserSettingCommand()
         {
-            var viewModel = new StatusBarControlViewModelTestClass();
-
-            viewModel.UserSettingCommand.Execute(null);
-            Assert.IsTrue(viewModel.Message.Contains(TextMessage));
+            this.viewModel.UserSettingCommand.Execute(null);
+            Assert.IsTrue(this.viewModel.Message.Contains(TextMessage));
         }
 
         [Test]
         public void VerifyProperties()
         {
-            var viewModel = new StatusBarControlViewModelTestClass();
-            Assert.IsNull(viewModel.Message);
-            Assert.AreEqual(StatusBarMessageSeverity.None, viewModel.Severity);
-            Assert.IsNotNull(viewModel.UserSettingCommand);
+            Assert.IsNull(this.viewModel.Message);
+            Assert.AreEqual(StatusBarMessageSeverity.None, this.viewModel.Severity);
+            Assert.IsNotNull(this.viewModel.UserSettingCommand);
         }
 
         [Test]
@@ -74,25 +86,23 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
         {
             const string message = "testMessage";
             const string errorMessage = "errorMessage";
-            var viewModel = new StatusBarControlViewModelTestClass();
-            viewModel.Append(message);
-            Assert.AreEqual(message,viewModel.Message.Split(' ').Last());
-            Assert.AreEqual(StatusBarMessageSeverity.Info, viewModel.Severity);
-            
-            viewModel.Append(errorMessage, StatusBarMessageSeverity.Error);
-            Assert.AreEqual(errorMessage, viewModel.Message.Split(' ').Last());
-            Assert.AreEqual(StatusBarMessageSeverity.Error, viewModel.Severity);
+            this.viewModel.Append(message);
+            Assert.AreEqual(message, this.viewModel.Message.Split(' ').Last());
+            Assert.AreEqual(StatusBarMessageSeverity.Info, this.viewModel.Severity);
 
-            viewModel.Append(errorMessage, StatusBarMessageSeverity.None);
-            Assert.AreEqual(errorMessage, viewModel.Message.Split(' ').Last());
-            Assert.AreEqual(StatusBarMessageSeverity.None, viewModel.Severity);
+            this.viewModel.Append(errorMessage, StatusBarMessageSeverity.Error);
+            Assert.AreEqual(errorMessage, this.viewModel.Message.Split(' ').Last());
+            Assert.AreEqual(StatusBarMessageSeverity.Error, this.viewModel.Severity);
 
-            viewModel.Append(errorMessage, StatusBarMessageSeverity.Warning);
-            Assert.AreEqual(errorMessage, viewModel.Message.Split(' ').Last());
-            Assert.AreEqual(StatusBarMessageSeverity.Warning, viewModel.Severity);
+            this.viewModel.Append(errorMessage, StatusBarMessageSeverity.None);
+            Assert.AreEqual(errorMessage, this.viewModel.Message.Split(' ').Last());
+            Assert.AreEqual(StatusBarMessageSeverity.None, this.viewModel.Severity);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-                viewModel.Append(errorMessage, (StatusBarMessageSeverity)42));
+            this.viewModel.Append(errorMessage, StatusBarMessageSeverity.Warning);
+            Assert.AreEqual(errorMessage, this.viewModel.Message.Split(' ').Last());
+            Assert.AreEqual(StatusBarMessageSeverity.Warning, this.viewModel.Severity);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => this.viewModel.Append(errorMessage, (StatusBarMessageSeverity)42));
         }
     }
 }
