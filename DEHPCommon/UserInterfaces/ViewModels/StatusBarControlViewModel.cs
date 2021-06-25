@@ -27,6 +27,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using System;
 
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using NLog;
@@ -34,14 +35,19 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The <see cref="StatusBarControlViewModel"/> is the view model for the <see cref="Views.StatusBarControl"/>
+    /// The <see cref="StatusBarControlViewModel"/> is the base view model for the <see cref="Views.StatusBarControl"/>
     /// </summary>
-    public class StatusBarControlViewModel : ReactiveObject, IStatusBarControlViewModel
+    public abstract class StatusBarControlViewModel : ReactiveObject, IStatusBarControlViewModel
     {
         /// <summary>
         /// The <see cref="NLog"/> logger
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The <see cref="INavigationService"/>
+        /// </summary>
+        protected INavigationService NavigationService;
 
         /// <summary>
         /// Backing field for <see cref="Message"/>
@@ -61,7 +67,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Backing field for <see cref="Severity"/>
         /// </summary>
         private StatusBarMessageSeverity severity;
-
+        
         /// <summary>
         /// Gets or sets the severity of the current <see cref="Message"/>
         /// </summary>
@@ -79,8 +85,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Initializes a new <see cref="StatusBarControlViewModel"/>
         /// </summary>
-        public StatusBarControlViewModel()
+        /// <param name="navigationService">The <see cref="NavigationService"/></param>
+        protected StatusBarControlViewModel(INavigationService navigationService)
         {
+            this.NavigationService = navigationService;
             this.UserSettingCommand = ReactiveCommand.Create();
             this.UserSettingCommand.Subscribe(_ => this.ExecuteUserSettingCommand());
         }
@@ -117,9 +125,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Executes the <see cref="UserSettingCommand"/>
         /// </summary>
-        private void ExecuteUserSettingCommand()
-        {
-            this.Append("User setting dialog opened");
-        }
+        protected abstract void ExecuteUserSettingCommand();
     }
 }

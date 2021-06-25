@@ -79,7 +79,6 @@ namespace DEHPCommon
             containerBuilder.RegisterType<ObjectBrowserViewModel>().As<IObjectBrowserViewModel>();
             containerBuilder.RegisterType<PublicationBrowserViewModel>().As<IPublicationBrowserViewModel>();
             containerBuilder.RegisterType<HubBrowserHeaderViewModel>().As<IHubBrowserHeaderViewModel>();
-            containerBuilder.RegisterType<StatusBarControlViewModel>().As<IStatusBarControlViewModel>().SingleInstance();
             containerBuilder.RegisterType<ExchangeHistoryViewModel>().As<IExchangeHistoryViewModel>();
             containerBuilder.RegisterType<HubSessionControlViewModel>().As<IHubSessionControlViewModel>();
         }
