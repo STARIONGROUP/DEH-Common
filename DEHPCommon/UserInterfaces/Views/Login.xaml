@@ -14,14 +14,8 @@
     <dxmvvm:Interaction.Behaviors>
         <behaviors:CloseWindowBehavior/>
     </dxmvvm:Interaction.Behaviors>
-    <!--<UserControl.Resources>
-        <ResourceDictionary>
-            <dx:BoolInverseConverter x:Key="BoolInverseConverter" />
-            </ResourceDictionary>
-    </UserControl.Resources>-->
     <Window.Resources>
         <ResourceDictionary>
-            <dx:BoolInverseConverter x:Key="BoolInverseConverter" />
             <Style x:Key="IsReadOnlyStyle" TargetType="{x:Type Control}">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding LoginSuccessful}" Value="True">
