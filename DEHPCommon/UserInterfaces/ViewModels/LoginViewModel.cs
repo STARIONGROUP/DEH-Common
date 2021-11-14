@@ -74,7 +74,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         public Dictionary<ServerType, string> DataSourceList { get; } = new Dictionary<ServerType, string>()
         {
-            { ServerType.Cdp4WebServices, "CDP4 WebServices"},
+            { ServerType.Cdp4WebServices, "COMET WebServices"},
             { ServerType.OcdtWspServer, "OCDT WSP Server"}
         };
 
@@ -151,6 +151,20 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             get => this.loginSuccessful;
             private set => this.RaiseAndSetIfChanged(ref this.loginSuccessful, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="IsBusy"/> property
+        /// </summary>
+        private bool isBusy;
+
+        /// <summary>
+        /// Gets or sets is busy flag
+        /// </summary>
+        public bool IsBusy
+        {
+            get => this.isBusy;
+            private set => this.RaiseAndSetIfChanged(ref this.isBusy, value);
         }
 
         /// <summary>
@@ -268,6 +282,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.hubController = hubController;
             this.userPreferenceService = userPreferenceService;
+            this.IsBusy = false;
+
+            this.SelectedServerType = this.DataSourceList.FirstOrDefault();
 
             this.PopulateSavedUris();
 
@@ -298,7 +315,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, 
                 _ => this.ExecuteLogin(), RxApp.MainThreadScheduler);
-            
+
             this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose,
                 _ => this.CloseCommandExecute(), RxApp.MainThreadScheduler);
 
@@ -334,6 +351,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             try
             {
+                this.IsBusy = true;
+
                 var model = new EngineeringModel(this.SelectedEngineeringModel.Thing.EngineeringModelIid, this.hubController.Session.Assembler.Cache, this.hubController.Session.Credentials.Uri)
                 {
                     EngineeringModelSetup = this.SelectedEngineeringModel.Thing
@@ -350,6 +369,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 this.logger.Error($"Loading Iteration failed: {exception}");
                 this.LogMessage = $"Loading Iteration failed: {exception.Message}";
             }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
 
         /// <summary>
@@ -358,22 +381,29 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteLogin()
         {
-            this.LogMessage = "Login in...";
+            this.LogMessage = "Logging in...";
             this.LoginSuccessful = false;
             this.LoginFailed = false;
+
+            this.IsBusy = true;
 
             try
             {
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
                 this.LoginSuccessful = await this.hubController.Open(credentials, this.SelectedServerType.Key);
+                this.LogMessage = "Login Successful";
+
                 this.PopulateEngineeringModels();
-                this.LogMessage = "Login successful";
             }
             catch (Exception exception)
             {
                 this.LoginFailed = true;
-                this.logger.Error($"Login failed: {exception}");
-                this.LogMessage = $"Login failed: {exception.Message}";
+                this.logger.Error($"Login Failed: {exception}");
+                this.LogMessage = $"Login Failed: {exception.Message}";
+            }
+            finally
+            {
+                this.IsBusy = false;
             }
         }
 
@@ -404,10 +434,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.Iterations.Clear();
 
-            foreach (var vm in this.SelectedEngineeringModel.Thing.IterationSetup.OrderBy(i => i.IterationNumber).Select(i => new IterationRowViewModel(i)))
+            foreach (var it in this.SelectedEngineeringModel.Thing.IterationSetup.OrderBy(i => i.IterationNumber))
             {
-                this.Iterations.Add(vm);
+                this.Iterations.Add(new IterationRowViewModel(it));
             }
+
+            this.SelectedIteration = this.Iterations.FirstOrDefault(ivm => ivm.Thing.FrozenOn == null);
         }
 
         /// <summary>
@@ -417,9 +449,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.EngineeringModels.Clear();
 
-            foreach (var vm in this.hubController.GetEngineeringModels().OrderBy(m => m.Name).Select(m => new EngineeringModelRowViewModel(m)))
+            foreach (var em in this.hubController.GetEngineeringModels().OrderBy(m => m.Name))
             {
-                this.EngineeringModels.Add(vm);
+                this.EngineeringModels.Add(new EngineeringModelRowViewModel(em));
             }
         }
     }

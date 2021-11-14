@@ -25,6 +25,7 @@
 namespace DEHPCommon.UserInterfaces.ViewModels
 {
     using System;
+    using System.Reactive.Linq;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.Services.NavigationService;
@@ -89,7 +90,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         protected StatusBarControlViewModel(INavigationService navigationService)
         {
             this.NavigationService = navigationService;
-            this.UserSettingCommand = ReactiveCommand.Create();
+            this.UserSettingCommand = ReactiveCommand.Create(Observable.Empty<bool>().StartWith(false));
             this.UserSettingCommand.Subscribe(_ => this.ExecuteUserSettingCommand());
         }
 

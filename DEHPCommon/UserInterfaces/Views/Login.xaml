@@ -9,8 +9,9 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:converters="clr-namespace:DEHPCommon.Converters" 
                    xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors" 
-                   Title="Connections"
-                   mc:Ignorable="d" Height="422" d:DesignWidth="409" MinWidth="600"  Width="400">
+                   Title="Connect to Hub"
+                   WindowStartupLocation="CenterScreen"
+                   mc:Ignorable="d" Height="422" d:DesignWidth="409" MinWidth="600"  Width="409">
     <dxmvvm:Interaction.Behaviors>
         <behaviors:CloseWindowBehavior/>
     </dxmvvm:Interaction.Behaviors>
@@ -54,11 +55,11 @@
             <ComboBox Style="{StaticResource IsReadOnlyStyle}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Name="ServerType" Margin="5" DisplayMemberPath="Value" FontSize="12"
                       ItemsSource="{Binding DataSourceList, Mode=OneTime}"
                       SelectedItem="{Binding Path=SelectedServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      ToolTip="Please select the server type &#x0a;Currently supported type: &#x0a;- CDP4 &#x0a;- WSP"
+                      ToolTip="Please select the server type &#x0a;Currently supported type: &#x0a;- COMET &#x0a;- WSP"
                       SelectedValuePath="Key" />
 
             <!--  Server Address  -->
-            <dxlc:LayoutItemLabel Grid.Row="1" Grid.Column="0" Height="Auto" Margin="5" Content="Server address" FontSize="12" />
+            <dxlc:LayoutItemLabel Grid.Row="1" Grid.Column="0" Height="Auto" Margin="5" Content="Server Address" FontSize="12" />
             <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1"
                               Height="Auto"
                               Margin="5"
@@ -117,10 +118,9 @@
                         <DataTemplate>
                             <TextBlock>
                                 <TextBlock.Text>
-                                    <MultiBinding StringFormat="{} Iteration {0} {1} {2}">
+                                    <MultiBinding StringFormat="{} Iteration {0} ({1})">
                                         <Binding Path="Number"/>
                                         <Binding Path="FrozenOn"/>
-                                        <Binding Path="Description"/>
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
@@ -129,7 +129,7 @@
                 </ComboBox>
 
                 <!--  Domain  -->
-            <dxlc:LayoutItemLabel Grid.Row="7" Grid.Column="0" Height="Auto" Margin="5" Content="Domain of expertise" FontSize="12" />
+            <dxlc:LayoutItemLabel Grid.Row="7" Grid.Column="0" Height="Auto" Margin="5" Content="Domain of Expertise" FontSize="12" />
             <ComboBox IsEnabled="{Binding LoginSuccessful}" Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Name="Domain" Margin="5" DisplayMemberPath="Name" FontSize="12"
                       ItemsSource="{Binding DomainsOfExpertise}"
                       ToolTip="Select your domain of expertise"
@@ -139,15 +139,21 @@
 
         <Grid Grid.Row="1" Margin="10"  Grid.Column="0">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Label Content="{Binding LogMessage}" FontSize="14" VerticalContentAlignment="Center" Margin="5"></Label>
-            <Image Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Apply_32x32.png}" Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
-            <Image Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Cancel_32x32.png}" Visibility="{Binding Path=LoginFailed, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
+            <dxe:ProgressBarEdit Width="80" Height="10" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding Path=IsBusy, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                <dxe:ProgressBarEdit.StyleSettings>
+                    <dxe:ProgressBarMarqueeStyleSettings/>
+                </dxe:ProgressBarEdit.StyleSettings>
+            </dxe:ProgressBarEdit>
+            <Label Grid.Column="1" Content="{Binding LogMessage}" FontSize="14" VerticalContentAlignment="Center" Margin="5"></Label>
+            <Image Grid.Column="2" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Apply_32x32.png}" Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
+            <Image Grid.Column="2" Height="24" Width="24" HorizontalAlignment="Right" Source="{dx:DXImage Image=Cancel_32x32.png}" Visibility="{Binding Path=LoginFailed, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" />
 
-            <Button Grid.Column="2" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right"
+            <Button Grid.Column="3" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right"
                     Command="{Binding LoginCommand}" Width="117" IsDefault="True"
                     ToolTip="Authenticate the user and open the session"
                     Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter Inverse=True}, UpdateSourceTrigger=PropertyChanged}">
@@ -157,7 +163,7 @@
                 </StackPanel>
             </Button>
 
-            <Button Grid.Column="2" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right" IsDefault="True"
+            <Button Grid.Column="3" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right" IsDefault="True"
                     Visibility="{Binding Path=LoginSuccessful, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"  
                     ToolTip="Open the selected Iteration with the selected Domain"
                     Command="{Binding CloseCommand}" Width="117" Content="Continue"/>
