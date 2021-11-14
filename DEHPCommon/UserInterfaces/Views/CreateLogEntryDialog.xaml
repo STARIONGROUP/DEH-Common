@@ -7,6 +7,8 @@
                    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" 
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    Title="Create Log Entry"
+                   Width="350"
+                   WindowStartupLocation="CenterScreen"
                    mc:Ignorable="d" Height="200" d:DesignWidth="350" MinWidth="350">
     <Window.Resources>
         <ResourceDictionary>
@@ -18,7 +20,7 @@
             <ColumnDefinition Width="6*" />
         </Grid.ColumnDefinitions>
 
-        <dxlc:LayoutItemLabel Grid.Column="0" Height="Auto" Margin="5" Content="Justification" />
+        <dxlc:LayoutItemLabel Grid.Column="0" Height="Auto" Margin="5" Content="Justification:" />
         <dxe:TextEdit Grid.Column="1" Height="Auto" Margin="5" FontSize="12"
                       TextWrapping="Wrap" 
                       AcceptsReturn="True" 

@@ -65,7 +65,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
             get => this.description;
             private set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
-        
+
         /// <summary>
         /// Gets or sets the datetime when the iteration has been frozen
         /// </summary>
@@ -83,7 +83,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         {
             this.Number = iterationSetup.IterationNumber.ToString();
             this.Description = iterationSetup.Description;
-            this.FrozenOn = iterationSetup.FrozenOn != null ? iterationSetup.FrozenOn.Value.ToString("g") : "Active";
+            this.FrozenOn = iterationSetup.FrozenOn != null ? $"Frozen On: {iterationSetup.FrozenOn.Value:g}" : "Active";
         }
     }
 }

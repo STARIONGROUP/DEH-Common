@@ -58,7 +58,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
             get => this.iid;
             private set => this.RaiseAndSetIfChanged(ref this.iid, value);
         }
-        
+
         /// <summary>
         /// Gets or sets the revisionNumber
         /// </summary>

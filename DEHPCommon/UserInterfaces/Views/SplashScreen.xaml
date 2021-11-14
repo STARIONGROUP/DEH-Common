@@ -9,6 +9,7 @@
                        MinWidth="600"
                        MinHeight="400"
                        AllowAcrylic="True"
+                       WindowStartupLocation="CenterScreen"
                        dx:DXDesignTimeHelper.Background="#55525252"
                        mc:Ignorable="d"
                        d:DataContext="{x:Static dxmvvm:DXSplashScreenViewModel.DesignTimeData}">
@@ -26,7 +27,7 @@
             <ProgressBar IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding Progress}" Grid.Row="2" Style="{DynamicResource ResourceKey={dxt:FluentSplashScreenThemeKey ResourceKey=ProgressBarStyle}}"/>
         </StackPanel>
 
-        <TextBlock x:Name="Copyright" Text="Copyright © RHEA System S.A." Grid.Row="2" Style="{DynamicResource ResourceKey={dxt:FluentSplashScreenThemeKey ResourceKey=CopyrightTextBoxStyle}}"/>
+        <TextBlock x:Name="Copyright" Text="Copyright © 2020-2021 RHEA System S.A." Grid.Row="2" Style="{DynamicResource ResourceKey={dxt:FluentSplashScreenThemeKey ResourceKey=CopyrightTextBoxStyle}}"/>
         <TextBlock x:Name="Status" Text="{Binding Status}" Grid.Row="2" Style="{DynamicResource ResourceKey={dxt:FluentSplashScreenThemeKey ResourceKey=StatusTextBoxStyle}}"/>
     </Grid>
 </dx:SplashScreenWindow>

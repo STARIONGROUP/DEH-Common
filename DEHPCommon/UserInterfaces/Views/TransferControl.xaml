@@ -24,7 +24,7 @@
             <TextBlock HorizontalAlignment="Center" Visibility="{Binding Progress, Converter={StaticResource NumericToVisibilityConverter}}"  VerticalAlignment="Center" FontSize="18" Text="{Binding Progress, StringFormat={}{0}%}" />
         </Grid>
         <Button ToolTip="Attempt to cancel the transfers" Grid.Row="1" Grid.Column="0" Height="40" Margin="10,5,5,10" Content="Cancel" Command="{Binding CancelCommand}"/>
-        <Button ToolTip="Transfer selected mapped things from dst to hub &#x0a;and mapped things from hub to dst &#x0a; Mapping will also be persisted"
+        <Button ToolTip="Transfer selected mapped things from dst to hub &#x0a;and mapped things from hub to DST &#x0a; Mapping will also be persisted"
                 Grid.Row="1" Grid.Column="1" Height="40" Margin="5,5,10,10" Command="{Binding TransferCommand}">
             <TextBlock HorizontalAlignment="Center" Text="{Binding TransferButtonText}"/>
         </Button>
