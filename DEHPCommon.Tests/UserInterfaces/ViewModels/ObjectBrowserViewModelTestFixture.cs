@@ -155,6 +155,7 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
             this.viewModel.BuildTrees(iterationClone);
             Assert.IsNotEmpty(this.viewModel.Things);
             Assert.AreEqual(1, this.viewModel.Things.Count);Assert.IsEmpty(this.viewModel.Things.First().ContainedRows);
+            Assert.IsTrue(this.viewModel.Things.FirstOrDefault()?.IsExpanded);
         }
 
         [Test]

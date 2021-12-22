@@ -189,6 +189,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     this.Things.Add(new ElementDefinitionsBrowserViewModel(iteration ?? this.HubController.OpenIteration, this.HubController.Session));
                 }
             }
+
+            if (this.Things.FirstOrDefault() is { } firstNode)
+            {
+                firstNode.IsExpanded = true;
+            }
         }
 
         /// <summary>
