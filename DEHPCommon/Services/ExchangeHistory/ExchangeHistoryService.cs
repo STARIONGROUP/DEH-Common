@@ -107,9 +107,9 @@ namespace DEHPCommon.Services.ExchangeHistory
 
             var newValueString = $"{prefix} {newValueRepresentation} [{scale}]";
             var valueToUpdateString = $"{prefix} {oldValueRepresentation} [{scale}]";
-
+            
             this.Append($"Value: [{valueToUpdateString}] from Parameter [{parameter?.ModelCode()}] " +
-                                        $"has been updated to [{newValueString}]");
+                        $"has been updated to [{newValueString}]");
         }
 
         /// <summary>
@@ -180,8 +180,8 @@ namespace DEHPCommon.Services.ExchangeHistory
                 var cols = parameter.ParameterType.NumberOfValues;
                 return $"[{valueSet.Computed.Count / cols}x{cols}]";
             }
-
-            return valueSet.Computed[0] ?? "-";
+            
+            return valueSet.Computed.DefaultIfEmpty("-").Aggregate((x, y) => $"{x},{y}");
         }
 
         /// <summary>

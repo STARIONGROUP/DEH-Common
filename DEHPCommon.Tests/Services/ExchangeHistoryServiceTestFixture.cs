@@ -232,5 +232,37 @@ namespace DEHPCommon.Tests.Services
             this.service.ClearPending();
             Assert.IsEmpty(this.service.PendingEntries);
         }
+
+        [Test]
+        public void VerifyAppendWithMultipleValuesValueSets()
+        {
+            var values = new List<string>() { "-", "-", "-" };
+
+            var valueSet = new ParameterValueSet()
+            {
+                Computed = new ValueArray<string>(values)
+            };
+
+            var valueSetClone = valueSet.Clone(false);
+
+            var compoundParameterType = new CompoundParameterType()
+            {
+                Name = "testParameterType",
+                ShortName = "testParameterType",
+                Component =
+                {
+                    new ParameterTypeComponent() { ParameterType = new DateParameterType() { Name = "date" } },
+                    new ParameterTypeComponent() { ParameterType = new TextParameterType() { Name = "text" } },
+                    new ParameterTypeComponent() { ParameterType = new SimpleQuantityKind() { Name = "number" } }
+                }
+            };
+
+            var parameter = new Parameter() { ParameterType = compoundParameterType, ValueSet = { valueSet }};
+            this.element.Parameter.Add(parameter);
+            
+            Assert.DoesNotThrow(() => this.service.Append(valueSet, valueSetClone));
+
+            Assert.IsTrue(this.service.PendingEntries.LastOrDefault()?.Message.Contains(compoundParameterType.Name));
+        }
     }
 }
