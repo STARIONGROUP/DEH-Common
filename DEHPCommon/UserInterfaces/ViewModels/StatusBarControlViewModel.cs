@@ -81,7 +81,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets the command that opens the user setting dialog
         /// </summary>
-        public ReactiveCommand<object> UserSettingCommand { get; private set; }
+        public ReactiveCommand<object> UserSettingCommand { get; protected set; }
 
         /// <summary>
         /// Initializes a new <see cref="StatusBarControlViewModel"/>
