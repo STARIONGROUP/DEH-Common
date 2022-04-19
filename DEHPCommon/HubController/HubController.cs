@@ -695,5 +695,77 @@ namespace DEHPCommon.HubController
             transaction.Create(newLogEntry);
             transaction.CreateOrUpdate(clonedEngineeringModel);
         }
+
+        /// <summary>
+        /// Gets the <see cref="Thing"/> by its <see cref="Thing.Iid"/> from rdls
+        /// </summary>
+        /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
+        /// <param name="iid">The id of the <see cref="Thing"/></param>
+        /// <param name="classKind">The <see cref="ClassKind"/></param>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <returns>An assert whether the <see cref="Thing"/> has been found</returns>
+        public bool TryGetThingById<TThing>(Guid iid, ClassKind classKind, out TThing thing) where TThing : Thing
+        {
+            return this.TryGetThingBy(x => x.Iid == iid, classKind, out thing);
+        }
+
+        /// <summary>
+        /// Gets the thing by predicate on <see cref="Thing" /> from the chain of rdls
+        /// </summary>
+        /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
+        /// <param name="predicate">The <see cref="Predicate{T}" /></param>
+        /// <param name="classKind">The <see cref="ClassKind"/></param>
+        /// <param name="thing">The <see cref="Thing" /></param>
+        /// <returns>Asserts whether the <see cref="Thing" /> as been found</returns>
+        public bool TryGetThingBy<TThing>(Func<TThing, bool> predicate, ClassKind classKind, out TThing thing) where TThing : Thing
+        {
+            Func<ReferenceDataLibrary, IEnumerable<TThing>> collectionSelector = classKind switch
+            {
+                ClassKind.Rule => x => (IEnumerable<TThing>)x.QueryRulesFromChainOfRdls(),
+                ClassKind.Category => x => (IEnumerable<TThing>)x.QueryCategoriesFromChainOfRdls(),
+                ClassKind.Constant => x => (IEnumerable<TThing>)x.QueryConstantsFromChainOfRdls(),
+                ClassKind.FileType => x => (IEnumerable<TThing>)x.QueryFileTypesFromChainOfRdls(),
+                ClassKind.Glossary => x => (IEnumerable<TThing>)x.QueryGlossariesFromChainOfRdls(),
+                ClassKind.MeasurementScale => x => (IEnumerable<TThing>)x.QueryMeasurementScalesFromChainOfRdls(),
+                ClassKind.MeasurementUnit => x => (IEnumerable<TThing>)x.QueryMeasurementUnitsFromChainOfRdls(),
+                ClassKind.ReferenceSource => x => (IEnumerable<TThing>)x.QueryReferenceSourcesFromChainOfRdls(),
+                ClassKind.UnitPrefix => x => (IEnumerable<TThing>)x.QueryUnitPrefixesFromChainOfRdls(),
+                ClassKind.QuantityKind => x => (IEnumerable<TThing>)x.BaseQuantityKind,
+                ClassKind.Relationship => x => (IEnumerable<TThing>)x.QueryRelationships,
+                ClassKind.ParameterType => x => (IEnumerable<TThing>)x.QueryParameterTypesFromChainOfRdls(),
+                _ => null
+            };
+
+            if (collectionSelector is null)
+            {
+                thing = default;
+                return false;
+            }
+
+            thing = this.OpenIteration.RequiredRdls.SelectMany(collectionSelector).FirstOrDefault(predicate);
+
+            return thing != null;
+        }
+
+        /// <summary>
+        /// Gets the DEHP <see cref="ReferenceDataLibrary" /> or the open model one
+        /// </summary>
+        /// <returns>The <see cref="ReferenceDataLibrary"/></returns>
+        public ReferenceDataLibrary GetDehpOrModelReferenceDataLibrary()
+        {
+            var dehpRdl = this.OpenIteration.RequiredRdls.FirstOrDefault(x => x.ShortName.ToUpper().Contains("DEHP"));
+
+            return dehpRdl ?? this.OpenIteration.RequiredRdls.First();
+        }
+
+        /// <summary>
+        /// Refresh the <see cref="ReferenceDataLibrary"/>
+        /// </summary>
+        /// <param name="library">The <see cref="ReferenceDataLibrary"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        public async Task RefreshReferenceDataLibrary(ReferenceDataLibrary library)
+        {
+            await this.Session.Read(library);
+        }
     }
 }
