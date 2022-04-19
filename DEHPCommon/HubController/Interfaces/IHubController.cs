@@ -25,6 +25,7 @@ namespace DEHPCommon.HubController.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -36,6 +37,8 @@ namespace DEHPCommon.HubController.Interfaces
     using CDP4Dal.Operations;
 
     using DEHPCommon.UserPreferenceHandler.Enums;
+
+    using File = CDP4Common.EngineeringModelData.File;
 
     /// <summary>
     /// Definition of the interface for the <see cref="HubController"/>
@@ -189,9 +192,13 @@ namespace DEHPCommon.HubController.Interfaces
         /// Upload one file to the <see cref="DomainFileStore"/> of the specified domain or of the active domain
         /// </summary>
         /// <param name="filePath">The full path to a local file to be uploaded</param>
-        /// <param name="file">The <see cref="File"/></param>
+        /// <param name="file">The <see cref="CDP4Common.EngineeringModelData.File"/></param>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="domain">The <see cref="DomainOfExpertise"/></param>
+        /// <remarks>
+        /// If <paramref name="filePath"/> is null, the user will be asked to select one
+        /// from a dialog box <see cref="HubController.GetFile"/>
+        /// </remarks>
         /// <returns>A <see cref="Task"/></returns>
         Task Upload(string filePath = null, File file = null, Iteration iteration = null, DomainOfExpertise domain = null);
 
@@ -224,7 +231,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="file">The <see cref="File"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Download(File file, System.IO.FileStream destination);
+        Task Download(File file, FileStream destination);
 
         /// <summary>
         /// Downloads a specific <see cref="FileRevision"/> into <see cref="System.IO.FileStream"/>
@@ -232,7 +239,7 @@ namespace DEHPCommon.HubController.Interfaces
         /// <param name="fileRevision">The <see cref="FileRevision"/></param>
         /// <param name="destination">The <see cref="System.IO.FileStream"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        Task Download(FileRevision fileRevision, System.IO.FileStream destination);
+        Task Download(FileRevision fileRevision, FileStream destination);
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{T}"/> of <see cref="ExternalIdentifierMap"/> for the provided dst tool
@@ -240,10 +247,43 @@ namespace DEHPCommon.HubController.Interfaces
         IEnumerable<ExternalIdentifierMap> AvailableExternalIdentifierMap(string toolName);
 
         /// <summary>
-        /// Adds a new <see cref="ModelLogEntry"/> record to the <see cref="EngineeringModel.LogEntry"/> list of the current <see cref="OpenIteration"/> and registers the change to a <see cref="ThingTransaction"/>
+        /// Adds a new <see cref="ModelLogEntry"/> record to the <see cref="EngineeringModel.LogEntry"/> list of the current <see cref="HubController.OpenIteration"/> and registers the change to a <see cref="ThingTransaction"/>
         /// </summary>
         /// <param name="content">The value that will be set to the <see cref="ModelLogEntry.Content"/></param>
         /// <param name="transaction">The <see cref="ThingTransaction"/> that will get the changes registered to</param>
         void RegisterNewLogEntryToTransaction(string content, ThingTransaction transaction);
+
+        /// <summary>
+        /// Gets the <see cref="Thing"/> by its <see cref="Thing.Iid"/> from rdls
+        /// </summary>
+        /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
+        /// <param name="iid">The id of the <see cref="Thing"/></param>
+        /// <param name="classKind">The <see cref="ClassKind"/></param>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <returns>An assert whether the <see cref="Thing"/> has been found</returns>
+        bool TryGetThingById<TThing>(Guid iid, ClassKind classKind, out TThing thing) where TThing : Thing;
+
+        /// <summary>
+        /// Gets the thing by predicate on <see cref="Thing" /> from the chain of rdls
+        /// </summary>
+        /// <typeparam name="TThing">The Type of <see cref="Thing"/> to get</typeparam>
+        /// <param name="predicate">The <see cref="Predicate{T}" /></param>
+        /// <param name="classKind">The <see cref="ClassKind"/></param>
+        /// <param name="thing">The <see cref="Thing" /></param>
+        /// <returns>Asserts whether the <see cref="Thing" /> as been found</returns>
+        bool TryGetThingBy<TThing>(Func<TThing, bool> predicate, ClassKind classKind, out TThing thing) where TThing : Thing;
+
+        /// <summary>
+        /// Gets the DEHP <see cref="ReferenceDataLibrary" /> or the open model one
+        /// </summary>
+        /// <returns>The <see cref="ReferenceDataLibrary"/></returns>
+        ReferenceDataLibrary GetDehpOrModelReferenceDataLibrary();
+
+        /// <summary>
+        /// Refresh the <see cref="ReferenceDataLibrary"/>
+        /// </summary>
+        /// <param name="library">The <see cref="ReferenceDataLibrary"/></param>
+        /// <returns>A <see cref="Task"/></returns>
+        Task RefreshReferenceDataLibrary( ReferenceDataLibrary library);
     }
 }

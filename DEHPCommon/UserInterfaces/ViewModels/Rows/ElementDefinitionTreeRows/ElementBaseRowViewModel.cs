@@ -126,12 +126,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// A list of all rows representing all <see cref="ParameterGroup"/> contained by this <see cref="CDP4Common.EngineeringModelData.ElementDefinition"/>
         /// </summary>
-        protected Dictionary<ParameterGroup, ParameterGroupRowViewModel> ParameterGroupCache;
+        protected Dictionary<Guid, ParameterGroupRowViewModel> ParameterGroupCache;
 
         /// <summary>
         /// A parameter group - parameter group container mapping
         /// </summary>
-        protected Dictionary<ParameterGroup, ParameterGroup> ParameterGroupContainment;
+        protected Dictionary<Guid, ParameterGroup> ParameterGroupContainment;
 
         /// <summary>
         /// The cache for the Parameter update's listener
@@ -159,8 +159,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             this.ParameterBaseCache = new Dictionary<ParameterBase, IRowViewModelBase<ParameterBase>>();
             this.ParameterBaseContainerMap = new Dictionary<ParameterBase, ParameterGroup>();
-            this.ParameterGroupCache = new Dictionary<ParameterGroup, ParameterGroupRowViewModel>();
-            this.ParameterGroupContainment = new Dictionary<ParameterGroup, ParameterGroup>();
+            this.ParameterGroupCache = new Dictionary<Guid, ParameterGroupRowViewModel>();
+            this.ParameterGroupContainment = new Dictionary<Guid, ParameterGroup>();
             this.ParameterBaseListener = new Dictionary<ParameterBase, IDisposable>();
             this.currentDomain = currentDomain;            
             this.UpdateOwnerProperties();
@@ -224,19 +224,19 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 if ((newContainer != null) && (oldContainer == null))
                 {
                     this.ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.ParameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.ParameterGroupCache[newContainer.Iid].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                     this.ParameterBaseContainerMap[parameterBase] = newContainer;
                 }
                 else if ((newContainer == null) && (oldContainer != null))
                 {
-                    this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
+                    this.ParameterGroupCache[oldContainer.Iid].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.ContainedRows.SortedInsert(associatedRow, this.ChildRowComparer);
                     this.ParameterBaseContainerMap[parameterBase] = null;
                 }
                 else if ((newContainer != null) && (newContainer != oldContainer))
                 {
-                    this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.ParameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.ParameterGroupCache[oldContainer.Iid].ContainedRows.RemoveWithoutDispose(associatedRow);
+                    this.ParameterGroupCache[newContainer.Iid].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                     this.ParameterBaseContainerMap[parameterBase] = newContainer;
                 }
             }
@@ -254,27 +254,27 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             try
             {
-                var oldContainer = this.ParameterGroupContainment[parameterGroup];
+                var oldContainer = this.ParameterGroupContainment[parameterGroup.Iid];
                 var newContainer = parameterGroup.ContainingGroup;
-                var associatedRow = this.ParameterGroupCache[parameterGroup];
+                var associatedRow = this.ParameterGroupCache[parameterGroup.Iid];
 
                 if (newContainer != null && oldContainer == null)
                 {
                     this.ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.ParameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
-                    this.ParameterGroupContainment[parameterGroup] = newContainer;
+                    this.ParameterGroupCache[newContainer.Iid].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.ParameterGroupContainment[parameterGroup.Iid] = newContainer;
                 }
                 else if (newContainer == null && oldContainer != null)
                 {
-                    this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
+                    this.ParameterGroupCache[oldContainer.Iid].ContainedRows.RemoveWithoutDispose(associatedRow);
                     this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
-                    this.ParameterGroupContainment[parameterGroup] = null;
+                    this.ParameterGroupContainment[parameterGroup.Iid] = null;
                 }
                 else if (newContainer != null && newContainer != oldContainer)
                 {
-                    this.ParameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.ParameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
-                    this.ParameterGroupContainment[parameterGroup] = newContainer;
+                    this.ParameterGroupCache[oldContainer.Iid].ContainedRows.RemoveWithoutDispose(associatedRow);
+                    this.ParameterGroupCache[newContainer.Iid].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    this.ParameterGroupContainment[parameterGroup.Iid] = newContainer;
                 }
             }
             catch (Exception exception)
@@ -354,32 +354,38 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 var definedGroups = elementDefinition.ParameterGroup;
 
                 // remove deleted groups
-                var oldgroup = this.ParameterGroupCache.Keys.Except(definedGroups).ToList();
+                var parameterGroups = this.ParameterGroupCache.Values.Select(x => x.Thing).ToList();
+                var oldgroup = parameterGroups.Except(definedGroups).ToList();
+
                 foreach (var group in oldgroup)
                 {
                     if (group.ContainingGroup == null)
                     {
-                        this.ContainedRows.RemoveWithoutDispose(this.ParameterGroupCache[group]);
+                        this.ContainedRows.RemoveWithoutDispose(this.ParameterGroupCache[group.Iid]);
                     }
                     else
                     {
-                        this.ParameterGroupCache[group.ContainingGroup].ContainedRows.RemoveWithoutDispose(this.ParameterGroupCache[group]);
+                        if (this.ParameterGroupCache.ContainsKey(group.ContainingGroup.Iid))
+                        {
+                            this.ParameterGroupCache[group.ContainingGroup.Iid].ContainedRows.RemoveWithoutDispose(this.ParameterGroupCache[group.Iid]);
+                        }
                     }
 
-                    this.ParameterGroupCache[group].Dispose();
-                    this.ParameterGroupCache.Remove(group);
-                    this.ParameterGroupContainment.Remove(group);
+                    this.ParameterGroupCache[group.Iid].Dispose();
+                    this.ParameterGroupCache.Remove(group.Iid);
+                    this.ParameterGroupContainment.Remove(group.Iid);
                 }
 
-                var updatedGroups = this.ParameterGroupCache.Keys.Intersect(definedGroups).ToList();
+                var updatedGroups = parameterGroups.Intersect(definedGroups).ToList();
 
                 // create new group rows
-                var newgroup = definedGroups.Except(this.ParameterGroupCache.Keys).ToList();
+                var newgroup = definedGroups.Except(parameterGroups).ToList();
+                
                 foreach (var group in newgroup)
                 {
                     var row = new ParameterGroupRowViewModel(group, this.currentDomain, this.Session, this);
-                    this.ParameterGroupCache.Add(group, row);
-                    this.ParameterGroupContainment.Add(group, group.ContainingGroup);
+                    this.ParameterGroupCache.Add(group.Iid, row);
+                    this.ParameterGroupContainment.Add(group.Iid, group.ContainingGroup);
                 }
 
                 // add the new group in the right position in the tree
@@ -387,12 +393,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 {
                     if (group.ContainingGroup == null)
                     {
-                        this.ContainedRows.SortedInsert(this.ParameterGroupCache[group], ChildRowComparer);
+                        this.ContainedRows.SortedInsert(this.ParameterGroupCache[group.Iid], this.ChildRowComparer);
                     }
                     else
                     {
-                        var container = this.ParameterGroupCache[group.ContainingGroup];
-                        container.ContainedRows.SortedInsert(this.ParameterGroupCache[group], ParameterGroupRowViewModel.ChildRowComparer);
+                        var container = this.ParameterGroupCache[group.ContainingGroup.Iid];
+                        container.ContainedRows.SortedInsert(this.ParameterGroupCache[group.Iid], ParameterGroupRowViewModel.ChildRowComparer);
                     }
                 }
 
@@ -437,7 +443,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                     }
                     else
                     {
-                        this.ParameterGroupCache[group].ContainedRows.RemoveWithoutDispose(row);
+                        this.ParameterGroupCache[group.Iid].ContainedRows.RemoveWithoutDispose(row);
                     }
 
                     row.Dispose();
@@ -479,7 +485,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 }
                 else
                 {
-                    if (this.ParameterGroupCache.TryGetValue(group, out var parameterGroupRowViewModel))
+                    if (this.ParameterGroupCache.TryGetValue(group.Iid, out var parameterGroupRowViewModel))
                     {
                         parameterGroupRowViewModel.ContainedRows.SortedInsert(row, ParameterGroupRowViewModel.ChildRowComparer);
                     }

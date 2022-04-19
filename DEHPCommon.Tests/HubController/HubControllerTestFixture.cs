@@ -75,6 +75,8 @@ namespace DEHPCommon.Tests.HubController
         private HubController hubController;
         private string uploadTestFilePath;
         private string downloadTestFilePath;
+        private ModelReferenceDataLibrary referenceDataLibrary;
+        private EngineeringModelSetup engineeringSetup;
 
         [SetUp]
         public void Setup()
@@ -87,6 +89,20 @@ namespace DEHPCommon.Tests.HubController
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person
+            };
+
+            this.referenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ShortName = "ARDL"
+            };
+
+            this.engineeringSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                RequiredRdl =
+                {
+                    this.referenceDataLibrary
+                },
+                Participant = { this.participant }
             };
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -108,7 +124,11 @@ namespace DEHPCommon.Tests.HubController
                             }
                         },
                         Participant = { this.participant }
-                    },
+                    }
+                },
+                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    Container = this.engineeringSetup
                 },
                 DomainFileStore =
                 {
@@ -497,6 +517,89 @@ namespace DEHPCommon.Tests.HubController
             Assert.AreEqual("Dummy justification", addedModelLogEntry.Content);
             Assert.AreEqual(LogLevelKind.USER, addedModelLogEntry.Level);
             Assert.AreEqual(this.person, addedModelLogEntry.Author);
+        }
+
+        [Test]
+        public void VerifyGetDehpOrModelReferenceDataLibrary()
+        {
+            this.hubController.OpenIteration = this.iteration;
+            Assert.AreEqual(this.referenceDataLibrary, this.hubController.GetDehpOrModelReferenceDataLibrary());
+            var dehpRdl = new ModelReferenceDataLibrary() { ShortName = "DeHpRDL" };
+
+            this.engineeringSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                RequiredRdl =
+                {
+                    dehpRdl
+                },
+                Participant = { this.participant }
+            };
+
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Container = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    EngineeringModelSetup = this.engineeringSetup,
+                },
+                IterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
+                {
+                    Container = this.engineeringSetup
+                }
+            };
+
+            this.hubController.OpenIteration = this.iteration;
+
+            Assert.AreEqual(dehpRdl, this.hubController.GetDehpOrModelReferenceDataLibrary());
+        }
+
+        [Test]
+        public void VerifyRefreshReferenceDataLibrary()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.hubController.RefreshReferenceDataLibrary(this.referenceDataLibrary));
+            this.session.Verify(x => x.Read(It.IsAny<ReferenceDataLibrary>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyTryGetThingBy()
+        {
+            this.hubController.OpenIteration = this.iteration;
+
+            var category = new Category()
+            {
+                Iid = Guid.NewGuid(),
+                ShortName = "acategory"
+            };
+
+            this.referenceDataLibrary.DefinedCategory.Add(category);
+
+            Assert.IsTrue(this.hubController.TryGetThingById(category.Iid, ClassKind.Category, out Thing thing));
+            Assert.AreEqual(category, thing);
+            Assert.IsTrue(this.hubController.TryGetThingById(category.Iid, ClassKind.Category, out Category categoryRetrieved));
+            Assert.AreEqual(category, categoryRetrieved);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.Rule, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.Constant, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.FileType, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.Glossary, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.MeasurementUnit, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.MeasurementScale, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.ReferenceSource, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.UnitPrefix, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.QuantityKind, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.Relationship, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.ParameterType, out thing));
+            Assert.IsNull(thing);
+            Assert.IsFalse(this.hubController.TryGetThingById(category.Iid, ClassKind.Parameter, out thing));
+            Assert.IsNull(thing);
         }
     }
 }
