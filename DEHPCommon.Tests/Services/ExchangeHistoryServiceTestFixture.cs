@@ -40,6 +40,7 @@ namespace DEHPCommon.Tests.Services
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.AdapterVersionService;
     using DEHPCommon.Services.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -50,6 +51,7 @@ namespace DEHPCommon.Tests.Services
     {
         private Mock<IHubController> hubController;
         private Mock<IStatusBarControlViewModel> statusBar;
+        private Mock<IAdapterVersionService> adapterVersionService;
         private ExchangeHistoryService service;
         private DomainOfExpertise domain;
         private Person person;
@@ -69,7 +71,9 @@ namespace DEHPCommon.Tests.Services
 
             this.statusBar = new Mock<IStatusBarControlViewModel>();
 
-            this.service = new ExchangeHistoryService(this.hubController.Object, this.statusBar.Object);
+            this.adapterVersionService = new Mock<IAdapterVersionService>();
+
+            this.service = new ExchangeHistoryService(this.hubController.Object, this.statusBar.Object, this.adapterVersionService.Object);
 
             this.element = new ElementDefinition() {Name = "element", ShortName = "el"};
         }

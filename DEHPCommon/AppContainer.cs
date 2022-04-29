@@ -27,6 +27,7 @@ namespace DEHPCommon
     using Autofac;
 
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.AdapterVersionService;
     using DEHPCommon.Services.ExchangeHistory;
     using DEHPCommon.Services.FileDialogService;
     using DEHPCommon.Services.IconCacheService;
@@ -65,7 +66,7 @@ namespace DEHPCommon
             containerBuilder.RegisterType<ObjectBrowserTreeSelectorService>().As<IObjectBrowserTreeSelectorService>().SingleInstance();
             containerBuilder.RegisterType<UserPreferenceService<UserPreference>>().As<IUserPreferenceService<UserPreference>>().SingleInstance();
             containerBuilder.RegisterType<ExchangeHistoryService>().As<IExchangeHistoryService>().SingleInstance();
-
+            containerBuilder.RegisterType<AdapterVersionService>().As<IAdapterVersionService>().SingleInstance();
             Container = containerBuilder.Build();
         }
 

@@ -39,6 +39,7 @@ namespace DEHPCommon.Services.ExchangeHistory
     using CDP4Common.SiteDirectoryData;
 
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.AdapterVersionService;
     using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     
@@ -74,6 +75,11 @@ namespace DEHPCommon.Services.ExchangeHistory
         private readonly IStatusBarControlViewModel statusBar;
 
         /// <summary>
+        /// The <see cref="IAdapterVersionService"/>
+        /// </summary>
+        private readonly IAdapterVersionService adapterVersionService;
+
+        /// <summary>
         /// Gets the collection of entries
         /// </summary>
         public List<ExchangeHistoryEntryViewModel> PendingEntries { get; } = new List<ExchangeHistoryEntryViewModel>();
@@ -82,11 +88,14 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// Initializes a new <see cref="ExchangeHistoryService"/>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
+        /// <param name="adapterVersionService">The <see cref="IAdapterVersionService"/></param>
         /// </summary>
-        public ExchangeHistoryService(IHubController hubController, IStatusBarControlViewModel statusBar)
+        public ExchangeHistoryService(IHubController hubController, IStatusBarControlViewModel statusBar,
+            IAdapterVersionService adapterVersionService)
         {
             this.hubController = hubController;
             this.statusBar = statusBar;
+            this.adapterVersionService = adapterVersionService;
         }
 
         /// <summary>
@@ -197,7 +206,7 @@ namespace DEHPCommon.Services.ExchangeHistory
 
                 var timestamp = DateTime.Now;
                 this.PendingEntries.ForEach(x => x.Timestamp = timestamp);
-                this.PendingEntries.ForEach(x => x.AdapterVersion = Assembly.GetEntryAssembly()?.GetName().Version);
+                this.PendingEntries.ForEach(x => x.AdapterVersion = this.adapterVersionService.CurrentAdapterVersion);
 
                 var entries = this.Read() ?? new List<ExchangeHistoryEntryViewModel>();
 
