@@ -260,8 +260,8 @@ namespace DEHPCommon.Tests.HubController
         {
             Assert.IsFalse(this.hubController.IsSessionOpen);
             Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await this.hubController.Open(new Credentials("admin", "pass", this.uri), (ServerType) 32));
-            Assert.ThrowsAsync<HttpRequestException>(async () => await this.hubController.Open(new Credentials("admin", "pass", this.uri), ServerType.Cdp4WebServices));
-            Assert.ThrowsAsync<HttpRequestException>(async () => await this.hubController.Open(new Credentials("admin", "poss", this.uri), ServerType.OcdtWspServer));
+            Assert.ThrowsAsync<DalReadException>(async () => await this.hubController.Open(new Credentials("admin", "pass", this.uri), ServerType.Cdp4WebServices));
+            Assert.ThrowsAsync<DalReadException>(async () => await this.hubController.Open(new Credentials("admin", "poss", this.uri), ServerType.OcdtWspServer));
             Assert.IsFalse(this.hubController.IsSessionOpen);
         }
 
