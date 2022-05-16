@@ -190,7 +190,6 @@ namespace DEHPCommon.Services.ExchangeHistory
                 ParameterSwitchKind.COMPUTED => valueSet.Computed,
                 ParameterSwitchKind.MANUAL => valueSet.Manual,
                 ParameterSwitchKind.REFERENCE => valueSet.Reference,
-                _ => null
             };
 
             if (parameter.ParameterType is SampledFunctionParameterType)
