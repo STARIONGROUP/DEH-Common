@@ -42,6 +42,8 @@ namespace DEHPCommon.Services.ExchangeHistory
     using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
+    using DevExpress.CodeParser;
+
     using Newtonsoft.Json;
 
     using NLog;
@@ -190,6 +192,7 @@ namespace DEHPCommon.Services.ExchangeHistory
                 ParameterSwitchKind.COMPUTED => valueSet.Computed,
                 ParameterSwitchKind.MANUAL => valueSet.Manual,
                 ParameterSwitchKind.REFERENCE => valueSet.Reference,
+                _ => throw new ArgumentOutOfRangeException(nameof(switchKind), "The ParameterSwitchKind can not be null")
             };
 
             if (parameter.ParameterType is SampledFunctionParameterType)
