@@ -29,7 +29,6 @@ namespace DEHPCommon.Services.ExchangeHistory
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -42,7 +41,7 @@ namespace DEHPCommon.Services.ExchangeHistory
     using DEHPCommon.Services.AdapterVersionService;
     using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    
+
     using Newtonsoft.Json;
 
     using NLog;
@@ -103,20 +102,21 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// </summary>
         /// <param name="valueToUpdate">The valueToUpdate to update</param>
         /// <param name="newValue">The <see cref="IValueSet"/> of reference</param>
-        public void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue)
+        /// <param name="switchKind">The <see cref="ParameterSwitchKind"/> where changes are related</param>
+        public void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue, ParameterSwitchKind switchKind = ParameterSwitchKind.COMPUTED)
         {
             var parameter = valueToUpdate.GetContainerOfType<ParameterOrOverrideBase>();
             var scale = parameter.Scale is null ? "-" : parameter.Scale.ShortName;
 
             var prefix = $"{(valueToUpdate.ActualOption is null ? string.Empty : $" Option: {valueToUpdate.ActualOption.Name}")}" +
-                            $"{(valueToUpdate.ActualState is null ? string.Empty : $" State: {valueToUpdate.ActualState.Name}")}";
+                         $"{(valueToUpdate.ActualState is null ? string.Empty : $" State: {valueToUpdate.ActualState.Name}")}";
 
-            var newValueRepresentation = GetValueSetValueRepresentation(parameter, newValue);
-            var oldValueRepresentation = GetValueSetValueRepresentation(parameter, valueToUpdate);
+            var newValueRepresentation = GetValueSetValueRepresentation(parameter, newValue, switchKind);
+            var oldValueRepresentation = GetValueSetValueRepresentation(parameter, valueToUpdate, switchKind);
 
             var newValueString = $"{prefix} {newValueRepresentation} [{scale}]";
             var valueToUpdateString = $"{prefix} {oldValueRepresentation} [{scale}]";
-            
+
             this.Append($"Value: [{valueToUpdateString}] from Parameter [{parameter?.ModelCode()}] " +
                         $"has been updated to [{newValueString}]");
         }
@@ -181,16 +181,25 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// </summary>
         /// <param name="parameter">The <see cref="ParameterBase"/> container</param>
         /// <param name="valueSet">The <see cref="IValueSet"/></param>
-        /// <returns></returns>
-        private static string GetValueSetValueRepresentation(ParameterBase parameter, IValueSet valueSet)
+        /// <param name="switchKind">The <see cref="ParameterSwitchKind"/> where changes are related</param>
+        /// <returns>The representation of the<paramref name="valueSet"/></returns>
+        private static string GetValueSetValueRepresentation(ParameterBase parameter, IValueSet valueSet, ParameterSwitchKind switchKind)
         {
+            var valueArray = switchKind switch
+            {
+                ParameterSwitchKind.COMPUTED => valueSet.Computed,
+                ParameterSwitchKind.MANUAL => valueSet.Manual,
+                ParameterSwitchKind.REFERENCE => valueSet.Reference,
+                _ => null
+            };
+
             if (parameter.ParameterType is SampledFunctionParameterType)
             {
                 var cols = parameter.ParameterType.NumberOfValues;
-                return $"[{valueSet.Computed.Count / cols}x{cols}]";
+                return $"[{valueArray.Count / cols}x{cols}]";
             }
-            
-            return valueSet.Computed.DefaultIfEmpty("-").Aggregate((x, y) => $"{x},{y}");
+
+            return valueArray.DefaultIfEmpty("-").Aggregate((x, y) => $"{x},{y}");
         }
 
         /// <summary>
@@ -211,13 +220,13 @@ namespace DEHPCommon.Services.ExchangeHistory
                 var entries = this.Read() ?? new List<ExchangeHistoryEntryViewModel>();
 
                 entries.AddRange(this.PendingEntries);
-                
+
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entries));
 
                 using var fileStream = new FileStream(Path, FileMode.OpenOrCreate);
 
                 await fileStream.WriteAsync(buffer, 0, buffer.Length);
-                
+
                 this.ClearPending();
 
                 stopwatch.Stop();

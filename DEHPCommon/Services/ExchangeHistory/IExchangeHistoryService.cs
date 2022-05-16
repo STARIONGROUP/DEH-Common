@@ -25,7 +25,6 @@
 namespace DEHPCommon.Services.ExchangeHistory
 {
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Common;
@@ -43,13 +42,6 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// Gets the collection of entries
         /// </summary>
         List<ExchangeHistoryEntryViewModel> PendingEntries { get; }
-
-        /// <summary>
-        /// Appends to the history a entry that concernes a difference between two <see cref="IValueSet"/>
-        /// </summary>
-        /// <param name="valueToUpdate">The valueToUpdate to update</param>
-        /// <param name="newValue">The <see cref="IValueSet"/> of reference</param>
-        void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue);
 
         /// <summary>
         /// Append to the history an entry that relates of a <see cref="ChangeKind"/> on the <paramref name="thing"/>
@@ -87,5 +79,13 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// </summary>
         /// <returns>A collection of <see cref="ExchangeHistoryEntryViewModel"/></returns>
         List<ExchangeHistoryEntryViewModel> Read();
+
+        /// <summary>
+        /// Appends to the history a entry that concernes a difference between two <see cref="IValueSet"/>
+        /// </summary>
+        /// <param name="valueToUpdate">The valueToUpdate to update</param>
+        /// <param name="newValue">The <see cref="IValueSet"/> of reference</param>
+        /// <param name="switchKind">The <see cref="ParameterSwitchKind"/> where changes are related</param>
+        void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue, ParameterSwitchKind switchKind = ParameterSwitchKind.COMPUTED);
     }
 }
