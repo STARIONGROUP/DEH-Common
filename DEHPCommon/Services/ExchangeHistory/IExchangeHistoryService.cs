@@ -25,7 +25,6 @@
 namespace DEHPCommon.Services.ExchangeHistory
 {
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Common;
@@ -49,7 +48,8 @@ namespace DEHPCommon.Services.ExchangeHistory
         /// </summary>
         /// <param name="valueToUpdate">The valueToUpdate to update</param>
         /// <param name="newValue">The <see cref="IValueSet"/> of reference</param>
-        void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue);
+        /// <param name="switchKind">The <see cref="ParameterSwitchKind"/> where changes are related</param>
+        void Append(ParameterValueSetBase valueToUpdate, IValueSet newValue, ParameterSwitchKind switchKind = ParameterSwitchKind.COMPUTED);
 
         /// <summary>
         /// Append to the history an entry that relates of a <see cref="ChangeKind"/> on the <paramref name="thing"/>

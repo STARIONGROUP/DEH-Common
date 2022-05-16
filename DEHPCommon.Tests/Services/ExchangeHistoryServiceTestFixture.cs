@@ -183,6 +183,9 @@ namespace DEHPCommon.Tests.Services
 
             Assert.DoesNotThrow(() => this.service.Append(parameterOverride.ValueSet.First(), parameterOverrideclone.ValueSet.First()));
             Assert.IsTrue(this.service.PendingEntries.LastOrDefault()?.Message.Contains(parameterOverride.ModelCode()));
+            Assert.DoesNotThrow(() => this.service.Append(parameterOverride.ValueSet.First(), parameterOverrideclone.ValueSet.First(), ParameterSwitchKind.MANUAL));
+            Assert.DoesNotThrow(() => this.service.Append(parameterOverride.ValueSet.First(), parameterOverrideclone.ValueSet.First(), ParameterSwitchKind.REFERENCE));
+            Assert.Throws<ArgumentOutOfRangeException>(() => this.service.Append(parameterOverride.ValueSet.First(), parameterOverrideclone.ValueSet.First(), (ParameterSwitchKind)10));
         }
 
         [Test]
