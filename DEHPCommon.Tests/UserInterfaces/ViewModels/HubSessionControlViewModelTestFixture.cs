@@ -26,10 +26,7 @@ using NUnit.Framework;
 
 namespace DEHPCommon.Tests.UserInterfaces.ViewModels
 {
-    using System;
-    using System.CodeDom;
     using System.Reactive.Concurrency;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
