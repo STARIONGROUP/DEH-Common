@@ -42,8 +42,6 @@ namespace DEHPCommon.Services.ExchangeHistory
     using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
-    using DevExpress.CodeParser;
-
     using Newtonsoft.Json;
 
     using NLog;

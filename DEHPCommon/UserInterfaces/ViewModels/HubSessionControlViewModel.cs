@@ -33,6 +33,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using CDP4Dal;
 
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Events;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -174,6 +175,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             try
             {
                 await this.hubController.Refresh();
+                CDPMessageBus.Current.SendMessage(new HubSessionControlEvent());
 
                 if (!silent)
                 {
@@ -196,6 +198,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             {
                 await this.hubController.Reload();
                 this.statusBar.Append($"Hub session has been reloaded");
+                CDPMessageBus.Current.SendMessage(new HubSessionControlEvent());
             }
             catch (Exception e)
             {
