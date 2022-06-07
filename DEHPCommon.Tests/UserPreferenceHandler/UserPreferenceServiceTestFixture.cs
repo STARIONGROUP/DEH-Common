@@ -52,7 +52,7 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
             this.expectedUserPreferencePath =
                 Path.Combine(this.userPreferenceService.UserPreferenceDirectories);
 
-            const string fileName = $"{UserPreferenceService<UserPreference>.FILE_NAME}{UserPreferenceService<UserPreference>.SETTING_FILE_EXTENSION}";
+            var fileName = $"{UserPreferenceService<UserPreference>.FILE_NAME}{UserPreferenceService<UserPreference>.SETTING_FILE_EXTENSION}";
 
             this.expectedUserPreferencePath = Path.Combine(this.expectedUserPreferencePath, $"{fileName}");
 
