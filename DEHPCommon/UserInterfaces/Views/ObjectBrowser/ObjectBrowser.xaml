@@ -3,11 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-             xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:viewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows"
              xmlns:converters="clr-namespace:DEHPCommon.Converters"
@@ -180,20 +178,7 @@
                     <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner"  Width="45"/>
                     <dxg:TreeListColumn FieldName="Published" Header="Published Value"/>
                     <dxg:TreeListColumn FieldName="ScaleShortName" Header="Scale"/>
-                    <dxg:TreeListColumn AllowEditing="True" FieldName="Switch">
-                        <dxg:TreeListColumn.CellTemplate>
-                            <DataTemplate>
-                                <dxe:ComboBoxEdit Name="PART_Editor"
-                                                  IsTextEditable="False"
-                                                  ShowBorder="True"
-                                                  ShowCustomItems="False">
-                                    <dxmvvm:Interaction.Behaviors>
-                                        <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type engineeringModelData:ParameterSwitchKind}" />
-                                    </dxmvvm:Interaction.Behaviors>
-                                </dxe:ComboBoxEdit>
-                            </DataTemplate>
-                        </dxg:TreeListColumn.CellTemplate>
-                    </dxg:TreeListColumn>
+                    <dxg:TreeListColumn AllowEditing="False" FieldName="Switch"/>
                     <dxg:TreeListColumn FieldName="Computed" />
                     <dxg:TreeListColumn AllowEditing="False" FieldName="Manual" />
                     <dxg:TreeListColumn AllowEditing="False" FieldName="Reference" />
