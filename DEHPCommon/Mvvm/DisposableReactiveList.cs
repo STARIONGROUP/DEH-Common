@@ -39,7 +39,7 @@ namespace DEHPCommon.Mvvm
         /// <summary>
         /// Overrides the method implementation in <see cref="ReactiveList{T}"/> and adds an <see cref="ObsoleteAttribute"/>
         /// so the code doesn't compile anymore when the method is unexpectedly being used.
-        /// <see href="https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt"/>
+        /// <a href="https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt">For more info</a>
         /// </summary>
         [Obsolete("Clear is deprecated, please use Clear(bool dispose) instead.", true)]
         public new void Clear()
