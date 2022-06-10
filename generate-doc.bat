@@ -1,6 +1,6 @@
 @ECHO OFF
 
-REM doxygen_html_documentation.bat
+REM generate-doc.bat
 REM
 REM Copyright (c) 2020-2022 RHEA System S.A.
 REM
@@ -25,7 +25,7 @@ REM Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 set QuietMode="-q"
 set DOXYGEN_GENERATE_LATEX=NO
 set CurrentDir=%cd%
-set ZipFileName="html.zip"
+set ZipFileName="doxygen_html_documentation.zip"
 
 :ParseArgs
 if "%1"=="" goto :ParsingEnded
@@ -71,4 +71,4 @@ call doc/latex/make.bat > nul
 
 :ExitStatement
 cd "%CurrentDir%"
-echo doxygen_html_documentation.bat is done
+echo generate-doc.bat is done
