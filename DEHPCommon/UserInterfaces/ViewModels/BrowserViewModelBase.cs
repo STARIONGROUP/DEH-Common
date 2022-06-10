@@ -122,7 +122,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets the <see ref="DateTime"/> at which the <see ref="Thing"/> was last modified.
+        /// Gets or sets the <see cref="DateTime"/> at which the <see cref="Thing"/> was last modified.
         /// </summary>
         [CDPVersion("1.1.0")]
         public DateTime ModifiedOn
