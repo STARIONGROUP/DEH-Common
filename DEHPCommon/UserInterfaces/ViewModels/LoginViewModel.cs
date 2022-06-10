@@ -414,9 +414,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.DomainsOfExpertise.Clear();
 
-            var activeParticipant = this.SelectedEngineeringModel.Thing.Participant.Single(x => x.Person == this.hubController.Session.ActivePerson);
+            var activeParticipant = this.SelectedEngineeringModel.Thing.Participant.SingleOrDefault(x => x.Person == this.hubController.Session.ActivePerson);
 
-            if (activeParticipant.Domain.Count != 0)
+            if (activeParticipant != null && activeParticipant.Domain.Count != 0)
             {
                 foreach (var vm in activeParticipant.Domain.OrderBy(x => x.Name).Select(x => new DomainOfExpertiseRowViewModel(x)))
                 {
@@ -449,7 +449,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.EngineeringModels.Clear();
 
-            foreach (var em in this.hubController.GetEngineeringModels().OrderBy(m => m.Name))
+            foreach (var em in this.hubController.GetEngineeringModels()
+                         .Where(x => x.Participant.Any(participant => 
+                             participant.Person.Iid == this.hubController.Session.ActivePerson.Iid)).OrderBy(m => m.Name))
             {
                 this.EngineeringModels.Add(new EngineeringModelRowViewModel(em));
             }

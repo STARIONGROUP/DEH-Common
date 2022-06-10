@@ -130,6 +130,21 @@ namespace DEHPCommon.Tests.UserInterfaces.ViewModels
                     { 
                         Name = "test2", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)},
                         Participant = { this.participant }
+                    },
+                    new EngineeringModelSetup(Guid.NewGuid(), null, null)
+                    {
+                        Name = "test2", IterationSetup = { new IterationSetup(Guid.NewGuid(), null, null)},
+                        Participant = 
+                        { 
+                            new Participant()
+                            {
+                                Domain = { this.domain },
+                                Person = new Person()
+                                {
+                                    Iid = Guid.NewGuid()
+                                }
+                            }
+                        }
                     }
                 });
 

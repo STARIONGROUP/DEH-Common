@@ -47,13 +47,14 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         [SetUp]
         public void SetUp()
         {
-            this.expectedUserPreferencePath =
-                Path.Combine(
-                    UserPreferenceService<UserPreference>.ApplicationExecutePath,
-                    UserPreferenceService<UserPreference>.UserPreferenceDirectoryName,
-                    "DEHPCommon.settings.json");
-
             this.userPreferenceService = new UserPreferenceService<UserPreference>();
+
+            this.expectedUserPreferencePath =
+                Path.Combine(this.userPreferenceService.UserPreferenceDirectories);
+
+            var fileName = $"{UserPreferenceService<UserPreference>.FILE_NAME}{UserPreferenceService<UserPreference>.SETTING_FILE_EXTENSION}";
+
+            this.expectedUserPreferencePath = Path.Combine(this.expectedUserPreferencePath, $"{fileName}");
 
             this.serverConnection1 = new ServerConnection()
             {
@@ -149,8 +150,13 @@ namespace DEHPCommon.Tests.UserPreferenceHandler
         [Test]
         public void VerifyCheckConfigurationDirectory()
         {
-            var configurationDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "UserPreferenceService");
-            Directory.Delete(configurationDirectory, true);
+            var configurationDirectory = Path.Combine(this.userPreferenceService.UserPreferenceDirectories);
+
+            if (Directory.Exists(configurationDirectory))
+            {
+                Directory.Delete(configurationDirectory, true);
+            }
+
             Assert.IsFalse(Directory.Exists(configurationDirectory));
             this.userPreferenceService.CheckConfigurationDirectory();
             Assert.IsTrue(Directory.Exists(configurationDirectory));
