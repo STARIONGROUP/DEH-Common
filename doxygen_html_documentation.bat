@@ -1,6 +1,6 @@
 @ECHO OFF
 
-REM generate-doc.bat
+REM doxygen_html_documentation.bat
 REM
 REM Copyright (c) 2020-2022 RHEA System S.A.
 REM
@@ -71,4 +71,4 @@ call doc/latex/make.bat > nul
 
 :ExitStatement
 cd "%CurrentDir%"
-echo generate-doc.bat is done
+echo doxygen_html_documentation.bat is done
