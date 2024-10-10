@@ -91,7 +91,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="6.1.0" />
+    <PackageReference Include="Autofac" Version="8.0.0" />
     <PackageReference Include="CDP4Common-CE" Version="7.3.0" />
     <PackageReference Include="CDP4Dal-CE" Version="7.3.0" />
     <PackageReference Include="CDP4JsonFileDal-CE" Version="7.3.0" />
