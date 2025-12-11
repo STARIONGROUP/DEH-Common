@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IObjectBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="IObjectBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -26,9 +26,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
     using System;
 
+    using System.Reactive;
+
     using CDP4Common.EngineeringModelData;
 
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
+
+    using DynamicData;
 
     using ReactiveUI;
 
@@ -50,22 +54,22 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets or sets the selected things collection
         /// </summary>
-        ReactiveList<object> SelectedThings { get; set; }
+        SourceList<object> SelectedThings { get; set; }
 
         /// <summary>
         /// Gets the collection of <see cref="BrowserViewModelBase"/> to be displayed in the tree
         /// </summary>
-        ReactiveList<BrowserViewModelBase> Things { get; }
+        SourceList<BrowserViewModelBase> Things { get; }
 
         /// <summary>
         /// Gets the Context Menu for the implementing view model
         /// </summary>
-        ReactiveList<ContextMenuItemViewModel> ContextMenu { get; }
+        SourceList<ContextMenuItemViewModel> ContextMenu { get; }
 
         /// <summary>
         /// Gets the command that allows to map the selected things
         /// </summary>
-        ReactiveCommand<object> MapCommand { get; set; }
+         ReactiveCommand<Unit, Unit> MapCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IObservable{T}"/> of <see cref="bool"/> that is bound to the <see cref="MapCommand"/> <see cref="ReactiveCommand{T}.CanExecute"/> property

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TransferControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="TransferControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -31,11 +31,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// View model for dst adapters transfer/cancel button and progress bar 
     /// </summary>
-    public abstract class TransferControlViewModel : ReactiveObject, ITransferControlViewModel
+    public abstract class TransferControlViewModel : ReactiveUI.ReactiveObject, ITransferControlViewModel
     {
         /// <summary>
         /// Backing field for <see cref="IsIndeterminate"/>
@@ -111,11 +112,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that triggers the transfer
         /// </summary>
-        public ReactiveCommand<Unit> TransferCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> TransferCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that cancels the transfer command
         /// </summary>
-        public ReactiveCommand<Unit> CancelCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; set; }
     }
 }

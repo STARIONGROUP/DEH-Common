@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterStateRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterStateRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -37,6 +37,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The row representing an <see cref="ActualFiniteState"/>
@@ -55,9 +56,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="option">The associated <see cref="Option"/></param>
         /// <param name="actualState">The associated <see cref="ActualFiniteState"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
+        /// <param name="messageBus">The associated <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The container row</param>
-        public ParameterStateRowViewModel(ParameterBase parameterBase, Option option, ActualFiniteState actualState, ISession session, IRowViewModelBase<Thing> containerViewModel)
-            : base(parameterBase, session, option, actualState, containerViewModel, 0)
+        public ParameterStateRowViewModel(ParameterBase parameterBase, Option option, ActualFiniteState actualState, ISession session, ICDPMessageBus messageBus, IRowViewModelBase<Thing> containerViewModel)
+            : base(parameterBase, session, messageBus, option, actualState, containerViewModel, 0)
         {
             this.Name = this.ActualState.Name;
             this.State = this.ActualState.Name;
@@ -66,7 +68,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             foreach (var possibleFiniteState in this.ActualState.PossibleState)
             {
-                var stateListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(possibleFiniteState)
+                var stateListener = this.MessageBus.Listen<ObjectChangedEvent>(possibleFiniteState)
                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                                    .ObserveOn(RxApp.MainThreadScheduler)
                                    .Subscribe(x => { this.Name = this.ActualState.Name; });

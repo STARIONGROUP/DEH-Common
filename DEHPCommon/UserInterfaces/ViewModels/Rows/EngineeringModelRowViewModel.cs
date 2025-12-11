@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EngineeringModelRowViewModel.cs"company="RHEA System S.A.">
-//    Copyright(c) 2020 RHEA System S.A.
+// <copyright file="EngineeringModelRowViewModel.cs"company="Starion Group S.A.">
+//    Copyright(c) 2024 Starion Group S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // 
 //    This file is part of DEHP Common Library
@@ -26,6 +26,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
     using CDP4Common.SiteDirectoryData;
     
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Row class representing a <see cref="EngineeringModelSetup"/> as a plain object

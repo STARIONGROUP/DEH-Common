@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AppContainer.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="AppContainer.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -25,6 +25,9 @@
 namespace DEHPCommon
 {
     using Autofac;
+    using CDP4Common.ExceptionHandlerService;
+
+    using CDP4Dal;
 
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.AdapterVersionService;
@@ -60,6 +63,8 @@ namespace DEHPCommon
             containerBuilder ??= new ContainerBuilder();
             RegisterViewModels(containerBuilder);
             containerBuilder.RegisterType<IconCacheService>().As<IIconCacheService>().SingleInstance();
+            containerBuilder.RegisterType<CDPMessageBus>().As<ICDPMessageBus>().SingleInstance();
+            containerBuilder.RegisterType<ExceptionHandlerService>().As<IExceptionHandlerService>().SingleInstance();
             containerBuilder.RegisterType<HubController.HubController>().As<IHubController>().SingleInstance();
             containerBuilder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
             containerBuilder.RegisterType<OpenSaveFileDialogService>().As<IOpenSaveFileDialogService>().SingleInstance();

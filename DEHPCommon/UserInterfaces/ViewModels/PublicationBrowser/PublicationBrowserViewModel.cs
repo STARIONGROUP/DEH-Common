@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PublicationBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="PublicationBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -33,6 +33,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
     using DEHPCommon.HubController.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
+    using CDP4Dal;
 
     /// <summary>
     /// The <see cref="PublicationBrowserViewModel"/> is a View Model that is responsible for managing the data and interactions with that data for a view
@@ -44,6 +46,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// The <see cref="IHubController"/>
         /// </summary>
         private readonly IHubController hubController;
+
+        /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
 
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
@@ -59,9 +66,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// Initializes a new instance of the <see cref="PublicationBrowserViewModel"/> class.
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
-        public PublicationBrowserViewModel(IHubController hubController)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        public PublicationBrowserViewModel(IHubController hubController, ICDPMessageBus messageBus)
         {
             this.hubController = hubController;
+            this.messageBus = messageBus;
             this.Caption = "Publication Browser";
 
             this.WhenAnyValue(x => x.hubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
@@ -72,7 +81,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
                     if (this.hubController.IsSessionOpen && this.hubController.OpenIteration != null)
                     {
                         this.ToolTip = $"{this.hubController.Session.DataSourceUri}\n{this.hubController.Session.ActivePerson.Name}";
-                        this.PublicationsViewModel = new PublicationsViewModel(this.hubController.OpenIteration, this.hubController.Session);
+                        this.PublicationsViewModel = new PublicationsViewModel(this.hubController.OpenIteration, this.hubController.Session, this.messageBus);
                     }
                     else
                     {

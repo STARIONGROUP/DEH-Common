@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BrowserViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="BrowserViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -25,7 +25,9 @@
 namespace DEHPCommon.UserInterfaces.ViewModels
 {
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -38,7 +40,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
+    using DynamicData;
+
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The View-Model-base that shall be used by a view-model representing a Browser
@@ -97,6 +102,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         private string domainOfExpertise;
 
         /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        protected ICDPMessageBus MessageBus { get; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether it is possible to write on the <see cref="SelectedThing"/>
         /// </summary>
         public bool CanWriteSelectedThing
@@ -117,42 +127,42 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> RefreshCommand { get; protected set; }
+        public ReactiveCommand<Unit, Task> RefreshCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> ExportCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> ExportCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> HelpCommand { get; protected set; }
+        public  ReactiveCommand<Unit, Unit> HelpCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> that changes the focus of a grid
         /// </summary>
-        public ReactiveCommand<object> ChangeFocusCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ChangeFocusCommand { get; private set; }
 
         /// <summary>
         /// Gets the Expand Rows Command
         /// </summary>
-        public ReactiveCommand<object> ExpandRowsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExpandRowsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Expand Rows Command
         /// </summary>
-        public ReactiveCommand<object> CollpaseRowsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CollpaseRowsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Context Menu for this browser
         /// </summary>
-        public ReactiveList<ContextMenuItemViewModel> ContextMenu { get; private set; }
+        public SourceList<ContextMenuItemViewModel> ContextMenu { get; private set; }
 
         /// <summary>
         /// Gets the "create" <see cref="ContextMenuItemViewModel"/>
         /// </summary>
-        public ReactiveList<ContextMenuItemViewModel> CreateContextMenu { get; private set; }
+        public SourceList<ContextMenuItemViewModel> CreateContextMenu { get; private set; }
 
         /// <summary>
         /// Gets the data-source
@@ -189,7 +199,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets the selected rows
         /// </summary>
-        public ReactiveList<IRowViewModelBase<Thing>> SelectedRows { get; protected set; }
+        public SourceList<IRowViewModelBase<Thing>> SelectedRows { get; protected set; }
 
         /// <summary>
         /// Gets or sets the focused row that represents a <see cref="Thing"/>
@@ -222,13 +232,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Gets the unique identifier of the view-model
         /// </summary>
         public Guid Identifier { get; private set; }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModel{T}"/> class
         /// </summary>
         /// <param name="thing"> The <see cref="Thing"/> that contains the data to browse. </param>
         /// <param name="session"> The <see cref="ISession"/> that manages the current view-model. </param>
-        protected BrowserViewModel(T thing, ISession session) : base(session)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        protected BrowserViewModel(T thing, ISession session, ICDPMessageBus messageBus) : base(session)
         {
             this.Thing = thing;
             this.SetProperties();
@@ -245,12 +256,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
 
             if (activePerson != null)
             {
-                var personSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Session.ActivePerson)
+                var personSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.Session.ActivePerson)
                     .Where(
                         objectChange =>
                             objectChange.EventKind == EventKind.Updated &&
                             objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(
                         _ =>
                         {
@@ -260,9 +270,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 this.Disposables.Add(personSubscription);
             }
 
-            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+            var thingSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.ObjectChangeEventHandler);
 
             this.Disposables.Add(thingSubscription);
@@ -273,9 +282,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private void SetProperties()
         {
-            this.ContextMenu = new ReactiveList<ContextMenuItemViewModel>();
-            this.CreateContextMenu = new ReactiveList<ContextMenuItemViewModel>();
-            this.SelectedRows = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.ContextMenu = new SourceList<ContextMenuItemViewModel>();
+            this.CreateContextMenu = new SourceList<ContextMenuItemViewModel>();
+            this.SelectedRows = new SourceList<IRowViewModelBase<Thing>>();
 
             this.Identifier = Guid.NewGuid();
             
@@ -289,7 +298,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Execute the <see cref="RefreshCommand"/>
         /// </summary>
-        protected virtual async void ExecuteRefreshCommand()
+        /// <returns>A <see cref="Unit"/></returns>
+        protected virtual async Task<Unit> ExecuteRefreshCommand()
         {
             try
             {
@@ -299,22 +309,28 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             {
                 this.Logger.Error(e, "The refresh operation failed: {0}");
             }
+
+            return Unit.Default;
         }
 
         /// <summary>
         /// Execute the <see cref="ExportCommand"/>
         /// </summary>
-        protected virtual void ExecuteExportCommand()
+        /// <returns>A <see cref="Unit"/></returns>
+        protected virtual Unit ExecuteExportCommand()
         {
             this.Logger.Info("Export Command called");
+            return Unit.Default;
         }
 
         /// <summary>
         /// Execute the <see cref="HelpCommand"/>
         /// </summary>
-        protected virtual void ExecuteHelpCommand()
+        /// <returns>A <see cref="Unit"/></returns>
+        protected virtual Unit ExecuteHelpCommand()
         {
             this.Logger.Info("Help Command called");
+            return Unit.Default;
         }
         
         /// <summary>
@@ -360,24 +376,27 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Executes the <see cref="ChangeFocusCommand"/>
         /// </summary>
-        protected virtual void ExecuteChangeFocusCommand()
+        protected virtual Unit ExecuteChangeFocusCommand()
         {
+            return Unit.Default;
         }
 
         /// <summary>
         /// Executes the expand rows logic
         /// </summary>
-        private void ExecuteExpandRows()
+        private Unit ExecuteExpandRows()
         {
             this.SelectedThing?.ExpandAllRows();
+            return Unit.Default;
         }
 
         /// <summary>
         /// Executes the collapse rows logic
         /// </summary>
-        private void ExecuteCollapseRows()
+        private Unit ExecuteCollapseRows()
         {
             this.SelectedThing?.CollapseAllRows();
+            return Unit.Default;
         }
 
         /// <summary>
@@ -386,38 +405,25 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         protected virtual void InitializeCommands()
         {
-            var sessionEventListener = CDPMessageBus.Current.Listen<SessionEvent>()
+            var sessionEventListener = this.MessageBus.Listen<SessionEvent>()
                 .Where(sessionEvent => sessionEvent.Session == this.Session && (sessionEvent.Status == SessionStatus.BeginUpdate || sessionEvent.Status == SessionStatus.EndUpdate))
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.OnAssemblerUpdate);
 
             this.Disposables.Add(sessionEventListener);
 
-            this.RefreshCommand = ReactiveCommand.Create();
-            this.RefreshCommand.Subscribe(_ => this.ExecuteRefreshCommand());
-
-            this.ExportCommand = ReactiveCommand.Create();
-            this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
-
-            this.HelpCommand = ReactiveCommand.Create();
-            this.HelpCommand.Subscribe(_ => this.ExecuteHelpCommand());
-
-            this.ChangeFocusCommand = ReactiveCommand.Create();
-            this.ChangeFocusCommand.Subscribe(_ => this.ExecuteChangeFocusCommand());
-
-            this.ExpandRowsCommand = ReactiveCommand.Create();
-            this.ExpandRowsCommand.Subscribe(_ => this.ExecuteExpandRows());
-
-            this.CollpaseRowsCommand = ReactiveCommand.Create();
-            this.CollpaseRowsCommand.Subscribe(_ => this.ExecuteCollapseRows());
+            this.RefreshCommand = ReactiveCommand.Create<Unit, Task>(_ => this.ExecuteRefreshCommand());
+            this.ExportCommand = ReactiveCommand.Create<Unit, Unit>(_ => this.ExecuteExportCommand());
+            this.HelpCommand = ReactiveCommand.Create<Unit, Unit>(_ => this.ExecuteHelpCommand());
+            this.ChangeFocusCommand = ReactiveCommand.Create<Unit, Unit>(_ => this.ExecuteChangeFocusCommand());
+            this.ExpandRowsCommand = ReactiveCommand.Create<Unit, Unit>(_ => this.ExecuteExpandRows());
+            this.CollpaseRowsCommand = ReactiveCommand.Create<Unit, Unit>(_ => this.ExecuteCollapseRows());
 
             var iteration = this.Thing as Iteration ?? this.Thing.GetContainerOfType<Iteration>();
             
             if (iteration != null)
             {
-                var domainSwitchSubscription = CDPMessageBus.Current.Listen<DomainChangedEvent>()
+                var domainSwitchSubscription = this.MessageBus.Listen<DomainChangedEvent>()
                     .Where(x => x.Iteration.Iid == iteration.Iid)
-                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.UpdateDomain);
                 
                 this.Disposables.Add(domainSwitchSubscription);

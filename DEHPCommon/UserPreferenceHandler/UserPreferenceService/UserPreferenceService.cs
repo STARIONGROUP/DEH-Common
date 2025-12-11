@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UserPreferenceService.cs"company="RHEA System S.A.">
-//    Copyright(c) 2020 RHEA System S.A.
+// <copyright file="UserPreferenceService.cs"company="Starion Group S.A.">
+//    Copyright(c) 2024 Starion Group S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // 
 //    This file is part of DEHP Common Library
@@ -60,7 +60,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// The name of the file
         /// </summary>
-        public const string FILE_NAME = "UserPreference";
+        private string fileName = typeof(T).Name;
 
         /// <summary>
         /// Gets or sets  user preference settings,
@@ -79,9 +79,9 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         {
             this.CheckConfigurationDirectory();
 
-            var path = Path.Combine(this.UserPreferenceDirectoryPath, FILE_NAME);
+            var path = Path.Combine(this.UserPreferenceDirectoryPath, fileName);
 
-            this.logger.Info($"Read user preference for {FILE_NAME} from {path}");
+            this.logger.Info($"Read user preference for {fileName} from {path}");
 
             try
             {
@@ -106,7 +106,7 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
         /// <summary>
         /// Save the <see cref="UserPreference"/> to disk
         /// </summary>
-            public void Save()
+        public void Save()
         {
             if (this.UserPreferenceSettings == null)
             {
@@ -115,9 +115,9 @@ namespace DEHPCommon.UserPreferenceHandler.UserPreferenceService
 
             this.CheckConfigurationDirectory();
 
-            var path = Path.Combine(this.UserPreferenceDirectoryPath, $"{FILE_NAME}{SETTING_FILE_EXTENSION}");
+            var path = Path.Combine(this.UserPreferenceDirectoryPath, $"{fileName}{SETTING_FILE_EXTENSION}");
 
-            this.logger.Info($"Write user preference to for {FILE_NAME} to {path}");
+            this.logger.Info($"Write user preference to for {fileName} to {path}");
 
             using (var streamWriter = File.CreateText(path))
             {

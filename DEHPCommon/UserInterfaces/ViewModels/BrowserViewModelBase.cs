@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BrowserViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="BrowserViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -42,6 +42,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using NLog;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The view model that represents the root element of hierarchical data to be displayed in the <see cref="ObjectBrowser"/>
@@ -86,8 +87,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets the list of rows representing a <see cref="Thing"/>
         /// </summary>
-        /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
-        public DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; } = new DisposableReactiveList<IRowViewModelBase<Thing>>();
+        /// <remarks>This was made into a list of generic row to use the SourceList extension</remarks>
+        public SourceList<IRowViewModelBase<Thing>> ContainedRows { get; } = new SourceList<IRowViewModelBase<Thing>>();
         
         /// <summary>
         /// Gets the <see cref="ISession"/>
@@ -170,7 +171,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.IsExpanded = true;
 
-            foreach (var row in this.ContainedRows)
+            foreach (var row in this.ContainedRows.Items)
             {
                 row.ExpandAllRows();
             }
@@ -183,7 +184,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         {
             this.IsExpanded = false;
 
-            foreach (var row in this.ContainedRows)
+            foreach (var row in this.ContainedRows.Items)
             {
                 row.CollapseAllRows();
             }
@@ -229,7 +230,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     this.Logger.Trace("The Disposables collection of the {0} is null", this.GetType().Name);
                 }
 
-                foreach (var row in this.ContainedRows)
+                foreach (var row in this.ContainedRows.Items)
                 {
                     row.Dispose();
                 }

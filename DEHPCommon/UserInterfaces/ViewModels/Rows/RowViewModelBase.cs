@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RowViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="RowViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -47,6 +47,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
     using DEHPCommon.Utilities;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The Base view-model class for rows
@@ -95,9 +96,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         /// <param name="thing">The <see cref="Thing"/> represented by the row</param>
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The parent Row</param>
-        protected RowViewModelBase(T thing, ISession session, IViewModelBase<Thing> containerViewModel = null) : base(thing, session)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        protected RowViewModelBase(T thing, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel = null) : base(thing, session, messageBus)
         {
-            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
+            this.ContainedRows = new SourceList<IRowViewModelBase<Thing>>();
             this.ContainerViewModel = containerViewModel;
             this.HighlightCancelDisposables = new List<IDisposable>();
 
@@ -149,7 +151,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         /// <summary>
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
-        public DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
+        public SourceList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
 
         /// <summary>
         /// Gets or sets the parent <see cref="IViewModelBase{T}"/>
@@ -204,7 +206,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         {
             this.IsExpanded = true;
 
-            foreach (var row in this.ContainedRows)
+            foreach (var row in this.ContainedRows.Items)
             {
                 row.ExpandAllRows();
             }
@@ -217,7 +219,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         {
             this.IsExpanded = false;
 
-            foreach (var row in this.ContainedRows)
+            foreach (var row in this.ContainedRows.Items)
             {
                 row.CollapseAllRows();
             }
@@ -273,7 +275,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
         /// </summary>
         protected virtual void InitializeSubscriptions()
         {
-            var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.Thing)
+            var highlightSubscription = this.MessageBus.Listen<HighlightEvent>(this.Thing)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
 
@@ -284,12 +286,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
             {
                 this.Disposables.AddRange(
                     thingAsCategorizableThing.Category.Select(
-                        category => CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(category)
+                        category => this.MessageBus.Listen<HighlightByCategoryEvent>(category)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.HighlightEventHandler())));
             }
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship))
+            this.Disposables.Add(this.MessageBus.Listen<ObjectChangedEvent>(typeof(Relationship))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateThingStatus()));
         }
@@ -310,7 +312,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
             this.IsHighlighted = true;
 
             // add a subscription to handle cancel of highlight
-            var cancelHighlightSubscription = CDPMessageBus.Current.Listen<CancelHighlightEvent>()
+            var cancelHighlightSubscription = this.MessageBus.Listen<CancelHighlightEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.CancelHighlightEventHandler());
 
@@ -346,10 +348,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows
                 disposable.Dispose();
             }
 
-            foreach (var row in this.ContainedRows)
-            {
-                row.Dispose();
-            }
+            this.ContainedRows.ClearAndDispose();
         }
 
         /// <summary>

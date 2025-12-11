@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ListToElementUsageConverter.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="ListToElementUsageConverter.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -27,9 +27,10 @@ namespace DEHPCommon.Converters
     using CDP4Common.EngineeringModelData;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
-    /// Converts a <see cref="ElementUsage"/> to <see cref="ReactiveList{T}"/> used by the list-box views or multi select combobox
+    /// Converts a <see cref="ElementUsage"/> to <see cref="SourceList{T}"/> used by the list-box views or multi select combobox
     /// </summary>
     public class ListToElementUsageConverter : GenericListToObjectListConverter<ElementUsage>
     {

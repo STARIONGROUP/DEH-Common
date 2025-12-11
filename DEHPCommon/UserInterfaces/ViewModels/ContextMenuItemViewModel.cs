@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ContextMenuItemViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ContextMenuItemViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -33,6 +33,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.Enumerators;
 
     using ReactiveUI;
+    using DynamicData;
+    using System.Reactive;
 
     /// <summary>
     /// The view-model for context menus
@@ -74,8 +76,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         public ContextMenuItemViewModel(string header, string inputGestureText, Action<Thing> executeCommandAction, Thing thing, bool canExecute, MenuItemKind menuItemKind = MenuItemKind.None)
         {
             this.CanExecute = canExecute;
-            this.MenuCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExecute));
-            ((ReactiveCommand<object>)this.MenuCommand).Subscribe(_ => executeCommandAction(this.RelatedThing));
+            this.MenuCommand = ReactiveCommand.Create(() => executeCommandAction(this.RelatedThing), this.WhenAnyValue(x => x.CanExecute));
             this.Header = header;
             this.InputGestureText = inputGestureText;
             this.RelatedThing = thing;

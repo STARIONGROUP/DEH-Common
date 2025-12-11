@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterGroupRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterGroupRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -38,6 +38,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.Utilities;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The row representing a <see cref="ParameterGroup"/>
@@ -93,8 +94,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="parameterGroup">The associated <see cref="ParameterGroup"/></param>
         /// <param name="currentDomain">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> row that contains this row</param>
-        public ParameterGroupRowViewModel(ParameterGroup parameterGroup, DomainOfExpertise currentDomain, ISession session, IViewModelBase<Thing> containerViewModel) : base(parameterGroup, session, containerViewModel)
+        public ParameterGroupRowViewModel(ParameterGroup parameterGroup, DomainOfExpertise currentDomain, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel) : base(parameterGroup, session, messageBus, containerViewModel)
         {
             this.CurrentDomain = currentDomain;
             this.currentGroup = this.Thing.ContainingGroup;

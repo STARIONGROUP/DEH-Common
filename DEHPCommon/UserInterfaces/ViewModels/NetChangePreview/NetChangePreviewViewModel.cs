@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NetChangePreviewViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="NetChangePreviewViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -32,6 +32,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
     using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
+using DynamicData;
+    using CDP4Dal;
 
     /// <summary>
     /// View model for the preview net change pane allowing the user to preview the change that will be transfered to either the Dst of the Hub
@@ -41,19 +44,20 @@ namespace DEHPCommon.UserInterfaces.ViewModels.NetChangePreview
         /// <summary>
         /// Gets the collection of <see cref="Thing"/>s at their previous state, this property is used for updating the Net change preview based on a selection
         /// </summary>
-        protected ReactiveList<Thing> ThingsAtPreviousState { get; } = new ReactiveList<Thing>();
+        protected SourceList<Thing> ThingsAtPreviousState { get; } = new SourceList<Thing>();
 
         /// <summary>
         /// Gets the collection of <see cref="Thing"/>s to be actually transfered
         /// </summary>
-        protected ReactiveList<object> SelectedThingsToTransfer { get; } = new ReactiveList<object>();
+        protected SourceList<object> SelectedThingsToTransfer { get; } = new SourceList<object>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NetChangePreviewViewModel"/> class.
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
-        protected NetChangePreviewViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService) : base(hubController, objectBrowserTreeSelectorService)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        protected NetChangePreviewViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService, ICDPMessageBus messageBus) : base(hubController, objectBrowserTreeSelectorService, messageBus)
         {
         }
 

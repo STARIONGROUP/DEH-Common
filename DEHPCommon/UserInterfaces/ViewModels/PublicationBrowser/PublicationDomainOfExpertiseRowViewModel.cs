@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PublicationDomainOfExpertiseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="PublicationDomainOfExpertiseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -37,6 +37,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
     using DEHPCommon.UserInterfaces.ViewModels.Rows;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The view-model for the <see cref="DomainOfExpertiseRowViewModel"/> view
@@ -63,9 +64,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         /// <param name="domainOfExpertise">The <see cref="DomainOfExpertise"/> associated with this row</param>
         /// <param name="session">The session</param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> that is the container of this <see cref="IRowViewModelBase{T}"/></param>
-        public PublicationDomainOfExpertiseRowViewModel(DomainOfExpertise domainOfExpertise, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(domainOfExpertise, session, containerViewModel)
+        public PublicationDomainOfExpertiseRowViewModel(DomainOfExpertise domainOfExpertise, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel)
+            : base(domainOfExpertise, session, messageBus, containerViewModel)
         {
             this.UpdateProperties();
             this.WhenAnyValue(vm => vm.ToBePublished).Subscribe(_ => this.ToBePublishedChanged());
@@ -116,7 +118,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         private void ToBePublishedChanged()
         {
-            foreach (var row in this.ContainedRows.OfType<IPublishableRow>())
+            foreach (var row in this.ContainedRows.Items.OfType<IPublishableRow>())
             {
                 row.ToBePublished = this.ToBePublished;
             }

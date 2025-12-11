@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PublicationParameterOrOverrideRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="PublicationParameterOrOverrideRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -37,6 +37,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The row representing a <see cref="ParameterOrOverrideBase" /> in the <see cref="PublicationsViewModel" />
@@ -62,11 +63,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <param name="session">
         /// The associated <see cref="ISession" />
         /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         /// <param name="containerViewModel">
         /// The container Row.
         /// </param>
-        public PublicationParameterOrOverrideRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, IRowViewModelBase<Thing> containerViewModel)
-            : base(parameterOrOverrideBase, session, containerViewModel)
+        public PublicationParameterOrOverrideRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, ICDPMessageBus messageBus, IRowViewModelBase<Thing> containerViewModel)
+            : base(parameterOrOverrideBase, session, messageBus, containerViewModel)
         {
             this.WhenAnyValue(vm => vm.ToBePublished).Subscribe(_ => this.ToBePublishedChanged());
             this.IsCheckable = true;

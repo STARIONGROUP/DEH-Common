@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LoginViewModel.cs"company="RHEA System S.A.">
-//    Copyright(c) 2020 RHEA System S.A.
+// <copyright file="LoginViewModel.cs"company="Starion Group S.A.">
+//    Copyright(c) 2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -41,9 +41,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.UserPreferenceHandler.Enums;
     using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
+    using DynamicData;
+
     using NLog;
 
     using ReactiveUI;
+    using DynamicData;
 
     using EngineeringModel = CDP4Common.EngineeringModelData.EngineeringModel;
     using Iteration = CDP4Common.EngineeringModelData.Iteration;
@@ -137,7 +140,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets the saved server addresses
         /// </summary>
-        public ReactiveList<string> SavedUris { get; private set; } = new ReactiveList<string> { ChangeTrackingEnabled = true };
+        public SourceList<string> SavedUris { get; private set; } = new ();
 
         /// <summary>
         /// Backing field for the <see cref="LoginSuccessful"/> property
@@ -185,7 +188,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
-        public ReactiveList<EngineeringModelRowViewModel> EngineeringModels { get; set; } = new ReactiveList<EngineeringModelRowViewModel>() { ChangeTrackingEnabled = true };
+        public SourceList<EngineeringModelRowViewModel> EngineeringModels { get; set; } = new SourceList<EngineeringModelRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="SelectedEngineeringModel"/>
@@ -204,7 +207,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
-        public ReactiveList<IterationRowViewModel> Iterations { get; set; } = new ReactiveList<IterationRowViewModel>() { ChangeTrackingEnabled = true };
+        public SourceList<IterationRowViewModel> Iterations { get; set; } = new SourceList<IterationRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="SelectedIteration"/>
@@ -223,7 +226,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
-        public ReactiveList<DomainOfExpertiseRowViewModel> DomainsOfExpertise { get; set; } = new ReactiveList<DomainOfExpertiseRowViewModel>() { ChangeTrackingEnabled = true };
+        public SourceList<DomainOfExpertiseRowViewModel> DomainsOfExpertise { get; set; } = new SourceList<DomainOfExpertiseRowViewModel>();
 
         /// <summary>
         /// Backing field for <see cref="SelectedDomainOfExpertise"/>
@@ -256,17 +259,17 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets the command responsible for adding the current <see cref="Uri"/> to <see cref="SavedUris"/>
         /// </summary>
-        public ReactiveCommand<object> SaveCurrentUriCommand { get; private set; }
+        public  ReactiveCommand<Unit, Unit> SaveCurrentUriCommand { get; private set; }
 
         /// <summary>
         /// Gets the server login command
         /// </summary>
-        public ReactiveCommand<Unit> LoginCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoginCommand { get; private set; }
 
         /// <summary>
         /// Gets the close command that closes the view when everything is setup
         /// </summary>
-        public ReactiveCommand<Unit> CloseCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CloseCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICloseWindowBehavior"/> instance
@@ -289,10 +292,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.PopulateSavedUris();
 
             var canSaveUri = this.SavedUris.CountChanged.StartWith(0).CombineLatest(this.WhenAnyValue(vm => vm.Uri),
-                (args, uri) => !string.IsNullOrWhiteSpace(uri) && !this.SavedUris.Contains(uri));
+                (args, uri) => !string.IsNullOrWhiteSpace(uri) && !this.SavedUris.Items.Contains(uri));
 
-            this.SaveCurrentUriCommand = ReactiveCommand.Create(canSaveUri);
-            this.SaveCurrentUriCommand.Subscribe(_ => this.ExecuteSaveCurrentUri());
+            this.SaveCurrentUriCommand = ReactiveCommand.Create(this.ExecuteSaveCurrentUri, canSaveUri, RxApp.MainThreadScheduler);
 
             var canLogin = this.WhenAnyValue(
                 vm => vm.SelectedServerType,
@@ -313,11 +315,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 (loginSuccess, iteration, engineeringModel, domain) =>
                     loginSuccess && iteration != null && engineeringModel != null && domain != null);
 
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, 
-                _ => this.ExecuteLogin(), RxApp.MainThreadScheduler);
+            this.LoginCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteLogin(), canLogin, RxApp.MainThreadScheduler);
 
-            this.CloseCommand = ReactiveCommand.CreateAsyncTask(canClose,
-                _ => this.CloseCommandExecute(), RxApp.MainThreadScheduler);
+            this.CloseCommand = ReactiveCommand.CreateFromTask(async _ => await this.CloseCommandExecute(), canClose, RxApp.MainThreadScheduler);
 
             this.LoginSuccessful = false;
             this.LoginFailed = false;
@@ -336,12 +336,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Executes the <see cref="SaveCurrentUriCommand"/>
         /// </summary>
-        private void ExecuteSaveCurrentUri()
+        /// <returns>A <see cref="Unit"/></returns>
+        private Unit ExecuteSaveCurrentUri()
         {
             var serverConnection = new ServerConnection { ServerType = this.SelectedServerType.Key, Uri = this.Uri };
             this.userPreferenceService.UserPreferenceSettings.SavedServerConections.Add(serverConnection);
             this.userPreferenceService.Save();
             this.PopulateSavedUris();
+            return Unit.Default;
         }
 
         /// <summary>
@@ -423,7 +425,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     this.DomainsOfExpertise.Add(vm);
                 }
 
-                this.SelectedDomainOfExpertise = this.DomainsOfExpertise.FirstOrDefault(x => x.Thing == activeParticipant.Person.DefaultDomain);
+                this.SelectedDomainOfExpertise = this.DomainsOfExpertise.Items.FirstOrDefault(x => x.Thing == activeParticipant.Person.DefaultDomain);
             }
         }
 
@@ -439,7 +441,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 this.Iterations.Add(new IterationRowViewModel(it));
             }
 
-            this.SelectedIteration = this.Iterations.FirstOrDefault(ivm => ivm.Thing.FrozenOn == null);
+            this.SelectedIteration = this.Iterations.Items.FirstOrDefault(ivm => ivm.Thing.FrozenOn == null);
         }
 
         /// <summary>

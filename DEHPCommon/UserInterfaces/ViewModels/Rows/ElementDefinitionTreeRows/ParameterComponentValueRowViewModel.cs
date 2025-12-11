@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterComponentValueRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterComponentValueRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -37,6 +37,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The Row representing a value that corresponds to a <see cref="ParameterTypeComponent"/> of a <see cref="ParameterBase"/>
@@ -55,6 +56,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="session">
         /// The associated <see cref="ISession"/>
         /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         /// <param name="actualOption">
         /// The <see cref="Option"/> of this row if any
         /// </param>
@@ -64,8 +68,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="containerRow">
         /// the row container
         /// </param>
-        public ParameterComponentValueRowViewModel(ParameterBase parameterBase, int valueIndex, ISession session, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow)
-            : base(parameterBase, session, actualOption, actualState, containerRow, valueIndex)
+        public ParameterComponentValueRowViewModel(ParameterBase parameterBase, int valueIndex, ISession session, ICDPMessageBus messageBus, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow)
+            : base(parameterBase, session, messageBus, actualOption, actualState, containerRow, valueIndex)
         {
             var compoundParameterType = this.AssertThatTheParameterIsElligible(valueIndex, containerRow);
 
@@ -73,7 +77,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             var component = compoundParameterType.Component[valueIndex];
             this.Name = component.ShortName;
 
-            var subscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(component)
+            var subscription = this.MessageBus.Listen<ObjectChangedEvent>(component)
                         .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x => this.Name = component.ShortName);
@@ -88,7 +92,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                     case ParameterOrOverrideBaseRowViewModel _:
                     case ParameterSubscriptionRowViewModel _:
                         {
-                            foreach (var rowViewModelBase in ((IRowViewModelBase<Thing>)this.ContainerViewModel).ContainedRows)
+                            foreach (var rowViewModelBase in ((IRowViewModelBase<Thing>)this.ContainerViewModel).ContainedRows.Items)
                             {
                                 var row = (ParameterComponentValueRowViewModel)rowViewModelBase;
                                 row.Switch = x;

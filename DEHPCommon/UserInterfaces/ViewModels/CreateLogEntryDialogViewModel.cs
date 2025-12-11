@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateLogEntryDialogViewModel.cs"company="RHEA System S.A.">
-//    Copyright(c) 2021 RHEA System S.A.
+// <copyright file="CreateLogEntryDialogViewModel.cs"company="Starion Group S.A.">
+//    Copyright(c) 2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -25,6 +25,7 @@
 namespace DEHPCommon.UserInterfaces.ViewModels
 {
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The view-model for the CreateLogEntryDialog view

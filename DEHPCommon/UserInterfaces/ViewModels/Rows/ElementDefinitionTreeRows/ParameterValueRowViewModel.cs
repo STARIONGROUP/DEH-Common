@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterValueRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterValueRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -41,6 +41,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.Utilities;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The base row view-model that displays the value-set of a <see cref="ParameterBase"/> 
@@ -87,6 +88,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="session">
         /// The <see cref="ISession"/>
         /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         /// <param name="actualOption">
         /// The actual <see cref="Option"/> represented if any
         /// </param>
@@ -99,8 +103,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="valueIndex">
         /// The index of the component if applicable
         /// </param>
-        protected ParameterValueRowViewModel(ParameterBase parameterBase, ISession session, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow, int valueIndex = 0)
-            : base(parameterBase, session, containerRow)
+        protected ParameterValueRowViewModel(ParameterBase parameterBase, ISession session, ICDPMessageBus messageBus, Option actualOption, ActualFiniteState actualState, IViewModelBase<Thing> containerRow, int valueIndex = 0)
+            : base(parameterBase, session, messageBus, containerRow)
         {
             this.ActualOption = actualOption;
             this.ActualState = actualState;
@@ -179,7 +183,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return;
             }
 
-            if (this.ContainedRows.Any())
+            if (this.ContainedRows.Count > 0)
             {
                 return;
             }
@@ -207,7 +211,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         private void SetParameterOrOverrideValues()
         {
-            if (this.ContainedRows.Any())
+            if (this.ContainedRows.Count > 0)
             {
                 return;
             }
@@ -348,7 +352,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(thing)
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetValues());
@@ -369,14 +373,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(thing)
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetValues());
             
             this.Disposables.Add(listener);
 
-            var subscribedListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing.SubscribedValueSet)
+            var subscribedListener = this.MessageBus.Listen<ObjectChangedEvent>(thing.SubscribedValueSet)
                             .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(_ => this.SetValues());
@@ -390,7 +394,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         private void UpdateIsPublishableStatus()
         {
-            if (this.ContainedRows.Any())
+            if (this.ContainedRows.Items.Any())
             {
                 this.IsPublishable = false;
                 return;
@@ -417,7 +421,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                     this.OwnerShortName = "[" + parameterOrOverride.Owner.ShortName + "]";
                 }
 
-                listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride.Owner)
+                listener = this.MessageBus.Listen<ObjectChangedEvent>(parameterOrOverride.Owner)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x =>
@@ -433,7 +437,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                     this.OwnerName = this.Owner.Name;
                     this.OwnerShortName = this.Owner.ShortName;
 
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
+                    listener = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.Owner)
                         .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(x =>

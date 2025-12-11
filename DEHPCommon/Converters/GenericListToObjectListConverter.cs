@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GenericListToObjectListConverter.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="GenericListToObjectListConverter.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -31,7 +31,7 @@ namespace DEHPCommon.Converters
     using System.Linq;
     using System.Windows.Data;
 
-    using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The abstract base class for the reative list to object used by the list-box views
@@ -40,7 +40,7 @@ namespace DEHPCommon.Converters
     public abstract class GenericListToObjectListConverter<T> : IValueConverter
     {
         /// <summary>
-        /// The conversion method converts a <see cref="ReactiveList{T}"/> of <typeparamref name="T" /> to an <see cref="object"/>.
+        /// The conversion method converts a <see cref="SourceList{T}"/> of <typeparamref name="T" /> to an <see cref="object"/>.
         /// </summary>
         /// <param name="value"> The incoming value. </param>
         /// <param name="targetType"> The target type. </param>
@@ -53,23 +53,23 @@ namespace DEHPCommon.Converters
         }
 
         /// <summary>
-        /// The conversion back method converts the <see cref="object"/> to <see cref="ReactiveList{T}"/> of <typeparamref name="T" />.
+        /// The conversion back method converts the <see cref="object"/> to <see cref="SourceList{T}"/> of <typeparamref name="T" />.
         /// </summary>
         /// <param name="value"> The incoming collection. </param>
         /// <param name="targetType"> The target type. </param>
         /// <param name="parameter"> The parameter passed on to this conversion. </param>
         /// <param name="culture"> The culture information. </param>
-        /// <returns> The <see cref="ReactiveList{T}"/> of <typeparamref name="T" /> containing the same objects as the input collection. </returns>
+        /// <returns> The <see cref="SourceList{T}"/> of <typeparamref name="T" /> containing the same objects as the input collection. </returns>
         public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var selection = (IList)value;
 
             if (selection == null)
             {
-                return new ReactiveList<T>();
+                return new SourceList<T>();
             }
 
-            var itemsSelection = new ReactiveList<T>();
+            var itemsSelection = new SourceList<T>();
 
             foreach (var item in selection)
             {

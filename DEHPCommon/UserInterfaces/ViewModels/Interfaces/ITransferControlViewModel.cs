@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ITransferControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="ITransferControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -24,10 +24,10 @@
 
 namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
-    using System.Reactive;
     using System.Windows.Input;
-
     using ReactiveUI;
+    using DynamicData;
+    using System.Reactive;
 
     /// <summary>
     /// Interface definition for <see cref="TransferControlViewModel"/>
@@ -47,11 +47,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that triggers the transfer
         /// </summary>
-        ReactiveCommand<Unit> TransferCommand { get; set; }
+        ReactiveCommand<Unit, Unit> TransferCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that cancels the transfer command
         /// </summary>
-        ReactiveCommand<Unit> CancelCommand { get; set; }
+        ReactiveCommand<Unit, Unit> CancelCommand { get; set; }
     }
 }

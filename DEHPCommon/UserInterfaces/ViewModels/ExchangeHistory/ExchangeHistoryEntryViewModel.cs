@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ExchangeHistoryEntryViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="ExchangeHistoryEntryViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -29,6 +29,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory
     using Newtonsoft.Json;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The <see cref="ExchangeHistoryEntryViewModel"/> represents one entry in the exchange history

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LoginLayoutGroupViewModel.cs"company="RHEA System S.A.">
-//    Copyright(c) 2020 RHEA System S.A.
+// <copyright file="LoginLayoutGroupViewModel.cs"company="Starion Group S.A.">
+//    Copyright(c) 2024 Starion Group S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
 //    This file is part of DEHP Common Library
@@ -26,6 +26,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Tabs
     using System;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The view-model for the LoginLayoutGroup that allows to manage displayed resources.

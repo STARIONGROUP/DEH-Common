@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ElementUsageRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -41,6 +41,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.Utilities;
 
     using ReactiveUI;
+    using DynamicData;
+    using DEHPCommon.Mvvm;
 
     /// <summary>
     /// The row class representing an <see cref="ElementUsage"/>
@@ -50,17 +52,17 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// Backing field for the <see cref="AllOptions"/> property.
         /// </summary>
-        private ReactiveList<Option> allOptions;
+        private SourceList<Option> allOptions = new();
 
         /// <summary>
         /// Backing field for the <see cref="ExcludedOptions"/> property.
         /// </summary>
-        private ReactiveList<Option> excludedOptions;
+        private SourceList<Option> excludedOptions = new();
 
         /// <summary>
         /// Backing field for the <see cref="SelectedOptions"/> property.
         /// </summary>
-        private ReactiveList<Option> selectedOptions;
+        private SourceList<Option> selectedOptions = new();
 
         /// <summary>
         /// Backing field for the option selection Tooltip.
@@ -71,37 +73,43 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// Backing field for <see cref="HasExcludes"/> 
         /// </summary>
         private bool? hasExcludes;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
         /// <param name="elementUsage">The associated <see cref="ElementUsage"/></param>
         /// <param name="currentExpertise">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The container view-model</param>
-        public ElementUsageRowViewModel(ElementUsage elementUsage, DomainOfExpertise currentExpertise, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(elementUsage, currentExpertise, session, containerViewModel)
+        public ElementUsageRowViewModel(ElementUsage elementUsage, DomainOfExpertise currentExpertise, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel)
+            : base(elementUsage, currentExpertise, session, messageBus, containerViewModel)
         {
-            this.AllOptions = new ReactiveList<Option>();
-            this.ExcludedOptions = new ReactiveList<Option>();
-            this.SelectedOptions = new ReactiveList<Option>();
+            this.AllOptions = new SourceList<Option>();
+            this.ExcludedOptions = new SourceList<Option>();
+            this.SelectedOptions = new SourceList<Option>();
 
-            this.WhenAnyValue(vm => vm.SelectedOptions).Subscribe(_ => this.ExcludedOptions = new ReactiveList<Option>(this.AllOptions.Except(this.SelectedOptions)));
+            this.WhenAnyValue(vm => vm.SelectedOptions).Subscribe(selectedOptions =>
+            {
+                var excludedItems = this.AllOptions.Items.Except(selectedOptions.Items).ToArray();
+                this.ExcludedOptions.Clear();
+                this.ExcludedOptions.AddRange(excludedItems);
+            });
 
             this.WhenAnyValue(vm => vm.ExcludedOptions).Subscribe(_ =>
             {
-                if (!this.SelectedOptions.Any())
+                if (this.SelectedOptions.Count == 0)
                 {
                     this.HasExcludes = null;
                     this.OptionToolTip = "This ElementUsage is not used in any option.";
                 }
                 else
                 {
-                    this.HasExcludes = this.ExcludedOptions.Any();
+                    this.HasExcludes = this.ExcludedOptions.Count > 0;
 
                     if (this.HasExcludes.Value)
                     {
-                        var excludedOptionNames = string.Join("\n", this.ExcludedOptions.Select(o => o.Name));
+                        var excludedOptionNames = string.Join("\n", this.ExcludedOptions.Items.Select(o => o.Name));
 
                         this.OptionToolTip = $"This ElementUsage is excluded from options:\n\r{excludedOptionNames}";
                     }
@@ -118,19 +126,19 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         }
         
         /// <summary>
-        /// Gets or sets the <see cref="ReactiveList{T}"/> of all <see cref="Option"/>s
+        /// Gets or sets the <see cref="SourceList{T}"/> of all <see cref="Option"/>s
         /// in this iteration.
         /// </summary>
-        public ReactiveList<Option> AllOptions
+        public SourceList<Option> AllOptions
         {
             get => this.allOptions;
             set => this.RaiseAndSetIfChanged(ref this.allOptions, value);
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ReactiveList{T}"/> of excluded <see cref="Option"/>s of this <see cref="ElementUsage"/>.
+        /// Gets or sets the <see cref="SourceList{T}"/> of excluded <see cref="Option"/>s of this <see cref="ElementUsage"/>.
         /// </summary>
-        public ReactiveList<Option> ExcludedOptions
+        public SourceList<Option> ExcludedOptions
         {
             get => this.excludedOptions;
             set => this.RaiseAndSetIfChanged(ref this.excludedOptions, value);
@@ -155,9 +163,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ReactiveList{T}"/> of selected <see cref="Option"/>s of this <see cref="ElementUsage"/>.
+        /// Gets or sets the <see cref="SourceList{T}"/> of selected <see cref="Option"/>s of this <see cref="ElementUsage"/>.
         /// </summary>
-        public ReactiveList<Option> SelectedOptions
+        public SourceList<Option> SelectedOptions
         {
             get => this.selectedOptions;
             set => this.RaiseAndSetIfChanged(ref this.selectedOptions, value);
@@ -178,25 +186,25 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             base.InitializeSubscriptions();
 
-            var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
+            var elementDefListener = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.ElementDefinitionObjectChangedHandler());
 
-            var highlightSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
+            var highlightSubscription = this.MessageBus.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
             this.Disposables.Add(highlightSubscription);
 
             var optionAddListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                this.MessageBus.Listen<ObjectChangedEvent>(typeof(Option))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache && objectChange.ChangedThing.Container == this.Thing.Container.Container)
                     .Select(x => x.ChangedThing as Option)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateOptionLists());
 
             var optionRemoveListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                this.MessageBus.Listen<ObjectChangedEvent>(typeof(Option))
                     .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache && objectChange.ChangedThing.Container == this.Thing.Container.Container)
                     .Select(x => x.ChangedThing as Option)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -295,10 +303,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         private void UpdateOptionLists()
         {
-            this.AllOptions = new ReactiveList<Option>(((Iteration)this.Thing.Container.Container).Option);
+            this.allOptions.ClearWithoutDispose();
+            this.ExcludedOptions.ClearWithoutDispose();
+            this.SelectedOptions.ClearWithoutDispose();
 
-            this.ExcludedOptions = new ReactiveList<Option>(this.Thing.ExcludeOption);
-            this.SelectedOptions = new ReactiveList<Option>(((Iteration)this.Thing.Container.Container).Option.Except(this.Thing.ExcludeOption));
+            this.AllOptions.AddRange(((Iteration)this.Thing.Container.Container).Option);
+            this.ExcludedOptions.AddRange(this.Thing.ExcludeOption);
+            this.SelectedOptions.AddRange(((Iteration)this.Thing.Container.Container).Option.Except(this.Thing.ExcludeOption));
         }
     }
 }

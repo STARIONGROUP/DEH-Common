@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ILoginViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ILoginViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -31,6 +31,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
     using DEHPCommon.UserPreferenceHandler.Enums;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Interface definition for <see cref="LoginViewModel"/>
@@ -75,11 +76,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
-        ReactiveList<EngineeringModelRowViewModel> EngineeringModels { get; }
+        SourceList<EngineeringModelRowViewModel> EngineeringModels { get; }
 
         /// <summary>
         /// Gets the server login command
         /// </summary>
-        ReactiveCommand<Unit> LoginCommand { get; }
+        ReactiveCommand<Unit, Unit> LoginCommand { get; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IStatusBarControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="IStatusBarControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -27,6 +27,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
     using DEHPCommon.Enumerators;
 
     using ReactiveUI;
+    using DynamicData;
+    using System.Reactive;
 
     /// <summary>
     /// Interface definition for <see cref="StatusBarControlViewModel"/>
@@ -46,7 +48,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets or sets the command that opens the user setting dialog
         /// </summary>
-        ReactiveCommand<object> UserSettingCommand { get; }
+         ReactiveCommand<Unit, Unit> UserSettingCommand { get; }
 
         /// <summary>
         /// Appends a new message to the represented status bar

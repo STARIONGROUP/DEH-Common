@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHubBrowserHeaderControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="IHubBrowserHeaderControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -30,6 +30,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
     using CDP4Dal;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Interface definition for <see cref="HubSessionControlViewModel"/>
@@ -45,12 +46,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets or sets the command to refresh the session
         /// </summary>
-        ReactiveCommand<Unit> RefreshCommand { get; set; }
+        ReactiveCommand<Unit, Unit> RefreshCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the command to reload the session
         /// </summary>
-        ReactiveCommand<Unit> ReloadCommand { get; set; }
+        ReactiveCommand<Unit, Unit> ReloadCommand { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="ISession"/> object has it's

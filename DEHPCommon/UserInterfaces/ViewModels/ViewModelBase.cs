@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -40,6 +40,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using NLog;
 
     using ReactiveUI;
+    using DynamicData;
 
     using Thing = CDP4Common.CommonData.Thing;
 
@@ -134,6 +135,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         protected List<IDisposable> Disposables { get; private set; }
 
         /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        protected ICDPMessageBus MessageBus { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ViewModelBase{T}"/> class.
         /// </summary>
         protected ViewModelBase()
@@ -150,10 +156,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <param name="session">
         /// The session this view model belongs to.
         /// </param>
-        protected ViewModelBase(T thing, ISession session)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        protected ViewModelBase(T thing, ISession session, ICDPMessageBus messageBus)
         {
             this.Logger = LogManager.GetLogger(this.GetType().FullName);
-
+            this.MessageBus = messageBus;
             this.PermissionService = session.PermissionService;
             this.Disposables = new List<IDisposable>();
             this.Thing = thing;
@@ -162,7 +171,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.RevisionNumber = thing.RevisionNumber;
             this.IDalUri = thing.IDalUri;
 
-            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+            var thingSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.ObjectChangeEventHandler);

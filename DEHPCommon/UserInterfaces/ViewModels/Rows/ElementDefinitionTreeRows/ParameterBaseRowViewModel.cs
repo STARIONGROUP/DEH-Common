@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -41,6 +41,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.Utilities;
 
     using ReactiveUI;
+    using DynamicData;
+    using DEHPCommon.Mvvm;
 
     /// <summary>
     /// The Base row-class for <see cref="ParameterBase"/>
@@ -56,18 +58,18 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// The value-set listeners cache
         /// </summary>
-        protected List<IDisposable> ValueSetListener = new List<IDisposable>();
+        protected List<IDisposable> ValueSetListener = [];
 
         /// <summary>
         /// The state listeners
         /// </summary>
-        private readonly List<IDisposable> actualFiniteStateListener;
+        private readonly List<IDisposable> actualFiniteStateListener = [];
 
         /// <summary>
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
         private string modelCode;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
         /// </summary>
@@ -80,13 +82,15 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="containerViewModel">
         /// The <see cref="ElementBaseRowViewModel{T}"/> row that contains this row.
         /// </param>
-        protected ParameterBaseRowViewModel(T parameterBase, ISession session, IViewModelBase<Thing> containerViewModel) : base(parameterBase, session, containerViewModel)
+        /// <param name="messageBus">
+        /// The associated <see cref="ICDPMessageBus"/>
+        /// </param>
+        protected ParameterBaseRowViewModel(T parameterBase, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel) : base(parameterBase, session, messageBus, containerViewModel)
         {
             this.IsCompoundType = this.Thing.ParameterType is CompoundParameterType;
             this.currentGroup = this.Thing.Group;
             this.ParameterType = this.Thing.ParameterType;
             this.ParameterTypeClassKind = this.Thing.ParameterType.ClassKind;
-            this.actualFiniteStateListener = new List<IDisposable>();
             this.Initialize();
         }
 
@@ -127,11 +131,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// Gets the list of possible <see cref="EnumerationValueDefinition"/> for this <see cref="Parameter"/>
         /// </summary>
-        public virtual ReactiveList<EnumerationValueDefinition> EnumerationValueDefinition
+        public virtual SourceList<EnumerationValueDefinition> EnumerationValueDefinition
         {
             get
             {
-                var enumValues = new ReactiveList<EnumerationValueDefinition>();
+                var enumValues = new SourceList<EnumerationValueDefinition>();
 
                 if (this.ParameterType is EnumerationParameterType enumPt)
                 {
@@ -174,7 +178,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             base.InitializeSubscriptions();
 
-            var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
+            var parameterTypeListener = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                    .ObserveOn(RxApp.MainThreadScheduler)
                    .Subscribe(x => this.UpdateProperties());
@@ -241,7 +245,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             this.ValueSetListener.Clear();
 
             // clear the children and repopulate
-            foreach (var row in this.ContainedRows)
+            foreach (var row in this.ContainedRows.Items)
             {
                 row.Dispose();
             }
@@ -291,7 +295,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             foreach (Option availableOption in iteration.Option)
             {
-                var row = new ParameterOptionRowViewModel(this.Thing, availableOption, this.Session, this);
+                var row = new ParameterOptionRowViewModel(this.Thing, availableOption, this.Session, this.MessageBus, this);
 
                 if (this.Thing.StateDependence != null)
                 {
@@ -321,7 +325,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             if (actualState.Kind == ActualFiniteStateKind.FORBIDDEN)
             {
                 var rowToRemove =
-                    row.ContainedRows.OfType<ParameterStateRowViewModel>()
+                    row.ContainedRows.Items.OfType<ParameterStateRowViewModel>()
                         .SingleOrDefault(x => x.ActualState == actualState);
                 
                 if (rowToRemove != null)
@@ -333,14 +337,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             }
 
             // mandatory state
-            var existingRow = row.ContainedRows.OfType<ParameterStateRowViewModel>().SingleOrDefault(x => x.ActualState == actualState);
+            var existingRow = row.ContainedRows.Items.OfType<ParameterStateRowViewModel>().SingleOrDefault(x => x.ActualState == actualState);
 
             if (existingRow != null)
             {
                 return;
             }
 
-            var stateRow = new ParameterStateRowViewModel(this.Thing, actualOption, actualState, this.Session, row);
+            var stateRow = new ParameterStateRowViewModel(this.Thing, actualOption, actualState, this.Session, this.MessageBus, row);
 
             if (this.Thing.ParameterType is CompoundParameterType)
             {
@@ -371,7 +375,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             foreach (var actualState in this.Thing.StateDependence.ActualState)
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(actualState)
+                var listener = this.MessageBus.Listen<ObjectChangedEvent>(actualState)
                                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                                    .ObserveOn(RxApp.MainThreadScheduler)
                                    .Subscribe(x => this.UpdateActualStateRow(row, actualOption, actualState));
@@ -398,7 +402,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {         
             for (var i = 0; i < ((CompoundParameterType)this.Thing.ParameterType).Component.Count; i++)
             {
-                var componentRow = new ParameterComponentValueRowViewModel(this.Thing, i, this.Session, actualOption, actualState, row);
+                var componentRow = new ParameterComponentValueRowViewModel(this.Thing, i, this.Session, this.MessageBus, actualOption, actualState, row);
                 componentRow.SetValues();
                 row.ContainedRows.Add(componentRow);
             }

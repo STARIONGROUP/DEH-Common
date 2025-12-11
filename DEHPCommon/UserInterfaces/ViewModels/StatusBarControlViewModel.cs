@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StatusBarControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="StatusBarControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -34,6 +34,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using NLog;
 
     using ReactiveUI;
+    using DynamicData;
+    using System.Reactive;
 
     /// <summary>
     /// The <see cref="StatusBarControlViewModel"/> is the base view model for the <see cref="Views.StatusBarControl"/>
@@ -81,7 +83,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets the command that opens the user setting dialog
         /// </summary>
-        public ReactiveCommand<object> UserSettingCommand { get; protected set; }
+        public  ReactiveCommand<Unit, Unit> UserSettingCommand { get; protected set; }
 
         /// <summary>
         /// Initializes a new <see cref="StatusBarControlViewModel"/>
@@ -90,8 +92,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         protected StatusBarControlViewModel(INavigationService navigationService)
         {
             this.NavigationService = navigationService;
-            this.UserSettingCommand = ReactiveCommand.Create(Observable.Empty<bool>().StartWith(false));
-            this.UserSettingCommand.Subscribe(_ => this.ExecuteUserSettingCommand());
+            this.UserSettingCommand = ReactiveCommand.Create(() => this.ExecuteUserSettingCommand(), Observable.Empty<bool>().StartWith(false));
         }
 
         /// <summary>

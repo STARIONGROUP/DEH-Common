@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ExchangeHistoryViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="ExchangeHistoryViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -30,6 +30,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory
     using DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The view model for displaying local exchange history
@@ -58,7 +59,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.ExchangeHistory
         /// <summary>
         /// Gets the collection of <see cref="ExchangeHistoryEntryViewModel"/>
         /// </summary>
-        public ReactiveList<ExchangeHistoryEntryViewModel> Entries { get; } = new ReactiveList<ExchangeHistoryEntryViewModel>();
+        public SourceList<ExchangeHistoryEntryViewModel> Entries { get; } = new SourceList<ExchangeHistoryEntryViewModel>();
 
         /// <summary>
         /// Initializes a new <see cref="ExchangeHistoryViewModel"/>

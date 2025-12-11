@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterOverrideRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterOverrideRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -36,6 +36,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The parameter row view model.
@@ -51,11 +52,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="session">
         /// The session.
         /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         /// <param name="containerViewModel">
         /// The container view-model.
         /// </param>
-        public ParameterOverrideRowViewModel(ParameterOverride parameterOverride, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(parameterOverride, session, containerViewModel)
+        public ParameterOverrideRowViewModel(ParameterOverride parameterOverride, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel)
+            : base(parameterOverride, session, messageBus, containerViewModel)
         {
         }
 
@@ -68,7 +72,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             var parameterOverride = (ParameterOverride)this.Thing;
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOverride.Parameter)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(parameterOverride.Parameter)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.ObjectChangeEventHandler(new ObjectChangedEvent(this.Thing)));

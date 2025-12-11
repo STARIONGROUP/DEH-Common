@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ElementDefinitionRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -38,6 +38,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.Utilities;
 
     using ReactiveUI;
+    using DynamicData;
+    using DEHPCommon.Mvvm;
 
     /// <summary>
     /// The row representing an <see cref="ElementDefinition"/>
@@ -48,16 +50,17 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// The backing field for <see cref="IsTopElement"/>
         /// </summary>
         private bool isTopElement;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
         /// <param name="elementDefinition">The associated <see cref="ElementDefinition"/></param>
         /// <param name="currentDomain">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The container view-model</param>
-        public ElementDefinitionRowViewModel(ElementDefinition elementDefinition, DomainOfExpertise currentDomain, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(elementDefinition, currentDomain, session, containerViewModel)
+        public ElementDefinitionRowViewModel(ElementDefinition elementDefinition, DomainOfExpertise currentDomain, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel)
+            : base(elementDefinition, currentDomain, session, messageBus, containerViewModel)
         {
             this.UpdateProperties();
         }
@@ -153,13 +156,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         private void PopulateElemenUsages()
         {
-            var currentUsages = this.ContainedRows.OfType<ElementUsageRowViewModel>().Select(x => x.Thing).ToList();
+            var currentUsages = this.ContainedRows.Items.OfType<ElementUsageRowViewModel>().Select(x => x.Thing).ToList();
 
             var deletedUsages = currentUsages.Except(this.Thing.ContainedElement).ToList();
             
             foreach (var deletedUsage in deletedUsages)
             {
-                var row = this.ContainedRows.OfType<ElementUsageRowViewModel>().SingleOrDefault(x => x.Thing == deletedUsage);
+                var row = this.ContainedRows.Items.OfType<ElementUsageRowViewModel>().SingleOrDefault(x => x.Thing == deletedUsage);
                 
                 if (row == null)
                 {
@@ -173,7 +176,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             
             foreach (var elementUsage in addedUsages)
             {
-                var row = new ElementUsageRowViewModel(elementUsage, this.CurrentDomain, this.Session, this);
+                var row = new ElementUsageRowViewModel(elementUsage, this.CurrentDomain, this.Session, this.MessageBus, this);
                 this.ContainedRows.SortedInsert(row, ChildRowComparer);
             }
         }

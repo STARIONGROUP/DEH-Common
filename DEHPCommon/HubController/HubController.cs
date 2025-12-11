@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HubController.cs"company="RHEA System S.A.">
-//    Copyright(c) 2020 RHEA System S.A.
+// <copyright file="HubController.cs"company="Starion Group S.A.">
+//    Copyright(c) 2024 Starion Group S.A.
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski.
 // 
 //    This file is part of DEHP Common Library
@@ -51,8 +51,10 @@ namespace DEHPCommon.HubController
     using NLog;
 
     using ReactiveUI;
+    using DynamicData;
 
     using File = CDP4Common.EngineeringModelData.File;
+    using CDP4Common.ExceptionHandlerService;
 
     /// <summary>
     /// Definition of the <see cref="HubController"/>, which is responsible to provides <see cref="ISession"/> related functionnalities
@@ -68,6 +70,16 @@ namespace DEHPCommon.HubController
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private readonly IOpenSaveFileDialogService fileDialogService;
+
+        /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
+        /// <summary>
+        /// The <see cref="IExceptionHandlerService"/>
+        /// </summary>
+        private readonly IExceptionHandlerService exceptionHandlerService;
 
         /// <summary>
         /// Backing field for <see cref="IsSessionOpen"/>
@@ -129,9 +141,13 @@ namespace DEHPCommon.HubController
         /// Initializes a new <see cref="HubController"/>
         /// </summary>
         /// <param name="fileDialogService">The <see cref="IOpenSaveFileDialogService"/></param>
-        public HubController(IOpenSaveFileDialogService fileDialogService)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
+        public HubController(IOpenSaveFileDialogService fileDialogService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
         {
             this.fileDialogService = fileDialogService;
+            this.messageBus = messageBus;
+            this.exceptionHandlerService = exceptionHandlerService;
         }
 
         /// <summary>
@@ -208,7 +224,7 @@ namespace DEHPCommon.HubController
                 _ => throw new ArgumentOutOfRangeException(nameof(serverType), "Invalid Server type selected")
             };
 
-            this.Session = new Session(dal, credentials);
+            this.Session = new Session(dal, credentials, this.messageBus, this.exceptionHandlerService);
             await this.Session.Open();
             this.IsSessionOpen = this.Session?.RetrieveSiteDirectory() != null;
             return this.IsSessionOpen;

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterValueBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterValueBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -34,6 +34,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Row class representing a <see cref="ParameterBase"/>
@@ -45,8 +46,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         /// <param name="parameterBase">The <see cref="ParameterBase"/> associated with this row</param>
         /// <param name="session">The session</param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> that is the container of this <see cref="IRowViewModelBase{T}"/></param>
-        protected ParameterValueBaseRowViewModel(T parameterBase, ISession session, IViewModelBase<Thing> containerViewModel) : base(parameterBase, session, containerViewModel)
+        protected ParameterValueBaseRowViewModel(T parameterBase, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel) : base(parameterBase, session, messageBus, containerViewModel)
         {
             this.Initialize();
         }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -41,8 +41,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         /// <param name="parameter"> The parameter. </param>
         /// <param name="session"> The session. </param>
+        /// <param name="messageBus"> The <see cref="ICDPMessageBus"/> </param>
         /// <param name="containerViewModel"> The container row. </param>
-        public ParameterRowViewModel(Parameter parameter, ISession session, IViewModelBase<Thing> containerViewModel) : base(parameter, session, containerViewModel)
+        public ParameterRowViewModel(Parameter parameter, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel) : base(parameter, session, messageBus, containerViewModel)
         {
         }
     }

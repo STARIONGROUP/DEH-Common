@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ElementBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ElementBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -43,6 +43,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
+    using DEHPCommon.Mvvm;
 
     /// <summary>
     /// The Base row class representing an <see cref="ElementBase"/>
@@ -116,28 +118,28 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <summary>
         /// A cache for all <see cref="ParameterBase"/>
         /// </summary>
-        protected Dictionary<ParameterBase, IRowViewModelBase<ParameterBase>> ParameterBaseCache;
+        protected Dictionary<ParameterBase, IRowViewModelBase<ParameterBase>> ParameterBaseCache = [];
 
         /// <summary>
         /// A cache that associates a <see cref="ParameterBase"/> with its <see cref="ParameterGroup"/> in the tree-view
         /// </summary>
-        protected Dictionary<ParameterBase, ParameterGroup> ParameterBaseContainerMap;
+        protected Dictionary<ParameterBase, ParameterGroup> ParameterBaseContainerMap = [];
 
         /// <summary>
         /// A list of all rows representing all <see cref="ParameterGroup"/> contained by this <see cref="CDP4Common.EngineeringModelData.ElementDefinition"/>
         /// </summary>
-        protected Dictionary<Guid, ParameterGroupRowViewModel> ParameterGroupCache;
+        protected Dictionary<Guid, ParameterGroupRowViewModel> ParameterGroupCache = [];
 
         /// <summary>
         /// A parameter group - parameter group container mapping
         /// </summary>
-        protected Dictionary<Guid, ParameterGroup> ParameterGroupContainment;
+        protected Dictionary<Guid, ParameterGroup> ParameterGroupContainment = [];
 
         /// <summary>
         /// The cache for the Parameter update's listener
         /// </summary>
-        protected Dictionary<ParameterBase, IDisposable> ParameterBaseListener; 
-        
+        protected Dictionary<ParameterBase, IDisposable> ParameterBaseListener = [];
+
         /// <summary>
         /// Backing field for <see cref="ModelCode"/>
         /// </summary>
@@ -147,21 +149,17 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// Backing field for <see cref="CurrentDomain"/>
         /// </summary>
         private readonly DomainOfExpertise currentDomain;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementBaseRowViewModel{T}"/> class
         /// </summary>
         /// <param name="elementBase">The associated <see cref="ElementBase"/></param>
         /// <param name="currentDomain">The active <see cref="DomainOfExpertise"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
+        /// <param name="messageBus">The associated <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The container view-model</param>
-        protected ElementBaseRowViewModel(T elementBase, DomainOfExpertise currentDomain, ISession session, IViewModelBase<Thing> containerViewModel) : base(elementBase, session, containerViewModel)
+        protected ElementBaseRowViewModel(T elementBase, DomainOfExpertise currentDomain, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel) : base(elementBase, session, messageBus, containerViewModel)
         {
-            this.ParameterBaseCache = new Dictionary<ParameterBase, IRowViewModelBase<ParameterBase>>();
-            this.ParameterBaseContainerMap = new Dictionary<ParameterBase, ParameterGroup>();
-            this.ParameterGroupCache = new Dictionary<Guid, ParameterGroupRowViewModel>();
-            this.ParameterGroupContainment = new Dictionary<Guid, ParameterGroup>();
-            this.ParameterBaseListener = new Dictionary<ParameterBase, IDisposable>();
             this.currentDomain = currentDomain;            
             this.UpdateOwnerProperties();
             this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
@@ -290,14 +288,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         {
             base.InitializeSubscriptions();
 
-            var selectSubscription = CDPMessageBus.Current.Listen<SelectEvent>()
+            var selectSubscription = this.MessageBus.Listen<SelectEvent>()
                 .Where(x => x.SelectedThing.ShortName == this.Thing.ShortName && x.SelectedThing.Iid == this.Thing.Iid && (this.Thing.Original != null || this.Thing.Iid == Guid.Empty))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.IsSelectedForTransfer = !x.CancelSelection);
 
             this.Disposables.Add(selectSubscription);
 
-            var ownerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
+            var ownerListener = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.Owner)
                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                                    .ObserveOn(RxApp.MainThreadScheduler)
                                    .Subscribe(x => { this.OwnerName = this.Thing.Owner.Name; this.OwnerShortName = this.Thing.Owner.ShortName; });
@@ -383,7 +381,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 
                 foreach (var group in newgroup)
                 {
-                    var row = new ParameterGroupRowViewModel(group, this.currentDomain, this.Session, this);
+                    var row = new ParameterGroupRowViewModel(group, this.currentDomain, this.Session, this.MessageBus, this);
                     this.ParameterGroupCache.Add(group.Iid, row);
                     this.ParameterGroupContainment.Add(group.Iid, group.ContainingGroup);
                 }
@@ -505,19 +503,19 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
             switch (parameterBase)
             {
                 case Parameter parameter:
-                    row = new ParameterRowViewModel(parameter, this.Session, this);
+                    row = new ParameterRowViewModel(parameter, this.Session, this.MessageBus, this);
                     this.AddParameterOrOverrideListener(parameter);
                     break;
                 case ParameterOverride parameterOverride:
-                    row = new ParameterOverrideRowViewModel(parameterOverride, this.Session, this);
+                    row = new ParameterOverrideRowViewModel(parameterOverride, this.Session, this.MessageBus, this);
                     this.AddParameterOrOverrideListener(parameterOverride);
                     break;
                 case ParameterSubscription parameterSubscription:
                 {
                     row = parameterSubscription.Container switch
                     {
-                        Parameter _ => new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this),
-                        ParameterOverride _ => new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this),
+                        Parameter _ => new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this.MessageBus, this),
+                        ParameterOverride _ => new ParameterSubscriptionRowViewModel(parameterSubscription, this.Session, this.MessageBus, this),
                         _ => null
                     };
 
@@ -552,7 +550,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(parameterOrOverride)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.PopulateParameters());
@@ -570,7 +568,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterSubscription)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(parameterSubscription)
                 .Where(objectChange => objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.PopulateParameters());

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HubBrowserHeaderViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="HubBrowserHeaderViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -35,6 +35,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.UserInterfaces.Views;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// View model for <see cref="HubBrowserHeader"/>

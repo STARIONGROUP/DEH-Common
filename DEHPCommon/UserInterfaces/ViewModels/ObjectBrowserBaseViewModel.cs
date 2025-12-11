@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ObjectBrowserBaseViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="ObjectBrowserBaseViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -27,6 +27,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows.Input;
 
@@ -41,7 +42,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
+    using DynamicData;
+
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Base viewmodel for Net change preview view models and the object browser
@@ -57,6 +61,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// The <see cref="IObjectBrowserTreeSelectorService"/>
         /// </summary>
         private readonly IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService;
+
+        /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        protected ICDPMessageBus MessageBus { get; }
 
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
@@ -89,22 +98,22 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets or sets the selected things collection
         /// </summary>
-        public ReactiveList<object> SelectedThings { get; set; } = new ReactiveList<object>();
+        public SourceList<object> SelectedThings { get; set; } = new SourceList<object>();
 
         /// <summary>
         /// Gets the collection of <see cref="IRowViewModelBase{T}"/> to be displayed in the tree
         /// </summary>
-        public ReactiveList<BrowserViewModelBase> Things { get; } = new ReactiveList<BrowserViewModelBase>();
+        public SourceList<BrowserViewModelBase> Things { get; } = new ();
 
         /// <summary>
         /// Gets the Context Menu for the implementing view model
         /// </summary>
-        public ReactiveList<ContextMenuItemViewModel> ContextMenu { get; } = new ReactiveList<ContextMenuItemViewModel>();
+        public SourceList<ContextMenuItemViewModel> ContextMenu { get; } = new();
 
         /// <summary>
         /// Gets the command that allows to map the selected things
         /// </summary>
-        public ReactiveCommand<object> MapCommand { get; set; }
+        public  ReactiveCommand<Unit, Unit> MapCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IObservable{T}"/> of <see cref="bool"/> that is bound to the <see cref="MapCommand"/> <see cref="ReactiveCommand{T}.CanExecute"/> property
@@ -117,10 +126,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
-        protected ObjectBrowserBaseViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        protected ObjectBrowserBaseViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService, ICDPMessageBus messageBus)
         {
             this.HubController = hubController;
             this.objectBrowserTreeSelectorService = objectBrowserTreeSelectorService;
+            this.MessageBus = messageBus;
             this.Caption = "Hub Object Browser";
             this.InitializesCommandsAndObservables();
         }
@@ -133,16 +144,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             this.WhenAnyValue(x => x.HubController.OpenIteration).ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.Reload());
             
-            CDPMessageBus.Current.Listen<UpdateObjectBrowserTreeEvent>()
+            this.MessageBus.Listen<UpdateObjectBrowserTreeEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.UpdateTree(x.Reset));
 
             this.CanMap = this.WhenAny(
                 vm => vm.SelectedThing,
-                vm => vm.SelectedThings.CountChanged,
+                vm => vm.SelectedThings.Count,
                 vm => vm.HubController.OpenIteration,
                 (selected, selection, iteration) =>
-                    iteration.Value != null && (selected.Value != null || this.SelectedThings.Any()));
+                    iteration.Value != null && (selected.Value != null || this.SelectedThings.Count > 0));
         }
 
         /// <summary>
@@ -184,13 +195,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             foreach (var thingKind in this.objectBrowserTreeSelectorService.ThingKinds)
             {
                 if (thingKind == typeof(ElementDefinition) &&
-                    this.Things.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.HubController.OpenIteration.Iid))
+                    this.Things.Items.OfType<IBrowserViewModelBase<Thing>>().All(x => x.Thing.Iid != this.HubController.OpenIteration.Iid))
                 {
-                    this.Things.Add(new ElementDefinitionsBrowserViewModel(iteration ?? this.HubController.OpenIteration, this.HubController.Session));
+                    this.Things.Add(new ElementDefinitionsBrowserViewModel(iteration ?? this.HubController.OpenIteration, this.HubController.Session, this.MessageBus));
                 }
             }
 
-            if (this.Things.FirstOrDefault() is { } firstNode)
+            if (this.Things.Items.FirstOrDefault() is { } firstNode)
             {
                 firstNode.IsExpanded = true;
             }

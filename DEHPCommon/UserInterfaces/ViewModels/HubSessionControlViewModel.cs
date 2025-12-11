@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HubBrowserHeaderControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="HubBrowserHeaderControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -90,14 +90,19 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="ICDPMessageBus"/>
+        /// </summary>
+        protected ICDPMessageBus MessageBus { get; }
+
+        /// <summary>
         /// Gets or sets the command to refresh the session
         /// </summary>
-        public ReactiveCommand<Unit> RefreshCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> RefreshCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the command to reload the session
         /// </summary>
-        public ReactiveCommand<Unit> ReloadCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ReloadCommand { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="ISession"/> object has it's
@@ -132,10 +137,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
-        public HubSessionControlViewModel(IHubController hubController, IStatusBarControlViewModel statusBar)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        public HubSessionControlViewModel(IHubController hubController, IStatusBarControlViewModel statusBar, ICDPMessageBus messageBus)
         {
             this.hubController = hubController;
             this.statusBar = statusBar;
+            this.MessageBus = messageBus;
 
             this.InitializeCommandsAndObservables();
         }
@@ -150,11 +157,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                     (i, o) =>
                         i.Value != null && o.Value);
 
-            this.RefreshCommand = ReactiveCommand.CreateAsyncTask(isConnectedObservable, async _ =>
-                await this.RefreshCommandExecute());
-
-            this.ReloadCommand = ReactiveCommand.CreateAsyncTask(isConnectedObservable, async _ =>
-                await this.ReloadCommandExecute());
+            this.RefreshCommand = ReactiveCommand.CreateFromTask(async _ => await this.RefreshCommandExecute(), isConnectedObservable);
+            this.ReloadCommand = ReactiveCommand.CreateFromTask(async _ => await this.ReloadCommandExecute(), isConnectedObservable);
 
             this.WhenAnyValue(x => x.IsAutoRefreshEnabled)
                 .Subscribe(_ => this.SetTimer());
@@ -175,7 +179,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             try
             {
                 await this.hubController.Refresh();
-                CDPMessageBus.Current.SendMessage(new HubSessionControlEvent());
+                this.MessageBus.SendMessage(new HubSessionControlEvent());
 
                 if (!silent)
                 {
@@ -198,7 +202,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             {
                 await this.hubController.Reload();
                 this.statusBar.Append($"Hub session has been reloaded");
-                CDPMessageBus.Current.SendMessage(new HubSessionControlEvent());
+                this.MessageBus.SendMessage(new HubSessionControlEvent());
             }
             catch (Exception e)
             {

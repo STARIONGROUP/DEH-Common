@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterOptionRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterOptionRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -36,6 +36,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The row representing an <see cref="Option"/> of a <see cref="ParameterBase"/>
@@ -48,14 +49,15 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="parameterBase">The associated <see cref="ParameterBase"/></param>
         /// <param name="option">The associated <see cref="Option"/></param>
         /// <param name="session">The associated <see cref="ISession"/></param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The container row</param>
-        public ParameterOptionRowViewModel(ParameterBase parameterBase, Option option, ISession session, IRowViewModelBase<Thing> containerViewModel)
-            : base(parameterBase, session, option, null, containerViewModel, 0)
+        public ParameterOptionRowViewModel(ParameterBase parameterBase, Option option, ISession session, ICDPMessageBus messageBus, IRowViewModelBase<Thing> containerViewModel)
+            : base(parameterBase, session, messageBus, option, null, containerViewModel, 0)
         {
             this.Name = this.ActualOption.Name;
             this.Option = this.ActualOption;
 
-            var optionListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Option)
+            var optionListener = this.MessageBus.Listen<ObjectChangedEvent>(this.Option)
                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                                    .ObserveOn(RxApp.MainThreadScheduler)
                                    .Subscribe(x => { this.Name = this.ActualOption.Name; });

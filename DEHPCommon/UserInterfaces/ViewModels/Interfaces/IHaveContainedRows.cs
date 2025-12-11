@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHaveContainedRows.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="IHaveContainedRows.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -26,8 +26,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
     using CDP4Common.CommonData;
 
-    using DEHPCommon.Mvvm;
-    
+    using DynamicData;
+
     /// <summary>
     /// The interface for the viewmodels that contain a <see cref="ContainedRows"/> property
     /// </summary>
@@ -36,6 +36,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets the Contained <see cref="IRowViewModelBase{T}"/> viewmodels
         /// </summary>
-        DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; }
+        SourceList<IRowViewModelBase<Thing>> ContainedRows { get; }
     }
 }

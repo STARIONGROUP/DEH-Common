@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ElementDefinitionsBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -45,6 +45,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using ReactiveUI;
+    using DynamicData;
+    using System.Reactive;
+    using DEHPCommon.Mvvm;
 
     /// <summary>
     /// Represent the view-model of the browser that displays all the <see cref="ElementDefinition"/>s in one <see cref="Iteration"/>
@@ -85,13 +88,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// Backing field for <see cref="CanCreateOverride"/>
         /// </summary>
         private bool canCreateOverride;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionsBrowserViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
         /// <param name="session">The session</param>
-        public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session) : base(iteration, session)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        public ElementDefinitionsBrowserViewModel(Iteration iteration, ISession session, ICDPMessageBus messageBus) : base(iteration, session, messageBus)
         {
             this.Name = nameof(ElementDefinition);
             this.Initialize();
@@ -163,12 +167,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
         /// </summary>
-        public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
+        public  ReactiveCommand<Unit, Unit> CopyModelCodeToClipboardCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to show the usages of specified element definition
         /// </summary>
-        public ReactiveCommand<object> HighlightElementUsagesCommand { get; private set; }
+        public  ReactiveCommand<Unit, Unit> HighlightElementUsagesCommand { get; private set; }
         
         /// <summary>
         /// Initializes the create <see cref="ReactiveCommand"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
@@ -178,11 +182,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels
             base.InitializeCommands();
             this.ComputeNotContextDependentPermission();
 
-            this.HighlightElementUsagesCommand = ReactiveCommand.Create();
-            this.HighlightElementUsagesCommand.Subscribe(_ => this.ExecuteHighlightElementUsagesCommand());
-
-            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
-            this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
+            this.HighlightElementUsagesCommand = ReactiveCommand.Create(() => this.ExecuteHighlightElementUsagesCommand());
+            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create(() => this.ExecuteCopyModelCodeToClipboardCommand());
         }
 
         /// <summary>
@@ -290,16 +291,18 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <summary>
         /// executes the <see cref="BrowserViewModel{T}.ChangeFocusCommand"/>
         /// </summary>
-        protected override void ExecuteChangeFocusCommand()
+        protected override Unit ExecuteChangeFocusCommand()
         {
             var usage = (ElementUsage)this.SelectedThing.Thing;
-            var definitionRow = this.ContainedRows.SingleOrDefault(x => x.Thing == usage.ElementDefinition);
+            var definitionRow = this.ContainedRows.Items.SingleOrDefault(x => x.Thing == usage.ElementDefinition);
             
             if (definitionRow != null)
             {
                 this.SelectedThing = definitionRow;
                 this.FocusedRow = definitionRow;
             }
+
+            return base.ExecuteChangeFocusCommand();
         }
 
         /// <summary>
@@ -311,10 +314,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            foreach (var elementDef in this.ContainedRows)
-            {
-                elementDef.Dispose();
-            }
+            this.ContainedRows.ClearAndDispose();
         }
 
         /// <summary>
@@ -345,7 +345,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private void UpdateElementDefinition()
         {
-            var currentDef = this.ContainedRows.Select(x => (ElementDefinition)x.Thing).ToList();
+            var currentDef = this.ContainedRows.Items.Select(x => (ElementDefinition)x.Thing).ToList();
             var addedDef = this.Thing.Element.Except(currentDef).ToList();
             var removedDef = currentDef.Except(this.Thing.Element).ToList();
 
@@ -359,7 +359,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 this.RemoveElementDefinitionRow(elementDefinition);
             }
 
-            var topElementDefinitionOld = this.ContainedRows.FirstOrDefault(vm => ((ElementDefinitionRowViewModel)vm).IsTopElement);
+            var topElementDefinitionOld = this.ContainedRows.Items.FirstOrDefault(vm => ((ElementDefinitionRowViewModel)vm).IsTopElement);
 
             if (this.Thing.TopElement == null)
             {
@@ -372,7 +372,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
                 return;
             }
 
-            if (this.ContainedRows.FirstOrDefault(vm => vm.Thing.Iid == this.Thing.TopElement.Iid) is ElementDefinitionRowViewModel topElementDefinitionNew)
+            if (this.ContainedRows.Items.FirstOrDefault(vm => vm.Thing.Iid == this.Thing.TopElement.Iid) is ElementDefinitionRowViewModel topElementDefinitionNew)
             {
                 topElementDefinitionNew.IsTopElement = true;
 
@@ -391,10 +391,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         protected virtual void ExecuteHighlightElementUsagesCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.MessageBus.SendMessage(new CancelHighlightEvent());
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), this.SelectedThing.Thing);
+            this.MessageBus.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), this.SelectedThing.Thing);
         }
 
         /// <summary>
@@ -403,7 +403,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <param name="elementDef">The <see cref="ElementDefinition"/> to add</param>
         private void AddElementDefinitionRow(ElementDefinition elementDef)
         {
-            var row = new ElementDefinitionRowViewModel(elementDef, this.QueryCurrentDomainOfExpertise(), this.Session, this);
+            var row = new ElementDefinitionRowViewModel(elementDef, this.QueryCurrentDomainOfExpertise(), this.Session, this.MessageBus, this);
             this.ContainedRows.SortedInsert(row, RowComparer);
         }
 
@@ -413,7 +413,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// <param name="elementDef">The <see cref="ElementDefinition"/> to remove</param>
         private void RemoveElementDefinitionRow(ElementDefinition elementDef)
         {
-            var row = this.ContainedRows.SingleOrDefault(x => x.Thing == elementDef);
+            var row = this.ContainedRows.Items.SingleOrDefault(x => x.Thing == elementDef);
             
             if (row != null)
             {
@@ -436,21 +436,22 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            var engineeringModelSetupSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
+            var domainOfExpertiseSubscription = this.MessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) 
+                                            && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            var iterationSetupSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());

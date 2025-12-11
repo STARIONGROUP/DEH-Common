@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PublicationBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="PublicationBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -43,6 +43,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
     using DEHPCommon.UserInterfaces.ViewModels;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The view-model for the <see cref="PublicationBrowser"/> view
@@ -69,10 +70,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
         /// <param name="session">The session</param>
-        public PublicationsViewModel(Iteration iteration, ISession session) : base(iteration, session)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        public PublicationsViewModel(Iteration iteration, ISession session, ICDPMessageBus messageBus) : base(iteration, session, messageBus)
         {
-            this.Publications = new DisposableReactiveList<PublicationRowViewModel>();
-            this.Domains = new DisposableReactiveList<PublicationDomainOfExpertiseRowViewModel>();
+            this.Publications = new SourceList<PublicationRowViewModel>();
+            this.Domains = new SourceList<PublicationDomainOfExpertiseRowViewModel>();
 
             this.AddSubscriptions();
             this.UpdatePublications();
@@ -109,12 +111,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <summary>
         /// Gets the rows representing <see cref="Publication"/>s
         /// </summary>
-        public DisposableReactiveList<PublicationRowViewModel> Publications { get; private set; }
+        public SourceList<PublicationRowViewModel> Publications { get; private set; }
 
         /// <summary>
         /// Gets the rows representing <see cref="DomainOfExpertise"/>s
         /// </summary>
-        public DisposableReactiveList<PublicationDomainOfExpertiseRowViewModel> Domains { get; private set; }
+        public SourceList<PublicationDomainOfExpertiseRowViewModel> Domains { get; private set; }
 
         /// <summary>
         /// Gets all parameter rows.
@@ -123,7 +125,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         {
             get
             {
-                return this.Domains.SelectMany(d => d.ContainedRows).OfType<PublicationParameterOrOverrideRowViewModel>();
+                return this.Domains.Items.SelectMany(d => d.ContainedRows.Items).OfType<PublicationParameterOrOverrideRowViewModel>();
             }
         }
 
@@ -133,7 +135,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         private void AddSubscriptions()
         {
             var updatePublishableParameterListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase))
+                this.MessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase))
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated
                                         && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
                                         && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -143,7 +145,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             this.Disposables.Add(updatePublishableParameterListener);
 
             var addParameterListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                this.MessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added
                                            && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
                                            && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -153,7 +155,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             this.Disposables.Add(addParameterListener);
 
             var updateParameterListener =
-                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                 this.MessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
                  .Where(objectChange => objectChange.EventKind == EventKind.Updated
                                     && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
                                     && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -163,7 +165,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             this.Disposables.Add(updateParameterListener);
 
             var removeParameterListener =
-                 CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                 this.MessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
                  .Where(objectChange => objectChange.EventKind == EventKind.Removed
                                     && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
                                     && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -173,7 +175,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             this.Disposables.Add(removeParameterListener);
 
             var addPublicationListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Publication))
+                this.MessageBus.Listen<ObjectChangedEvent>(typeof(Publication))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added
                                         && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
                                         && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -183,28 +185,28 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             this.Disposables.Add(addPublicationListener);
 
             var updatedEngineeringModelListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                this.MessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.UpdateDomains());
             this.Disposables.Add(updatedEngineeringModelListener);
 
             var updateDomainOfExpretiseListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                this.MessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as DomainOfExpertise)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.UpdateDomainOfExpretiseRowViewModel);
             this.Disposables.Add(updateDomainOfExpretiseListener);
 
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            var engineeringModelSetupSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated
                                         && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+            var domainOfExpertiseSubscription = this.MessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated
                                         && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber
                                         && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -212,7 +214,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
                     .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            var iterationSetupSubscription = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated
                                         && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -242,14 +244,14 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <param name="parameter">The <see cref="ParameterOrOverrideBase"/> that this row will belong to.</param>
         private void AddPublishableParameterRowViewModel(ParameterOrOverrideBase parameter)
         {
-            var domainRow = this.Domains.SingleOrDefault(vm => vm.Thing == parameter.Owner);
+            var domainRow = this.Domains.Items.SingleOrDefault(vm => vm.Thing == parameter.Owner);
             if (domainRow == null)
             {
                 return;
             }
 
             // if the row already exists then simply update it
-            var parameterRow = domainRow.ContainedRows.FirstOrDefault(pr => pr.Thing == parameter);
+            var parameterRow = domainRow.ContainedRows.Items.FirstOrDefault(pr => pr.Thing == parameter);
             if (parameterRow != null)
             {
                 ((PublicationParameterOrOverrideRowViewModel)parameterRow).SetProperties();
@@ -257,7 +259,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             }
 
             // create the row only if it is publishable
-            parameterRow = new PublicationParameterOrOverrideRowViewModel(parameter, this.Session, domainRow);
+            parameterRow = new PublicationParameterOrOverrideRowViewModel(parameter, this.Session, this.MessageBus, domainRow);
 
             // if the domain row has a checkbox, select this one as well.
             ((PublicationParameterOrOverrideRowViewModel)parameterRow).ToBePublished = domainRow.ToBePublished;
@@ -271,13 +273,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <param name="parameter">The parameter that is no longer publishable.</param>
         private void RemovePublishableParameterRowViewModel(ParameterOrOverrideBase parameter)
         {
-            var domainRow = this.Domains.SingleOrDefault(vm => vm.Thing == parameter.Owner);
+            var domainRow = this.Domains.Items.SingleOrDefault(vm => vm.Thing == parameter.Owner);
             if (domainRow == null)
             {
                 return;
             }
 
-            var parameterRow = domainRow.ContainedRows.FirstOrDefault(pr => pr.Thing == parameter);
+            var parameterRow = domainRow.ContainedRows.Items.FirstOrDefault(pr => pr.Thing == parameter);
             if (parameterRow != null)
             {
                 domainRow.ContainedRows.RemoveAndDispose(parameterRow);
@@ -291,10 +293,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         private void RelocateParameterRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase)
         {
             // In case the owner has changed check if there are other domains that contain that parameter.
-            var oldOwners = this.Domains.Where(d => d.ContainedRows.Any(p => p.Thing == parameterOrOverrideBase) && d.Thing != parameterOrOverrideBase.Owner);
+            var oldOwners = this.Domains.Items.Where(d => d.ContainedRows.Items.Any(p => p.Thing == parameterOrOverrideBase) && d.Thing != parameterOrOverrideBase.Owner);
             foreach (var owner in oldOwners)
             {
-                var row = owner.ContainedRows.FirstOrDefault(pr => pr.Thing == parameterOrOverrideBase);
+                var row = owner.ContainedRows.Items.FirstOrDefault(pr => pr.Thing == parameterOrOverrideBase);
                 if (row != null)
                 {
                     owner.ContainedRows.RemoveAndDispose(row);
@@ -306,16 +308,16 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
                 return;
             }
 
-            var domainRow = this.Domains.SingleOrDefault(vm => vm.Thing == parameterOrOverrideBase.Owner);
+            var domainRow = this.Domains.Items.SingleOrDefault(vm => vm.Thing == parameterOrOverrideBase.Owner);
             if (domainRow == null)
             {
                 return;
             }
 
-            var parameterRow = domainRow.ContainedRows.FirstOrDefault(pr => pr.Thing == parameterOrOverrideBase);
+            var parameterRow = domainRow.ContainedRows.Items.FirstOrDefault(pr => pr.Thing == parameterOrOverrideBase);
             if (parameterRow == null)
             {
-                parameterRow = new PublicationParameterOrOverrideRowViewModel(parameterOrOverrideBase, this.Session, domainRow);
+                parameterRow = new PublicationParameterOrOverrideRowViewModel(parameterOrOverrideBase, this.Session, this.MessageBus, domainRow);
 
                 // if the domain row has a checkbox, select this one as well.
                 ((PublicationParameterOrOverrideRowViewModel)parameterRow).ToBePublished = domainRow.ToBePublished;
@@ -330,19 +332,19 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <param name="publication">The associated <see cref="Publication"/></param>
         private void AddPublicationRowViewModel(Publication publication)
         {
-            if (this.Publications.Any(x => x.Thing == publication))
+            if (this.Publications.Items.Any(x => x.Thing == publication))
             {
                 return;
             }
 
-            var row = new PublicationRowViewModel(publication, this.Session, this);
+            var row = new PublicationRowViewModel(publication, this.Session, this.MessageBus, this);
             row.Index = this.Thing.Publication.IndexOf(publication);
 
             var listOfParams = new List<PublicationParameterOrOverrideRowViewModel>();
 
             foreach (var parameterOrOverrideBase in publication.PublishedParameter)
             {
-                var parameterRow = new PublicationParameterOrOverrideRowViewModel(parameterOrOverrideBase, this.Session, row);
+                var parameterRow = new PublicationParameterOrOverrideRowViewModel(parameterOrOverrideBase, this.Session, this.MessageBus, row);
 
                 // turn off the checkbox for this row
                 parameterRow.IsCheckable = false;
@@ -382,12 +384,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         private void UpdatePublications()
         {
-            var newPublications = this.Thing.Publication.Except(this.Publications.Select(x => x.Thing)).ToList();
-            var oldPublications = this.Publications.Select(x => x.Thing).Except(this.Thing.Publication).ToList();
+            var newPublications = this.Thing.Publication.Except(this.Publications.Items.Select(x => x.Thing)).ToList();
+            var oldPublications = this.Publications.Items.Select(x => x.Thing).Except(this.Thing.Publication).ToList();
 
             foreach (var publication in oldPublications)
             {
-                var row = this.Publications.SingleOrDefault(x => x.Thing == publication);
+                var row = this.Publications.Items.SingleOrDefault(x => x.Thing == publication);
                 if (row != null)
                 {
                     this.Publications.RemoveAndDispose(row);
@@ -399,7 +401,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
                 this.AddPublicationRowViewModel(publication);
             }
 
-            this.Publications.Sort((o1, o2) => o1.Index.CompareTo(o2.Index));
+            this.Publications.Items.ToList().Sort((o1, o2) => o1.Index.CompareTo(o2.Index));
         }
 
         /// <summary>
@@ -407,12 +409,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         private void UpdateDomains()
         {
-            var newDomains = this.CurrentEngineeringModelSetup.ActiveDomain.Except(this.Domains.Select(x => x.Thing)).ToList();
-            var oldDomains = this.Domains.Select(x => x.Thing).Except(this.CurrentEngineeringModelSetup.ActiveDomain).ToList();
+            var newDomains = this.CurrentEngineeringModelSetup.ActiveDomain.Except(this.Domains.Items.Select(x => x.Thing)).ToList();
+            var oldDomains = this.Domains.Items.Select(x => x.Thing).Except(this.CurrentEngineeringModelSetup.ActiveDomain).ToList();
 
             foreach (var domain in oldDomains)
             {
-                var row = this.Domains.SingleOrDefault(x => x.Thing == domain);
+                var row = this.Domains.Items.SingleOrDefault(x => x.Thing == domain);
                 if (row != null)
                 {
                     this.Domains.RemoveAndDispose(row);
@@ -433,7 +435,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         private void SortDomains()
         {
-            this.Domains.Sort((o1, o2) =>
+            this.Domains.Items.ToList().Sort((o1, o2) =>
             {
                 var nameO1 = o1.Name ?? string.Empty;
                 var nameO2 = o2.Name ?? string.Empty;
@@ -453,13 +455,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <param name="domain">Domain to be added</param>
         private void AddDomainOfExpretiseRowViewModel(DomainOfExpertise domain)
         {
-            var row = new PublicationDomainOfExpertiseRowViewModel(domain, this.Session, this);
+            var row = new PublicationDomainOfExpertiseRowViewModel(domain, this.Session, this.MessageBus, this);
 
             var listOfParams = new List<PublicationParameterOrOverrideRowViewModel>();
 
             foreach (var parameter in domain.OwnedParametersThatCanBePublished(this.Thing))
             {
-                var parameterRow = new PublicationParameterOrOverrideRowViewModel(parameter, this.Session, row);
+                var parameterRow = new PublicationParameterOrOverrideRowViewModel(parameter, this.Session, this.MessageBus, row);
                 listOfParams.Add(parameterRow);
             }
 
@@ -473,7 +475,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// <param name="domain">Domain to be removed</param>
         private void RemoveDomainOfExpretiseRowViewModel(DomainOfExpertise domain)
         {
-            var domainRow = this.Domains.SingleOrDefault(vm => vm.Thing == domain);
+            var domainRow = this.Domains.Items.SingleOrDefault(vm => vm.Thing == domain);
 
             if (domainRow != null)
             {
@@ -491,7 +493,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
             {
                 this.RemoveDomainOfExpretiseRowViewModel(domain);
             }
-            else if (this.Domains.SingleOrDefault(vm => vm.Thing == domain) == null)
+            else if (this.Domains.Items.SingleOrDefault(vm => vm.Thing == domain) == null)
             {
                 this.AddDomainOfExpretiseRowViewModel(domain);
                 this.SortDomains();
@@ -525,12 +527,12 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         {
             base.Dispose(disposing);
 
-            foreach (var publication in this.Publications)
+            foreach (var publication in this.Publications.Items)
             {
                 publication.Dispose();
             }
 
-            foreach (var domain in this.Domains)
+            foreach (var domain in this.Domains.Items)
             {
                 domain.Dispose();
             }

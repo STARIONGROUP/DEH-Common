@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinedThingRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="DefinedThingRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -32,6 +32,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Row class representing a <see cref="DefinedThing"/>
@@ -53,8 +54,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         /// <param name="definedThing">The <see cref="DefinedThing"/> associated with this row</param>
         /// <param name="session">The session</param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> that is the container of this <see cref="IRowViewModelBase{T}"/></param>
-        protected DefinedThingRowViewModel(T definedThing, ISession session, IViewModelBase<Thing> containerViewModel) : base(definedThing, session, containerViewModel)
+        protected DefinedThingRowViewModel(T definedThing, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel) : base(definedThing, session, messageBus, containerViewModel)
         {
             this.UpdateProperties();
         }

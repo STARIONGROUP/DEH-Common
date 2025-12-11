@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ObjectBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ObjectBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -25,7 +25,9 @@
 namespace DEHPCommon.UserInterfaces.ViewModels
 {
     using CDP4Common.CommonData;
-    
+
+    using CDP4Dal;
+
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
     
@@ -40,8 +42,9 @@ namespace DEHPCommon.UserInterfaces.ViewModels
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="objectBrowserTreeSelectorService">The <see cref="IObjectBrowserTreeSelectorService"/></param>
-        public ObjectBrowserViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService)
-        : base (hubController, objectBrowserTreeSelectorService)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        public ObjectBrowserViewModel(IHubController hubController, IObjectBrowserTreeSelectorService objectBrowserTreeSelectorService, ICDPMessageBus messageBus)
+            : base (hubController, objectBrowserTreeSelectorService, messageBus)
         {
         }
     }

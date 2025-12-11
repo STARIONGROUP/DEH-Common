@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PublicationRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="PublicationRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 // 
@@ -46,9 +46,10 @@ namespace DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser
         /// </summary>
         /// <param name="publication">The <see cref="Publication"/> associated with this row</param>
         /// <param name="session">The session</param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public PublicationRowViewModel(Publication publication, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(publication, session, containerViewModel)
+        public PublicationRowViewModel(Publication publication, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel)
+            : base(publication, session, messageBus, containerViewModel)
         {
         }
 

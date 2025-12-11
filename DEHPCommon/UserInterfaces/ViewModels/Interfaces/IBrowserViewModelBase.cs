@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IBrowserViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="IBrowserViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -26,7 +26,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
     using CDP4Common.CommonData;
 
-    using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The interface for the browser-view-model
@@ -47,6 +47,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets the context menu view-model
         /// </summary>
-        ReactiveList<ContextMenuItemViewModel> ContextMenu { get; }
+        SourceList<ContextMenuItemViewModel> ContextMenu { get; }
     }
 }

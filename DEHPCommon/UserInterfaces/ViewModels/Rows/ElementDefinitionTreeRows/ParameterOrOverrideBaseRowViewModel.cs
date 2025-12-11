@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2020 RHEA System S.A.
+// <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -42,6 +42,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// The row representing a <see cref="ParameterOrOverrideBase"/>
@@ -70,8 +71,11 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// <param name="containerViewModel">
         /// The container Row.
         /// </param>
-        protected ParameterOrOverrideBaseRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(parameterOrOverrideBase, session, containerViewModel)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        protected ParameterOrOverrideBaseRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, ICDPMessageBus messageBus, IViewModelBase<Thing> containerViewModel)
+            : base(parameterOrOverrideBase, session, messageBus, containerViewModel)
         {
             if (this.Thing.Iid != Guid.Empty)
             {
@@ -113,7 +117,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(valueset)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.SetProperties());
@@ -136,7 +140,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         /// </summary>
         protected void SetOwnerListener()
         {
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
+            var listener = this.MessageBus.Listen<ObjectChangedEvent>(this.Thing.Owner)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(
@@ -309,7 +313,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 return value;
             }
 
-            return ValueValidator.DefaultValue;
+            return "-";
         }
 
         /// <summary>
@@ -369,13 +373,13 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
 
             if (actualOption != null)
             {
-                var optionRow = this.ContainedRows.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
+                var optionRow = this.ContainedRows.Items.Cast<ParameterOptionRowViewModel>().Single(x => x.ActualOption == actualOption);
 
                 if (actualState != null)
                 {
                     if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
                     {
-                        var actualStateRow = optionRow.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        var actualStateRow = optionRow.ContainedRows.Items.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
                         this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
                     }
                 }
@@ -390,7 +394,7 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
                 {
                     if (actualState.Kind != ActualFiniteStateKind.FORBIDDEN)
                     {
-                        var actualStateRow = this.ContainedRows.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
+                        var actualStateRow = this.ContainedRows.Items.Cast<ParameterStateRowViewModel>().Single(x => x.ActualState == actualState);
                         this.UpdateScalarOrCompoundValueSet(valueSet, actualStateRow);
                     }
                 }
@@ -445,8 +449,8 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows
         private void UpdateCompoundValueSet(ParameterValueSetBase valueSet, IHaveContainedRows row = null)
         {
             var componentRows = row == null
-                ? this.ContainedRows.Cast<ParameterComponentValueRowViewModel>().ToList()
-                : row.ContainedRows.Cast<ParameterComponentValueRowViewModel>().ToList();
+                ? this.ContainedRows.Items.Cast<ParameterComponentValueRowViewModel>().ToList()
+                : row.ContainedRows.Items.Cast<ParameterComponentValueRowViewModel>().ToList();
 
             valueSet.Computed = new ValueArray<string>(new string[componentRows.Count]);
             valueSet.Manual = new ValueArray<string>(new string[componentRows.Count]);

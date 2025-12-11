@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHaveContextMenuViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
+// <copyright file="IHaveContextMenuViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2020-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
@@ -24,7 +24,10 @@
 
 namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
 {
+    using DynamicData;
+
     using ReactiveUI;
+    using DynamicData;
 
     /// <summary>
     /// Interface definition for view models that has a context menu
@@ -39,6 +42,6 @@ namespace DEHPCommon.UserInterfaces.ViewModels.Interfaces
         /// <summary>
         /// Gets the Context Menu for the implementing view model
         /// </summary>
-        ReactiveList<ContextMenuItemViewModel> ContextMenu { get; }
+        SourceList<ContextMenuItemViewModel> ContextMenu { get; }
     }
 }

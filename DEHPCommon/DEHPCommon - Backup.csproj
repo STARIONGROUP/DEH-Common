@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
@@ -205,4 +205,8 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <Target Name="DeployToLocal" AfterTargets="Pack" Condition="'$(Configuration)' == 'Debug'">
+    <Copy SourceFiles="bin/Debug/$(AssemblyName).$(Version).nupkg" DestinationFolder="C:\LocalNugetFeed" />
+    <Message Text="[LocalNugetPublisher.🐙] ==&gt; Nuget package Version $(Version) locally installed to C:\LocalNugetFeed" Importance="high" />
+  </Target>
 </Project>
